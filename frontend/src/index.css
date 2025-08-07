@@ -1,0 +1,103 @@
+/* Import Bengali fonts */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap');
+
+/* CSS Variables */
+:root {
+  --font-bengali: 'Noto Sans Bengali', sans-serif;
+  --color-primary: #000000;
+  --color-secondary: #333333;
+  --color-text: #000000;
+  --color-text-light: #666666;
+  --color-background: #ffffff;
+  --color-border: #e0e0e0;
+  --color-hover: #f5f5f5;
+  --color-active: #000000;
+  --color-accent: #444444;
+  --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 4px 8px rgba(0, 0, 0, 0.15);
+  --transition: all 0.3s ease;
+}
+
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-bengali);
+  line-height: 1.6;
+  color: var(--color-text);
+  background-color: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Bengali text styles */
+.bengali-text {
+  font-family: var(--font-bengali);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.bengali-heading {
+  font-family: var(--font-bengali);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Utility classes */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-family: var(--font-bengali);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #333333;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 15px;
+  }
+}
+
+/* Focus styles for accessibility */
+*:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --color-border: #000000;
+    --color-text: #000000;
+    --color-text-light: #333333;
+  }
+}

@@ -1,0 +1,145 @@
+.news-container {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 20px;
+  min-height: calc(100vh - 200px);
+}
+
+.news-main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.featured-news-section {
+  width: 100%;
+}
+
+.featured-news-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.trending-news-sidebar {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 24px;
+  height: fit-content;
+  position: sticky;
+  top: 100px;
+  border: 1px solid #e9ecef;
+}
+
+.trending-news-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Loading States */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 16px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-container p {
+  font-size: 16px;
+  color: #666;
+  font-family: var(--font-bengali, 'Noto Sans Bengali', sans-serif);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .news-container {
+    grid-template-columns: 1fr 280px;
+    gap: 24px;
+    padding: 20px 16px;
+  }
+  
+  .trending-news-sidebar {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .news-container {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 16px 12px;
+  }
+  
+  .trending-news-sidebar {
+    position: static;
+    order: -1;
+    padding: 16px;
+  }
+  
+  .trending-news-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+  }
+  
+  .news-main-content {
+    gap: 24px;
+  }
+  
+  .featured-news-grid {
+    gap: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .news-container {
+    padding: 12px 8px;
+    gap: 20px;
+  }
+  
+  .trending-news-sidebar {
+    padding: 12px;
+  }
+  
+  .trending-news-list {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .featured-news-grid {
+    gap: 16px;
+  }
+  
+  .loading-container {
+    min-height: 300px;
+  }
+  
+  .loading-spinner {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .loading-container p {
+    font-size: 14px;
+  }
+} 

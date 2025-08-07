@@ -1,0 +1,162 @@
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.section-title--center {
+  justify-content: center;
+  text-align: center;
+}
+
+.section-title--right {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.section-title-border {
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+  opacity: 0.6;
+}
+
+.section-title--center .section-title-border {
+  max-width: 60px;
+}
+
+.section-title-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.section-title-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  color: white;
+  font-size: 18px;
+}
+
+.section-title-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.section-title-main {
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+  font-family: var(--font-bengali, 'Noto Sans Bengali', sans-serif);
+  line-height: 1.2;
+}
+
+.section-title-subtitle {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+  font-family: var(--font-bengali, 'Noto Sans Bengali', sans-serif);
+}
+
+/* Variants */
+.section-title--vertical {
+  flex-direction: column;
+  gap: 12px;
+  text-align: center;
+}
+
+.section-title--vertical .section-title-border {
+  width: 2px;
+  height: 40px;
+  background: linear-gradient(180deg, transparent, var(--color-primary), transparent);
+}
+
+.section-title--vertical .section-title-content {
+  flex-direction: column;
+  gap: 8px;
+}
+
+.section-title--vertical .section-title-main {
+  font-size: 20px;
+}
+
+.section-title--compact {
+  margin-bottom: 16px;
+}
+
+.section-title--compact .section-title-main {
+  font-size: 20px;
+}
+
+.section-title--compact .section-title-border {
+  height: 1px;
+}
+
+.section-title--large {
+  margin-bottom: 32px;
+}
+
+.section-title--large .section-title-main {
+  font-size: 28px;
+}
+
+.section-title--large .section-title-border {
+  height: 3px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .section-title {
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  
+  .section-title-main {
+    font-size: 20px;
+  }
+  
+  .section-title-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+  
+  .section-title--large .section-title-main {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-title {
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  
+  .section-title-main {
+    font-size: 18px;
+  }
+  
+  .section-title-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+  }
+  
+  .section-title--vertical .section-title-main {
+    font-size: 16px;
+  }
+  
+  .section-title--large .section-title-main {
+    font-size: 20px;
+  }
+} 
