@@ -25,13 +25,14 @@
 }
 
 .trending-news-sidebar {
-  background: #f8f9fa;
+  background: #ffffff;
   border-radius: 12px;
   padding: 24px;
   height: fit-content;
   position: sticky;
   top: 100px;
   border: 1px solid #e9ecef;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .trending-news-list {

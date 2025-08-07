@@ -77,27 +77,16 @@
 .logo {
   text-decoration: none;
   color: inherit;
-}
-
-.logo-text {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  line-height: 1.2;
+  justify-content: center;
 }
 
-.logo-english {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--color-primary);
-  font-family: 'Arial', sans-serif;
-}
-
-.logo-bengali {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--color-secondary);
-  font-family: var(--font-bengali);
+.logo-image {
+  height: 90px;
+  width: auto;
+  object-fit: contain;
+  max-width: 350px;
 }
 
 /* Right Side - Actions */
@@ -266,12 +255,9 @@
     min-height: 50px;
   }
 
-  .logo-english {
-    font-size: 16px;
-  }
-
-  .logo-bengali {
-    font-size: 14px;
+  .logo-image {
+    height: 80px;
+    max-width: 250px;
   }
 
   .action-btn {

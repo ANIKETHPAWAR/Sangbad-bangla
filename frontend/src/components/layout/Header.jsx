@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiSearch, FiX, FiUser, FiFacebook, FiGlobe } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
+import logo from '../../assets/logo.jpg';
 import './Header.css';
 
 const Header = ({ 
@@ -44,10 +45,7 @@ const Header = ({
           {/* Center - Logo */}
           <div className="header-center">
             <Link to="/" className="logo">
-              <div className="logo-text">
-                <span className="logo-english">Hindustan Times</span>
-                <span className="logo-bengali">বাংলা</span>
-              </div>
+              <img src={logo} alt="Sangbad Bangla" className="logo-image" />
             </Link>
           </div>
 
