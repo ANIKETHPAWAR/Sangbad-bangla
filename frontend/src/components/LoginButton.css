@@ -1,0 +1,22 @@
+.login-button {
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: var(--transition);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-family: var(--font-bengali);
+}
+
+.login-button:hover {
+  color: var(--color-primary);
+  background-color: var(--color-hover);
+}
+
+.login-button:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}

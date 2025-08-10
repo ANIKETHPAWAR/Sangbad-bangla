@@ -1,0 +1,21 @@
+.logout-button {
+  background: none;
+  border: none;
+  color: var(--color-text-light);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: var(--transition);
+  font-family: var(--font-bengali);
+}
+
+.logout-button:hover {
+  color: var(--color-primary);
+  background-color: var(--color-hover);
+}
+
+.logout-button:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}

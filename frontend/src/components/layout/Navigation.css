@@ -17,7 +17,7 @@
 
 /* Mobile Menu Button */
 .mobile-menu-btn {
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: center;
   width: 40px;
@@ -238,9 +238,7 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .mobile-menu-btn {
-    display: flex;
-  }
+  /* Mobile menu button is already displayed */
 
   .nav-links {
     display: none;

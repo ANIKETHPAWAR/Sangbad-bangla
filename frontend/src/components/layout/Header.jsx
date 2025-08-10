@@ -1,7 +1,9 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiSearch, FiX, FiUser, FiFacebook, FiGlobe } from 'react-icons/fi';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth0 } from '@auth0/auth0-react';
+import LoginButton from '../LoginButton';
+import LogoutButton from '../LogoutButton';
 import logo from '../../assets/logo.jpg';
 import './Header.css';
 
@@ -18,29 +20,13 @@ const Header = ({
   setIsTranslatorOpen
 }) => {
   const navigate = useNavigate();
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, logout, isAuthenticated } = useAuth0();
   return (
     <div className="header">
       <div className="container">
         <div className="header-content">
           {/* Left Side - Notification Icon */}
-          <div className="header-left">
-            <div className="notification-icon">
-              <div className="icon-wrapper" onClick={requestPermission}>
-                <div className="notepad-icon">📝</div>
-              </div>
-              {newsError && (
-                <div className="connection-status error">
-                  <span>⚠️</span>
-                </div>
-              )}
-              {isConnected && (
-                <div className="connection-status connected">
-                  <span>🟢</span>
-                </div>
-              )}
-            </div>
-          </div>
+          
 
           {/* Center - Logo */}
           <div className="header-center">
@@ -80,29 +66,14 @@ const Header = ({
             
             <div className="separator"></div>
             
-            <button className="action-btn user-btn" aria-label="User">
-              <FiUser />
-            </button>
-            
             {isAuthenticated ? (
               <div className="user-menu">
+                <span className="user-greeting">Hello,</span>
                 <span className="user-name">{user?.name || user?.email}</span>
-                <button 
-                  className="logout-button"
-                  onClick={logout}
-                  aria-label="Logout"
-                >
-                  Logout
-                </button>
+                <LogoutButton />
               </div>
             ) : (
-              <span 
-                className="sign-in-text"
-                onClick={() => navigate('/signin')}
-                style={{ cursor: 'pointer' }}
-              >
-                Sign In
-              </span>
+              <LoginButton />
             )}
           </div>
         </div>

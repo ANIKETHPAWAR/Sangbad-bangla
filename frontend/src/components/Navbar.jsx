@@ -6,7 +6,7 @@ import { useNewsData } from '../hooks/useNewsData';
 import { useNotifications } from '../hooks/useNotifications';
 import './Navbar.css';
 
-const Navbar = () => {
+const Navbar = ({ onSidebarToggle }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isTranslatorOpen, setIsTranslatorOpen] = useState(false);
@@ -67,6 +67,7 @@ const Navbar = () => {
         isMobileMenuOpen={isMobileMenuOpen}
         setIsMobileMenuOpen={setIsMobileMenuOpen}
         handleNavClick={handleNavClick}
+        onSidebarToggle={onSidebarToggle}
       />
 
         {/* Translator Component */}

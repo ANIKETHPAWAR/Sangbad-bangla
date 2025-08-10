@@ -6,7 +6,8 @@ import './Navigation.css';
 const Navigation = ({ 
   isMobileMenuOpen, 
   setIsMobileMenuOpen, 
-  handleNavClick
+  handleNavClick,
+  onSidebarToggle
 }) => {
   const location = useLocation();
   const [currentDate, setCurrentDate] = useState('');
@@ -53,8 +54,8 @@ const Navigation = ({
           {/* Mobile Menu Button */}
           <button 
             className="mobile-menu-btn"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label="Toggle menu"
+            onClick={onSidebarToggle}
+            aria-label="Toggle sidebar"
           >
             <FiMenu />
           </button>

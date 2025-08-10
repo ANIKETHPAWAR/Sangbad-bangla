@@ -1,1 +1,10 @@
 @import "tailwindcss";
+
+.app-layout {
+  display: block;
+}
+
+.app-main {
+  min-height: calc(100vh - 200px);
+  width: 100%;
+}

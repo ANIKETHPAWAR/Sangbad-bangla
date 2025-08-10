@@ -1,9 +1,12 @@
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { GoogleOAuthProvider } from '@react-oauth/google';
+import { Auth0Provider } from '@auth0/auth0-react';
 import Navbar from './components/Navbar';
+import Sidebar from './components/layout/Sidebar';
+import Footer from './components/layout/Footer';
 import { NewsContainer } from './components/news';
 import SignIn from './pages/SignIn';
-import { AuthProvider } from './context/AuthContext';
+
 import './App.css';
 
 // Placeholder components for routes
@@ -31,13 +34,24 @@ const NotFound = () => (
 );
 
 function App() {
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+
+  const handleSidebarToggle = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const handleSidebarClose = () => {
+    setIsSidebarOpen(false);
+  };
+
   return (
-    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID"}>
-      <AuthProvider>
-        <Router>
-          <div className="App">
-            <Navbar />
-            <main style={{ minHeight: 'calc(100vh - 200px)' }}>
+    
+      <Router>
+        <div className="App">
+          <Navbar onSidebarToggle={handleSidebarToggle} />
+          <Sidebar isOpen={isSidebarOpen} onClose={handleSidebarClose} />
+          <div className="app-layout container">
+            <main className="app-main">
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/signin" element={<SignIn />} />
@@ -58,9 +72,10 @@ function App() {
               </Routes>
             </main>
           </div>
-        </Router>
-      </AuthProvider>
-    </GoogleOAuthProvider>
+          <Footer />
+        </div>
+      </Router>
+   
   );
 }
 
