@@ -30,7 +30,7 @@ const NewsContainer = () => {
     loadNewsData();
   }, []);
 
-  const handleNewsClick = (newsId) => {
+  const handleNewsClick = () => {
     // Handle news click - navigate to detail page or open modal
   };
 

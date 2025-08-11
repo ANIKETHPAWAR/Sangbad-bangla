@@ -1,6 +1,6 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { FiSearch, FiX, FiUser, FiFacebook } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
+import { FiSearch, FiX, FiFacebook } from 'react-icons/fi';
 import { useAuth0 } from '@auth0/auth0-react';
 import LoginButton from '../LoginButton';
 import LogoutButton from '../LogoutButton';
@@ -12,13 +12,9 @@ const Header = ({
   setIsSearchOpen, 
   searchQuery, 
   setSearchQuery, 
-  handleSearch,
-  requestPermission,
-  newsError,
-  isConnected
+  handleSearch
 }) => {
-  const navigate = useNavigate();
-  const { user, logout, isAuthenticated } = useAuth0();
+  const { user, isAuthenticated } = useAuth0();
   return (
     <div className="header">
       <div className="container">

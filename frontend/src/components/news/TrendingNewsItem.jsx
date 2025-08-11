@@ -7,7 +7,6 @@ const TrendingNewsItem = ({
   imageUrl, 
   title, 
   subtitle,
-  excerpt,
   category,
   publishDate,
   author,

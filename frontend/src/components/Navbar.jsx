@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Header from './layout/Header';
 import Navigation from './layout/Navigation';
 import { useNewsData } from '../hooks/useNewsData';
@@ -12,9 +12,8 @@ const Navbar = ({ onSidebarToggle }) => {
 
   // Custom hooks
   const {
-    isConnected,
     error: newsError,
-    isLoading: newsLoading
+    isConnected
   } = useNewsData();
 
   const {
