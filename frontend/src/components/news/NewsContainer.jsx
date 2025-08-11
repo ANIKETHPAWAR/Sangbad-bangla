@@ -36,7 +36,6 @@ const NewsContainer = () => {
   }, []);
 
   const handleNewsClick = (newsId) => {
-    console.log('News clicked:', newsId);
     // Handle news click - navigate to detail page or open modal
   };
 

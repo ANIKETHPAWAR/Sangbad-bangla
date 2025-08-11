@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Header from './layout/Header';
 import Navigation from './layout/Navigation';
-import Translator from './Translator';
 import { useNewsData } from '../hooks/useNewsData';
 import { useNotifications } from '../hooks/useNotifications';
 import './Navbar.css';
@@ -9,7 +8,6 @@ import './Navbar.css';
 const Navbar = ({ onSidebarToggle }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isTranslatorOpen, setIsTranslatorOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Custom hooks
@@ -55,8 +53,7 @@ const Navbar = ({ onSidebarToggle }) => {
         requestPermission={requestPermission}
         newsError={newsError}
         isConnected={isConnected}
-        isTranslatorOpen={isTranslatorOpen}
-        setIsTranslatorOpen={setIsTranslatorOpen}
+
       />
 
       {/* Separator Line */}
@@ -70,11 +67,7 @@ const Navbar = ({ onSidebarToggle }) => {
         onSidebarToggle={onSidebarToggle}
       />
 
-        {/* Translator Component */}
-        <Translator 
-          isOpen={isTranslatorOpen} 
-          onClose={() => setIsTranslatorOpen(false)} 
-        />
+
       </nav>
     );
   };

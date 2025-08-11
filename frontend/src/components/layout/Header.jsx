@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiSearch, FiX, FiUser, FiFacebook, FiGlobe } from 'react-icons/fi';
+import { FiSearch, FiX, FiUser, FiFacebook } from 'react-icons/fi';
 import { useAuth0 } from '@auth0/auth0-react';
 import LoginButton from '../LoginButton';
 import LogoutButton from '../LogoutButton';
@@ -15,9 +15,7 @@ const Header = ({
   handleSearch,
   requestPermission,
   newsError,
-  isConnected,
-  isTranslatorOpen,
-  setIsTranslatorOpen
+  isConnected
 }) => {
   const navigate = useNavigate();
   const { user, logout, isAuthenticated } = useAuth0();
@@ -45,14 +43,7 @@ const Header = ({
               {isSearchOpen ? <FiX /> : <FiSearch />}
             </button>
             
-            <button 
-              className="action-btn translator-btn"
-              onClick={() => setIsTranslatorOpen(!isTranslatorOpen)}
-              aria-label="Translator"
-              title="English to Hindi Translator"
-            >
-              <FiGlobe />
-            </button>
+
             
             <a 
               href="https://facebook.com" 
