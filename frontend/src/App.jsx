@@ -57,16 +57,18 @@ function App() {
                 <Route path="/signin" element={<SignIn />} />
                 <Route path="/all-news" element={<CategoryPage category="সব খবর" />} />
                 <Route path="/popular" element={<CategoryPage category="জনপ্রিয়" />} />
-                <Route path="/cricket" element={<CategoryPage category="ক্রিকেট" />} />
-                <Route path="/bengal-face" element={<CategoryPage category="বাংলার মুখ" />} />
-                <Route path="/astrology" element={<CategoryPage category="ভাগ্যলিপি" />} />
-                <Route path="/football" element={<CategoryPage category="ফুটবল" />} />
-                <Route path="/bioscope" element={<CategoryPage category="বায়োস্কোপ" />} />
-                <Route path="/photo-gallery" element={<CategoryPage category="ছবিঘর" />} />
-                <Route path="/kolkata" element={<CategoryPage category="কলকাতা" />} />
-                <Route path="/careers" element={<CategoryPage category="কর্মখালি" />} />
-                <Route path="/web-stories" element={<CategoryPage category="ওয়েবস্টোরি" />} />
-                <Route path="/lifestyle" element={<CategoryPage category="টুকিটাকি" />} />
+                <Route path="/technology" element={<CategoryPage category="প্রযুক্তি" />} />
+                <Route path="/environment" element={<CategoryPage category="পরিবেশ" />} />
+                <Route path="/culture" element={<CategoryPage category="সংস্কৃতি" />} />
+                <Route path="/education" element={<CategoryPage category="শিক্ষা" />} />
+                <Route path="/tourism" element={<CategoryPage category="পর্যটন" />} />
+                <Route path="/economy" element={<CategoryPage category="অর্থনীতি" />} />
+                <Route path="/health" element={<CategoryPage category="স্বাস্থ্য" />} />
+                <Route path="/industry" element={<CategoryPage category="শিল্প" />} />
+                <Route path="/agriculture" element={<CategoryPage category="কৃষি" />} />
+                <Route path="/art" element={<CategoryPage category="শিল্পকলা" />} />
+                <Route path="/science" element={<CategoryPage category="বিজ্ঞান" />} />
+                <Route path="/sports" element={<CategoryPage category="খেলাধুলা" />} />
                 <Route path="/search" element={<SearchPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

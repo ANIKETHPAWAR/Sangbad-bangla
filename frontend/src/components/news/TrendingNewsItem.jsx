@@ -6,9 +6,14 @@ const TrendingNewsItem = ({
   id,
   imageUrl, 
   title, 
+  subtitle,
+  excerpt,
   category,
   publishDate,
+  author,
+  readTime,
   isNew = false,
+  isBreaking = false,
   onClick 
 }) => {
   const handleClick = () => {
@@ -44,7 +49,12 @@ const TrendingNewsItem = ({
             className="trending-news-image"
             loading="lazy"
           />
-          {isNew && (
+          {isBreaking && (
+            <div className="breaking-news-badge">
+              <span>ব্রেকিং নিউজ</span>
+            </div>
+          )}
+          {isNew && !isBreaking && (
             <div className="new-badge">
               <span>নতুন</span>
             </div>
@@ -66,6 +76,23 @@ const TrendingNewsItem = ({
           <h3 className="trending-news-title">
             {title}
           </h3>
+          {subtitle && (
+            <p className="trending-news-subtitle">
+              {subtitle}
+            </p>
+          )}
+          <div className="trending-news-footer">
+            {author && (
+              <span className="trending-author">
+                {author}
+              </span>
+            )}
+            {readTime && (
+              <span className="trending-read-time">
+                {readTime} মিনিট পড়া
+              </span>
+            )}
+          </div>
         </div>
       </Link>
     </article>

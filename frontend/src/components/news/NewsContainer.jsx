@@ -8,7 +8,6 @@ import './NewsContainer.css';
 
 const NewsContainer = () => {
   const [featuredNews, setFeaturedNews] = useState([]);
-  const [trendingNews, setTrendingNews] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Load news data from service
@@ -17,14 +16,10 @@ const NewsContainer = () => {
       try {
         setLoading(true);
         
-        // Load featured and trending news in parallel
-        const [featuredData, trendingData] = await Promise.all([
-          newsDataService.getFeaturedNews(),
-          newsDataService.getTrendingNews()
-        ]);
+        // Load only featured news data
+        const featuredData = await newsDataService.getFeaturedNews();
         
         setFeaturedNews(featuredData);
-        setTrendingNews(trendingData);
       } catch (error) {
         console.error('Error loading news data:', error);
       } finally {
@@ -75,7 +70,7 @@ const NewsContainer = () => {
         </section>
       </div>
 
-      {/* Trending News Sidebar */}
+      {/* Trending News Sidebar - Now displays the same data as featured news */}
       <aside className="trending-news-sidebar">
         <SectionTitle 
           title="ট্রেন্ডিং খবর" 
@@ -85,7 +80,7 @@ const NewsContainer = () => {
         />
         
         <div className="trending-news-list">
-          {trendingNews.map((news) => (
+          {featuredNews.map((news) => (
             <TrendingNewsItem
               key={news.id}
               {...news}
