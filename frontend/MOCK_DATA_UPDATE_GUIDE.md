@@ -42,8 +42,7 @@ frontend/src/data/
      publishDate: '2025-01-16T10:00:00Z',
      category: 'নতুন ক্যাটাগরি',
      author: 'রিপোর্টারের নাম',
-     readTime: 5,
-     isBreaking: true // Set to true for breaking news
+     readTime: 5
    }
    ```
 
@@ -100,7 +99,6 @@ frontend/src/data/
 
 ```javascript
 {
-  isBreaking: true,         // Shows breaking news badge
   // Add any other fields you need
 }
 ```

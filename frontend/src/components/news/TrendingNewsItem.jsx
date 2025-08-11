@@ -12,7 +12,6 @@ const TrendingNewsItem = ({
   author,
   readTime,
   isNew = false,
-  isBreaking = false,
   onClick 
 }) => {
   const handleClick = () => {
@@ -48,12 +47,7 @@ const TrendingNewsItem = ({
             className="trending-news-image"
             loading="lazy"
           />
-          {isBreaking && (
-            <div className="breaking-news-badge">
-              <span>ব্রেকিং নিউজ</span>
-            </div>
-          )}
-          {isNew && !isBreaking && (
+          {isNew && (
             <div className="new-badge">
               <span>নতুন</span>
             </div>

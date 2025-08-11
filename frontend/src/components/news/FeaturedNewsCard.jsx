@@ -12,7 +12,6 @@ const FeaturedNewsCard = ({
   category,
   author,
   readTime,
-  isBreaking = false,
   onClick 
 }) => {
   const handleClick = () => {
@@ -42,11 +41,6 @@ const FeaturedNewsCard = ({
             className="featured-news-image"
             loading="lazy"
           />
-          {isBreaking && (
-            <div className="breaking-news-badge">
-              <span>ব্রেকিং নিউজ</span>
-            </div>
-          )}
           {category && (
             <div className="category-badge">
               <span>{category}</span>

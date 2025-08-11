@@ -24,8 +24,7 @@ Open `mockNewsData.js` and modify the news items as needed:
   publishDate: '2025-01-16T10:00:00Z', // Use current date
   category: 'নতুন ক্যাটাগরি',
   author: 'রিপোর্টারের নাম',
-  readTime: 5,
-  isBreaking: false // Set to true for breaking news
+  readTime: 5
 }
 ```
 
@@ -65,7 +64,6 @@ Vercel will automatically rebuild and deploy with the new data.
 - `category` - News category
 - `author` - Reporter's name
 - `readTime` - Estimated reading time in minutes
-- `isBreaking` - Boolean for breaking news badge
 
 ### Trending News
 
@@ -109,7 +107,6 @@ When you're ready to move to a real API:
   publishDate: '2025-01-16T09:00:00Z',
   category: 'পরিবহন',
   author: 'পরিবহন রিপোর্টার',
-  readTime: 4,
-  isBreaking: true
+  readTime: 4
 }
 ```

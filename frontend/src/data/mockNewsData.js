@@ -10,8 +10,7 @@ export const mockNewsData = {
       publishDate: '2025-01-15T10:20:00Z',
       category: 'প্রযুক্তি',
       author: 'প্রযুক্তি রিপোর্টার',
-      readTime: 4,
-      isBreaking: true
+      readTime: 4
     },
     {
       id: 2,
