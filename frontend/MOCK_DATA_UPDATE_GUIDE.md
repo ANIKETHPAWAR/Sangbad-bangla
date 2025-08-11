@@ -20,15 +20,17 @@ frontend/src/data/
 ### **Option 1: Quick Update (Recommended)**
 
 1. **Edit the Data File**
+
    ```bash
    # Navigate to the data directory
    cd frontend/src/data
-   
+
    # Edit the mock data file
    code mockNewsData.js  # or use your preferred editor
    ```
 
 2. **Add New News Items**
+
    ```javascript
    // Add this to the featuredNews array
    {
@@ -46,6 +48,7 @@ frontend/src/data/
    ```
 
 3. **Commit and Push**
+
    ```bash
    git add .
    git commit -m "Update mock news data with latest stories"
@@ -60,23 +63,25 @@ frontend/src/data/
 ### **Option 2: Bulk Update**
 
 1. **Replace Entire News Array**
+
    ```javascript
    featuredNews: [
      // Your complete new news array
      // All old news will be replaced
-   ]
+   ];
    ```
 
 2. **Update Trending News**
    ```javascript
    trendingNews: [
      // Your complete new trending news array
-   ]
+   ];
    ```
 
 ## 📊 Data Structure Reference
 
 ### **Required Fields**
+
 ```javascript
 {
   id: 1,                    // Unique number
@@ -92,6 +97,7 @@ frontend/src/data/
 ```
 
 ### **Optional Fields**
+
 ```javascript
 {
   isBreaking: true,         // Shows breaking news badge
@@ -102,7 +108,12 @@ frontend/src/data/
 ## 🔧 Helper Functions Available
 
 ```javascript
-import { getCurrentDate, addNewsItem, updateNewsItem, deleteNewsItem } from './mockNewsData.js';
+import {
+  getCurrentDate,
+  addNewsItem,
+  updateNewsItem,
+  deleteNewsItem,
+} from "./mockNewsData.js";
 
 // Get current timestamp
 const now = getCurrentDate();
@@ -124,18 +135,20 @@ deleteNewsItem(1);
 ## 📅 Date Management
 
 ### **Use Current Date**
+
 ```javascript
-import { getCurrentDate } from './mockNewsData.js';
+import { getCurrentDate } from "./mockNewsData.js";
 
 {
-  publishDate: getCurrentDate()
+  publishDate: getCurrentDate();
 }
 ```
 
 ### **Manual Date Format**
+
 ```javascript
 {
-  publishDate: '2025-01-16T10:30:00Z'
+  publishDate: "2025-01-16T10:30:00Z";
   // Format: YYYY-MM-DDTHH:mm:ssZ
 }
 ```
@@ -143,11 +156,13 @@ import { getCurrentDate } from './mockNewsData.js';
 ## 🎨 Image Management
 
 ### **Recommended Image Sources**
+
 - **Unsplash**: `https://images.unsplash.com/photo-ID?w=800&h=400&fit=crop`
 - **Your CDN**: `https://your-cdn.com/images/news/image.jpg`
 - **External URLs**: Ensure they're accessible and stable
 
 ### **Image Requirements**
+
 - **Aspect Ratio**: 16:9 or 4:3 recommended
 - **Size**: 800x400px minimum
 - **Format**: JPG, PNG, WebP
@@ -156,12 +171,14 @@ import { getCurrentDate } from './mockNewsData.js';
 ## 🚨 Important Notes
 
 ### **Before Deployment**
+
 1. ✅ **Unique IDs**: No duplicate IDs allowed
 2. ✅ **Valid URLs**: All image URLs must be accessible
 3. ✅ **Bengali Text**: Use proper Bengali characters
 4. ✅ **Data Structure**: Follow the exact format
 
 ### **After Deployment**
+
 1. ✅ **Test Images**: Ensure all images load correctly
 2. ✅ **Check Content**: Verify Bengali text displays properly
 3. ✅ **Mobile View**: Test on mobile devices
@@ -180,6 +197,7 @@ graph LR
 ## 📱 Testing Your Updates
 
 ### **Local Testing**
+
 ```bash
 cd frontend
 npm run dev
@@ -187,6 +205,7 @@ npm run dev
 ```
 
 ### **Production Testing**
+
 1. Deploy to Vercel
 2. Visit your live site
 3. Verify new content appears
@@ -197,11 +216,13 @@ npm run dev
 ### **Common Issues**
 
 1. **Images Not Loading**
+
    - Check image URLs are accessible
    - Verify HTTPS vs HTTP
    - Test URLs in browser
 
 2. **Bengali Text Issues**
+
    - Ensure proper Bengali font support
    - Check for encoding issues
    - Verify text in browser console
@@ -212,6 +233,7 @@ npm run dev
    - Check for missing commas or brackets
 
 ### **Get Help**
+
 - Check the `README.md` in the data directory
 - Review the console for error messages
 - Verify the data structure matches the examples

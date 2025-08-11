@@ -10,6 +10,7 @@ This directory contains the mock news data that can be easily updated without re
 ## 🔄 How to Update Mock Data
 
 ### 1. **Edit the Data File**
+
 Open `mockNewsData.js` and modify the news items as needed:
 
 ```javascript
@@ -29,16 +30,18 @@ Open `mockNewsData.js` and modify the news items as needed:
 ```
 
 ### 2. **Update Dates**
+
 Use the `getCurrentDate()` helper function for current timestamps:
 
 ```javascript
-import { getCurrentDate } from './mockNewsData.js';
+import { getCurrentDate } from "./mockNewsData.js";
 
 // In your news item:
-publishDate: getCurrentDate()
+publishDate: getCurrentDate();
 ```
 
 ### 3. **Redeploy**
+
 After updating the data, redeploy your application to Vercel:
 
 ```bash
@@ -52,6 +55,7 @@ Vercel will automatically rebuild and deploy with the new data.
 ## 📊 Data Structure
 
 ### Featured News
+
 - `id` - Unique identifier
 - `imageUrl` - Image URL for the news
 - `title` - Main headline in Bengali
@@ -64,6 +68,7 @@ Vercel will automatically rebuild and deploy with the new data.
 - `isBreaking` - Boolean for breaking news badge
 
 ### Trending News
+
 Same structure as featured news, but displayed in the sidebar.
 
 ## 🚀 Helper Functions
@@ -86,6 +91,7 @@ The file includes helper functions for dynamic updates:
 ## 🔧 Future Enhancement
 
 When you're ready to move to a real API:
+
 1. Replace the mock data service calls with actual API endpoints
 2. Keep the same data structure for consistency
 3. Update the service methods to use real HTTP requests
