@@ -7,7 +7,7 @@ export default defineConfig({
   build: {
     // Production optimizations
     target: 'es2015',
-    minify: 'terser',
+    minify: 'esbuild', // Changed from 'terser' to 'esbuild' for better reliability
     cssMinify: true,
     rollupOptions: {
       output: {

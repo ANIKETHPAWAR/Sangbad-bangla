@@ -19,8 +19,12 @@ This guide will help you deploy Blendpilot for optimal performance and fast user
 ```bash
 cd frontend
 npm install
+# Ensure terser is installed for minification
+npm install --save-dev terser
 npm run build
 ```
+
+**Note**: If you encounter a "terser not found" error during build, the package.json has been updated to include terser as a dependency. The build should work automatically now.
 
 ### Step 2: Deploy to Vercel
 
@@ -187,8 +191,14 @@ After getting your backend URL, update the frontend:
    - Ensure all dependencies are in `package.json`
 
 4. **API Timeouts:**
+
    - Railway has 30s timeout by default
    - Optimize database queries if needed
+
+5. **Terser Build Error:**
+   - **Error**: `terser not found. Since Vite v3, terser has become an optional dependency`
+   - **Solution**: The package.json has been updated to include terser
+   - **Alternative**: Use `minify: 'esbuild'` in vite.config.js (already configured)
 
 ---
 
