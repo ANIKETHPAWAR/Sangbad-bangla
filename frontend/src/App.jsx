@@ -9,7 +9,6 @@ import Sidebar from './components/layout/Sidebar';
 
 // Page Components
 import SignIn from './pages/SignIn';
-import SectionPage from './pages/SectionPage';
 
 // News Components
 import NewsContainer from './components/news/NewsContainer';
@@ -60,7 +59,7 @@ function App() {
             <Route path="/" element={<NewsContainer />} />
             <Route path="/all-news" element={<NewsContainer />} />
             <Route path="/article/:articleId" element={<ArticlePage />} />
-            <Route path="/section/:sectionName/:numberOfStories" element={<SectionPage />} />
+            <Route path="/section/:sectionName/:numberOfStories" element={<ArticleDetailPage />} />
             <Route path="/popular" element={<NewsContainer />} />
             <Route path="/cricket" element={<CricketNewsPage />} />
             <Route path="/bengal-face" element={<NewsContainer />} />

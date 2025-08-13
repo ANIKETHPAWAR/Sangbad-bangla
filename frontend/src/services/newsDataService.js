@@ -406,44 +406,25 @@ class NewsDataService {
   // Get news by category using section feed API
   async getNewsByCategory(category) {
     try {
-      console.log(`🔍 Fetching news for category: ${category}`);
-      
       // Use the section feed API with the category name
-      const apiUrl = `${this.baseUrl}/api/section-feed/${encodeURIComponent(category)}/10`;
-      console.log(`📡 API URL: ${apiUrl}`);
-      
-      const response = await fetch(apiUrl);
-      
-      console.log(`📥 Response status: ${response.status}`);
+      const response = await fetch(`${this.baseUrl}/api/section-feed/${encodeURIComponent(category)}/10`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
       const data = await response.json();
-      console.log(`📥 API Response:`, data);
       
       if (data.success && data.stories) {
-        console.log(`✅ Found ${data.stories.length} stories for category: ${category}`);
-        
         // Transform and sort by publish date - latest first
-        const transformedStories = data.stories
+        return data.stories
           .map(item => this.transformNewsItem(item))
           .sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate));
-        
-        console.log(`✅ Transformed ${transformedStories.length} stories for category: ${category}`);
-        return transformedStories;
       }
       
-      console.warn(`⚠️ No stories found for category: ${category}`);
       return [];
     } catch (error) {
-      console.error(`❌ Error fetching news by category from API:`, error);
-      console.error(`❌ Error details:`, {
-        category,
-        baseUrl: this.baseUrl,
-        message: error.message
-      });
+      console.error('Error fetching news by category from API:', error);
       return this.getMockNewsByCategory(category);
     }
   }
@@ -485,6 +466,8 @@ class NewsDataService {
   // Get section feed for detailed article view
   async getSectionFeed(sectionName, numStories = 10) {
     try {
+      console.log('🔍 Fetching section feed for:', sectionName, 'with', numStories, 'stories');
+      
       const response = await fetch(`${this.baseUrl}/api/section-feed/${encodeURIComponent(sectionName)}/${numStories}`);
       
       if (!response.ok) {
@@ -492,6 +475,7 @@ class NewsDataService {
       }
       
       const data = await response.json();
+      console.log('✅ Section feed API response:', data);
       
       if (data.success && data.stories) {
         return data.stories.map(item => this.transformNewsItem(item));
@@ -499,68 +483,90 @@ class NewsDataService {
       
       return [];
     } catch (error) {
-      console.error('Error fetching section feed from API:', error);
+      console.error('❌ Error fetching section feed from API:', error);
       return [];
     }
   }
 
   async getDetailedArticle(sectionName, numberOfStories = 10) {
     try {
-      // Use the backend proxy endpoint instead of calling external API directly
-      const response = await fetch(`/api/proxy-hindustantimes/section/${sectionName}/${numberOfStories}`);
+      console.log('🔍 Fetching detailed articles for section:', sectionName);
+      
+      // Use the backend section feed endpoint
+      const response = await fetch(`${this.baseUrl}/api/section-feed/${encodeURIComponent(sectionName)}/${numberOfStories}`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
       const data = await response.json();
-      console.log('Detailed Article API Response (via proxy):', data);
-      console.log('Response structure check:', {
-        hasContent: !!data.content,
-        hasSectionItems: !!(data.content && data.content.sectionItems),
-        isArray: Array.isArray(data.content?.sectionItems),
-        sectionItemsLength: data.content?.sectionItems?.length || 0
-      });
+      console.log('✅ Detailed Article API Response:', data);
       
-      if (data.content && data.content.sectionItems && Array.isArray(data.content.sectionItems)) {
+      if (data.success && data.stories && Array.isArray(data.stories)) {
         // Transform and sort by publish date - latest first
-        const transformedStories = this.transformDetailedStories(data.content.sectionItems);
-        return transformedStories.sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate));
+        const transformedStories = this.transformDetailedStories(data.stories);
+        const sortedStories = transformedStories.sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate));
+        
+        console.log('✅ Transformed and sorted detailed articles:', sortedStories);
+        return sortedStories;
       } else {
-        // If the external API returns an empty sectionItems array or no content,
-        // it might mean no articles for that section, or an invalid section name.
-        // We should still return an empty array to prevent errors.
-        if (data.content && data.content.sectionItems === null) {
-          console.warn('No stories found for section:', sectionName);
-          return [];
-        }
-        console.warn('Unexpected API response structure:', data);
-        throw new Error('Invalid response format from API - missing content.sectionItems');
+        console.warn('⚠️ No stories found for section:', sectionName);
+        // Fallback to mock data instead of empty array
+        return this.getMockNewsByCategory(sectionName);
       }
     } catch (error) {
-      console.error('Error fetching detailed article:', error);
-      throw error;
+      console.error('❌ Error fetching detailed article:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        sectionName,
+        numberOfStories,
+        baseUrl: this.baseUrl
+      });
+      
+      // Fallback to mock data instead of throwing error
+      console.log('🔄 Falling back to mock data for section:', sectionName);
+      return this.getMockNewsByCategory(sectionName);
     }
   }
 
   transformDetailedStories(stories) {
-    return stories.map(item => ({
-      id: item.itemId || item.id || item.storyId,
-      title: item.headLine || item.title || item.headline,
-      subtitle: item.subHead || item.subtitle || item.subHeadline,
-      excerpt: item.shortDescription || item.excerpt || item.description,
-      content: item.content || item.body,
-      imageUrl: item.wallpaperLarge || item.mediumRes || item.thumbImage || item.imageUrl || item.image || item.leadImage,
-      publishDate: this.parseDate(item.publishedDate || item.publishDate || item.date),
-      readTime: item.timeToRead || item.readTime || item.readingTime || 3,
-      authorName: item.authorName || item.author || item.byline || '',
-      category: item.section || item.category || '',
-      contentType: item.contentType || 'News',
-      detailUrl: item.detailFeedURL || item.detailUrl || item.url || item.link,
-      websiteUrl: item.websiteURL || item.websiteUrl || item.sourceUrl,
-      keywords: item.keywords || item.tags || [],
-      sectionName: item.section || item.sectionName || ''
-    }));
+    if (!stories || !Array.isArray(stories)) {
+      console.warn('⚠️ transformDetailedStories: Invalid stories input:', stories);
+      return [];
+    }
+    
+    console.log('🔄 Transforming detailed stories:', stories);
+    
+    const transformed = stories.map((item, index) => {
+      try {
+        const transformedItem = {
+          id: item.id || item.itemId || item.storyId || index,
+          title: item.title || item.headLine || item.headline || `Story ${index + 1}`,
+          subtitle: item.subtitle || item.subHead || item.subHeadline || '',
+          excerpt: item.excerpt || item.shortDescription || item.description || '',
+          content: item.content || item.body || '',
+          imageUrl: item.imageUrl || item.wallpaperLarge || item.mediumRes || item.thumbImage || item.image || item.leadImage || '',
+          publishDate: this.parseDate(item.publishDate || item.publishedDate || item.date),
+          readTime: item.readTime || item.timeToRead || item.readingTime || 3,
+          authorName: item.authorName || item.author || item.byline || '',
+          category: item.category || item.section || item.sectionName || '',
+          contentType: item.contentType || 'News',
+          detailUrl: item.detailUrl || item.detailFeedURL || item.url || item.link || '',
+          websiteUrl: item.websiteUrl || item.websiteURL || item.sourceUrl || '',
+          keywords: item.keywords || item.tags || [],
+          sectionName: item.sectionName || item.section || ''
+        };
+        
+        console.log(`✅ Transformed story ${index + 1}:`, transformedItem);
+        return transformedItem;
+      } catch (error) {
+        console.error(`❌ Error transforming story ${index + 1}:`, error, item);
+        return null;
+      }
+    }).filter(Boolean); // Remove any null items
+    
+    console.log(`✅ Successfully transformed ${transformed.length} stories`);
+    return transformed;
   }
 
   // Fallback mock data methods
@@ -573,10 +579,41 @@ class NewsDataService {
   }
 
   getMockNewsByCategory(category) {
+    console.log('🔄 Getting mock news for category:', category);
+    
     const allNews = [...mockNewsData.featuredNews, ...mockNewsData.trendingNews];
-    return allNews.filter(news => 
+    
+    // First try to find exact category match
+    let filteredNews = allNews.filter(news => 
       news.category && news.category.toLowerCase().includes(category.toLowerCase())
     );
+    
+    // If no exact match, return all news (fallback)
+    if (filteredNews.length === 0) {
+      console.log('⚠️ No exact category match found, returning all mock news as fallback');
+      filteredNews = allNews;
+    }
+    
+    // Ensure we have at least some news
+    if (filteredNews.length === 0) {
+      console.log('⚠️ No mock news available, creating default news');
+      filteredNews = [
+        {
+          id: 'fallback-1',
+          imageUrl: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=400&fit=crop',
+          title: `${category} সম্পর্কিত খবর`,
+          subtitle: 'এই বিভাগের জন্য খবর লোড হচ্ছে',
+          excerpt: 'আপনার নির্বাচিত বিভাগের জন্য খবর লোড হচ্ছে। কিছুক্ষণ অপেক্ষা করুন।',
+          publishDate: new Date().toISOString(),
+          category: category,
+          author: 'সিস্টেম',
+          readTime: 3
+        }
+      ];
+    }
+    
+    console.log(`✅ Returning ${filteredNews.length} mock news items for category: ${category}`);
+    return filteredNews;
   }
 
   getMockSearchNews(query) {
