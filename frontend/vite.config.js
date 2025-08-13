@@ -26,7 +26,9 @@ export default defineConfig({
   },
   server: {
     proxy: {
+      // Development proxy - commented out for production
       // Route our new API endpoints to local backend
+      /*
       '/api/popular-stories': {
         target: 'http://localhost:5000',
         changeOrigin: true,
@@ -78,6 +80,7 @@ export default defineConfig({
           });
         }
       },
+      */
       // Keep existing proxy for external Hindustan Times API calls
       '/api/sectionfeedperp': {
         target: 'https://bangla.hindustantimes.com',
@@ -135,25 +138,8 @@ export default defineConfig({
             console.log('📤 Fetching website content:', proxyReq.path);
           });
         }
-      },
-      // Catch-all proxy for any other /api routes to go to local backend
-      '/api': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-        secure: false,
-        configure: (proxy, options) => {
-          proxy.on('error', (err, req, res) => {
-            console.log('❌ CATCH-ALL API PROXY ERROR:', err);
-            console.log('Request URL:', req.url);
-          });
-          proxy.on('proxyReq', (proxyReq, req, res) => {
-            console.log('📤 Sending Request to Local Backend (catch-all):', req.method, req.url);
-          });
-          proxy.on('proxyRes', (proxyRes, req, res) => {
-            console.log('📥 Received Response from Local Backend (catch-all):', proxyRes.statusCode, req.url);
-          });
-        }
       }
+      // Removed catch-all proxy since we're using production backend
     }
   }
 })

@@ -3,8 +3,9 @@ import { mockNewsData } from '../data/mockNewsData.js';
 
 class NewsDataService {
   constructor() {
-    // Use proxy URL to avoid CORS issues
-    this.baseUrl = '/api';
+    // Use production backend URL if available, otherwise fall back to proxy
+    this.baseUrl = import.meta.env.VITE_API_BASE_URL || '/api';
+    console.log('NewsDataService initialized with baseUrl:', this.baseUrl);
   }
 
   // Transform API response to match our frontend structure
@@ -140,10 +141,17 @@ class NewsDataService {
   // Get featured news from new popular stories API
   async getFeaturedNews() {
     try {
+      console.log('🔍 Fetching featured news from:', `${this.baseUrl}/api/popular-stories`);
+      
       // Force fresh data with aggressive cache busting
       const timestamp = Date.now();
       const randomParam = Math.random().toString(36).substring(7);
-      const response = await fetch(`${this.baseUrl}/popular-stories?t=${timestamp}&r=${randomParam}&fresh=true`, {
+      const fullUrl = `${this.baseUrl}/api/popular-stories?t=${timestamp}&r=${randomParam}&fresh=true`;
+      
+      console.log('📡 Full API URL:', fullUrl);
+      console.log('🌐 Base URL being used:', this.baseUrl);
+      
+      const response = await fetch(fullUrl, {
         method: 'GET',
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -152,12 +160,15 @@ class NewsDataService {
         }
       });
       
+      console.log('📥 Response status:', response.status);
+      console.log('📥 Response headers:', Object.fromEntries(response.headers.entries()));
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
       const data = await response.json();
-      console.log('Fresh Popular Stories API Response:', data);
+      console.log('✅ Fresh Popular Stories API Response:', data);
       
       if (data.success && data.stories) {
         // Transform and sort by publish date - latest first
@@ -166,12 +177,18 @@ class NewsDataService {
           .sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate))
           .slice(0, 10);
         
-        console.log('Fresh Transformed and Sorted Featured News (Latest First):', transformedNews);
+        console.log('✅ Fresh Transformed and Sorted Featured News (Latest First):', transformedNews);
         return transformedNews;
       }
       return [];
     } catch (error) {
-      console.error('Error fetching popular stories from API:', error);
+      console.error('❌ Error fetching popular stories from API:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        stack: error.stack,
+        baseUrl: this.baseUrl,
+        fullUrl: `${this.baseUrl}/api/popular-stories`
+      });
       return this.getMockFeaturedNews();
     }
   }
@@ -179,8 +196,10 @@ class NewsDataService {
   // Get trending news from trending stories API
   async getTrendingNews() {
     try {
+      console.log('🔍 Fetching trending news from:', `${this.baseUrl}/api/trending-stories`);
+      
       // First try to get trending stories from a dedicated trending endpoint
-      let response = await fetch(`${this.baseUrl}/trending-stories`, {
+      let response = await fetch(`${this.baseUrl}/api/trending-stories`, {
         method: 'GET',
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -189,10 +208,12 @@ class NewsDataService {
         }
       });
       
+      console.log('📥 Trending stories response status:', response.status);
+      
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.stories) {
-          console.log('Fresh Trending Stories API Response:', data);
+          console.log('✅ Fresh Trending Stories API Response:', data);
           // Sort by publish date - latest first
           return data.stories
             .map(item => this.transformNewsItem(item))
@@ -201,10 +222,16 @@ class NewsDataService {
         }
       }
       
+      console.log('🔄 Falling back to popular stories for trending news...');
+      
       // Fallback: Get fresh trending data by calling popular stories with aggressive cache busting
       const timestamp = Date.now();
       const randomParam = Math.random().toString(36).substring(7);
-      response = await fetch(`${this.baseUrl}/popular-stories?t=${timestamp}&r=${randomParam}&trending=true`, {
+      const fallbackUrl = `${this.baseUrl}/api/popular-stories?t=${timestamp}&r=${randomParam}&trending=true`;
+      
+      console.log('📡 Fallback API URL:', fallbackUrl);
+      
+      response = await fetch(fallbackUrl, {
         method: 'GET',
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -212,6 +239,8 @@ class NewsDataService {
           'Expires': '0'
         }
       });
+      
+      console.log('📥 Fallback response status:', response.status);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -232,7 +261,7 @@ class NewsDataService {
           ...allTransformedStories.slice(8, 10)     // Take 2 more recent ones
         ];
         
-        console.log('Fresh Trending News (Latest First):', trendingItems);
+        console.log('✅ Fresh Trending News (Latest First):', trendingItems);
         return trendingItems
           .slice(0, 8)
           .filter(item => item.publishDate); // Ensure we have valid dates
@@ -240,8 +269,12 @@ class NewsDataService {
       
       return [];
     } catch (error) {
-      console.error('Error fetching trending news from API:', error);
-      // Fallback to mock data if API fails
+      console.error('❌ Error fetching trending news:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        stack: error.stack,
+        baseUrl: this.baseUrl
+      });
       return this.getMockTrendingNews();
     }
   }
@@ -251,7 +284,7 @@ class NewsDataService {
     try {
       // Add cache busting to ensure fresh data
       const timestamp = Date.now();
-      const response = await fetch(`${this.baseUrl}/popular-stories?t=${timestamp}&fresh=true`);
+      const response = await fetch(`${this.baseUrl}/api/popular-stories?t=${timestamp}&fresh=true`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -306,7 +339,7 @@ class NewsDataService {
       // Force fresh data with aggressive cache busting
       const timestamp = Date.now();
       const randomParam = Math.random().toString(36).substring(7);
-      const response = await fetch(`${this.baseUrl}/popular-stories?t=${timestamp}&r=${randomParam}&set=${setIndex}&fresh=true`, {
+      const response = await fetch(`${this.baseUrl}/api/popular-stories?t=${timestamp}&r=${randomParam}&set=${setIndex}&fresh=true`, {
         method: 'GET',
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -374,7 +407,7 @@ class NewsDataService {
   async getNewsByCategory(category) {
     try {
       // Use the section feed API with the category name
-      const response = await fetch(`${this.baseUrl}/section-feed/${encodeURIComponent(category)}/10`);
+      const response = await fetch(`${this.baseUrl}/api/section-feed/${encodeURIComponent(category)}/10`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -399,7 +432,7 @@ class NewsDataService {
   // Search news from popular stories
   async searchNews(query) {
     try {
-      const response = await fetch(`${this.baseUrl}/popular-stories`);
+      const response = await fetch(`${this.baseUrl}/api/popular-stories`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -570,7 +603,7 @@ class NewsDataService {
   // Fetch cricket data from the backend proxy
   async getCricketData() {
     try {
-      const response = await fetch('/api/cricket-data');
+      const response = await fetch(`${this.baseUrl}/api/cricket-data`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

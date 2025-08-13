@@ -54,7 +54,17 @@ function validateAndFormatDate(dateString) {
 }
 
 // Middleware
-app.use(cors());
+const corsOptions = {
+  origin: [
+    'https://sangbadbangla.vercel.app', // Your Vercel frontend
+    'http://localhost:3000', // Local development
+    'http://localhost:5173'  // Vite dev server
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Health check endpoint
@@ -72,6 +82,21 @@ app.get('/test', (req, res) => {
   res.json({ 
     message: 'Server is working!',
     timestamp: new Date().toISOString()
+  });
+});
+
+// Test API connection endpoint
+app.get('/api/test-connection', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Backend API connection successful!',
+    timestamp: new Date().toISOString(),
+    backendUrl: 'https://sangbadbangla1.onrender.com',
+    endpoints: [
+      '/api/popular-stories',
+      '/api/section-feed/:sectionName/:numStories',
+      '/api/cricket-data'
+    ]
   });
 });
 
