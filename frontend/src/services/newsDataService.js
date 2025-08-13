@@ -406,25 +406,44 @@ class NewsDataService {
   // Get news by category using section feed API
   async getNewsByCategory(category) {
     try {
+      console.log(`🔍 Fetching news for category: ${category}`);
+      
       // Use the section feed API with the category name
-      const response = await fetch(`${this.baseUrl}/api/section-feed/${encodeURIComponent(category)}/10`);
+      const apiUrl = `${this.baseUrl}/api/section-feed/${encodeURIComponent(category)}/10`;
+      console.log(`📡 API URL: ${apiUrl}`);
+      
+      const response = await fetch(apiUrl);
+      
+      console.log(`📥 Response status: ${response.status}`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
       const data = await response.json();
+      console.log(`📥 API Response:`, data);
       
       if (data.success && data.stories) {
+        console.log(`✅ Found ${data.stories.length} stories for category: ${category}`);
+        
         // Transform and sort by publish date - latest first
-        return data.stories
+        const transformedStories = data.stories
           .map(item => this.transformNewsItem(item))
           .sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate));
+        
+        console.log(`✅ Transformed ${transformedStories.length} stories for category: ${category}`);
+        return transformedStories;
       }
       
+      console.warn(`⚠️ No stories found for category: ${category}`);
       return [];
     } catch (error) {
-      console.error('Error fetching news by category from API:', error);
+      console.error(`❌ Error fetching news by category from API:`, error);
+      console.error(`❌ Error details:`, {
+        category,
+        baseUrl: this.baseUrl,
+        message: error.message
+      });
       return this.getMockNewsByCategory(category);
     }
   }
@@ -466,8 +485,7 @@ class NewsDataService {
   // Get section feed for detailed article view
   async getSectionFeed(sectionName, numStories = 10) {
     try {
-      const response = await fetch(`${this.baseUrl}/api/app/sectionfeedperp/v1/{sectionName}/{numStories}
-`);
+      const response = await fetch(`${this.baseUrl}/api/section-feed/${encodeURIComponent(sectionName)}/${numStories}`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
