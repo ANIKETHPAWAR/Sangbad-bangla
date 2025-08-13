@@ -4,11 +4,113 @@
   gap: 16px;
   margin-bottom: 24px;
   position: relative;
+  width: 100%;
+  background: transparent;
 }
 
+/* Special styling for center-aligned section titles */
 .section-title--center {
   justify-content: center;
   text-align: center;
+  flex-direction: row;
+  gap: 16px;
+  width: 100%;
+  margin: 0 auto;
+  background: transparent;
+  align-items: center;
+}
+
+.section-title--center .section-title-content {
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+  gap: 12px;
+  width: auto;
+  max-width: 100%;
+  align-items: center;
+  background: transparent;
+  order: 2;
+}
+
+.section-title--center .section-title-text {
+  text-align: center;
+  align-items: center;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: transparent;
+}
+
+.section-title--center .section-title-main {
+  text-align: center;
+  width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  margin: 0 auto;
+  font-size: 22px;
+  font-weight: 600;
+  background: transparent;
+}
+
+.section-title--center .section-title-subtitle {
+  text-align: center;
+  width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  margin: 0 auto;
+  max-width: 350px;
+  font-size: 13px;
+  color: #777;
+  background: transparent;
+}
+
+.section-title--center .section-title-icon {
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: var(--color-primary);
+  font-size: 20px;
+}
+
+/* Ensure Bengali text renders properly */
+.section-title-main,
+.section-title-subtitle {
+  font-feature-settings: "liga" 1, "kern" 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-feature-settings: "liga" 1, "kern" 1;
+  -moz-font-feature-settings: "liga" 1, "kern" 1;
+}
+
+/* Additional spacing for large variant */
+.section-title--large.section-title--center {
+  margin-bottom: 40px;
+  margin-top: 20px;
+}
+
+.section-title--large.section-title--center .section-title-main {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2c3e50;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  margin-bottom: 12px;
+}
+
+.section-title--large.section-title--center .section-title-subtitle {
+  font-size: 16px;
+  color: #6c757d;
+  font-weight: 500;
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+.section-title--large.section-title--center .section-title-icon {
+  font-size: 28px;
+  color: #007bff;
+  margin-bottom: 12px;
 }
 
 .section-title--right {
@@ -16,22 +118,34 @@
   text-align: right;
 }
 
-.section-title-border {
-  flex: 1;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+/* Left border for non-center titles */
+.section-title-border-left {
+  width: 2px;
+  height: 40px;
+  background: #e0e0e0;
+  margin-right: 12px;
   opacity: 0.6;
 }
 
-/* Special styling for trending news section */
-.trending-news-sidebar .section-title-border {
-  background: linear-gradient(90deg, transparent, #dc3545, transparent);
+/* Right border for non-center titles */
+.section-title-border-right {
+  width: 2px;
+  height: 40px;
+  background: #e0e0e0;
+  margin-left: 12px;
   opacity: 0.6;
 }
 
-.section-title--center .section-title-border {
-  max-width: 60px;
+/* Special styling for trending news section borders */
+.trending-news-sidebar .section-title-border-left,
+.trending-news-sidebar .section-title-border-right {
+  background: #e0e0e0;
+  opacity: 0.6;
+  display: block !important;
+  visibility: visible !important;
 }
+
+
 
 .section-title-content {
   display: flex;
@@ -44,24 +158,43 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  background: var(--color-primary);
-  border-radius: 50%;
-  color: white;
+  width: 32px;
+  height: 32px;
+  background: none;
+  color: var(--color-primary);
   font-size: 18px;
+  flex-shrink: 0;
+  min-width: 32px;
+  min-height: 32px;
+}
+
+/* Ensure icons are visible */
+.section-title-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 /* Special styling for trending news section */
 .trending-news-sidebar .section-title-icon {
-  background: #dc3545;
-  box-shadow: 0 1px 3px rgba(220, 53, 69, 0.2);
+  background: none;
+  color: #dc3545;
+  box-shadow: none;
+}
+
+.trending-news-sidebar .section-title-icon svg {
+  color: #dc3545;
+  fill: #dc3545;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .section-title-text {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  align-items: inherit;
 }
 
 .section-title-main {
@@ -76,6 +209,11 @@
 /* Special styling for trending news section */
 .trending-news-sidebar .section-title-main {
   color: #dc3545;
+  font-weight: 600;
+  font-size: 20px;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .section-title-subtitle {
@@ -83,6 +221,7 @@
   color: #666;
   margin: 0;
   font-family: var(--font-bengali, 'Noto Sans Bengali', sans-serif);
+  line-height: 1.4;
 }
 
 /* Variants */
@@ -90,26 +229,21 @@
   flex-direction: column;
   gap: 12px;
   text-align: center;
+  align-items: center;
 }
 
-.section-title--vertical .section-title-border {
-  width: 2px;
-  height: 40px;
-  background: linear-gradient(180deg, transparent, var(--color-primary), transparent);
-}
 
-/* Special styling for trending news section vertical border */
-.trending-news-sidebar .section-title--vertical .section-title-border {
-  background: linear-gradient(180deg, transparent, #dc3545, transparent);
-}
 
 .section-title--vertical .section-title-content {
   flex-direction: column;
   gap: 8px;
+  align-items: center;
+  justify-content: center;
 }
 
 .section-title--vertical .section-title-main {
   font-size: 20px;
+  text-align: center;
 }
 
 .section-title--compact {
@@ -120,27 +254,179 @@
   font-size: 20px;
 }
 
-.section-title--compact .section-title-border {
-  height: 1px;
-}
+
 
 .section-title--large {
   margin-bottom: 32px;
 }
 
 .section-title--large .section-title-main {
-  font-size: 28px;
+  font-size: 24px;
+  font-weight: 600;
 }
 
-.section-title--large .section-title-border {
-  height: 3px;
+.section-title--large .section-title-subtitle {
+  font-size: 16px;
+  color: #555;
+  font-weight: 500;
 }
+
+
+
+/* Decorative lines for trending news heading */
+.decorative-line {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 16px;
+  flex-shrink: 0;
+}
+
+.decorative-line-left {
+  order: 1;
+}
+
+.decorative-line-right {
+  order: 3;
+}
+
+.decorative-line-vertical-group {
+  display: flex;
+  gap: 2px;
+}
+
+.decorative-line-vertical {
+  width: 2px;
+  height: 16px;
+  background: #dc3545;
+  border-radius: 1px;
+}
+
+/* Special styling for center-aligned titles with decorative lines */
+.section-title--center .decorative-line {
+  margin: 0 20px;
+  flex-shrink: 0;
+}
+
+/* Ensure decorative lines work well with trending news styling */
+.trending-news-sidebar .decorative-line-vertical {
+  background: #dc3545 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Fix alignment for trending news section titles */
+.trending-news-sidebar .section-title--center {
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  padding: 0 10px;
+}
+
+.trending-news-sidebar .section-title--center .section-title-content {
+  order: 2;
+  flex-shrink: 0;
+  min-width: 0;
+  max-width: 280px;
+}
+
+.trending-news-sidebar .decorative-line-left {
+  order: 1;
+  flex-shrink: 0;
+}
+
+.trending-news-sidebar .decorative-line-right {
+  order: 3;
+  flex-shrink: 0;
+}
+
+/* Ensure proper spacing for trending news decorative lines */
+.trending-news-sidebar .decorative-line {
+  margin: 0 16px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.trending-news-sidebar .decorative-line-vertical {
+  height: 16px;
+  width: 2px;
+  background: #dc3545;
+  border-radius: 1px;
+}
+
+/* Center the entire trending news title section */
+.trending-news-sidebar .section-title--center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* Ensure decorative lines are properly sized for the sidebar */
+.trending-news-sidebar .decorative-line-vertical-group {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+/* Responsive adjustments for decorative lines */
+@media (max-width: 768px) {
+  .decorative-line {
+    margin: 0 12px;
+  }
+  
+  .section-title--center .decorative-line {
+    margin: 0 16px;
+  }
+  
+  .decorative-line-vertical {
+    width: 2px;
+    height: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .decorative-line {
+    margin: 0 8px;
+  }
+  
+  .section-title--center .decorative-line {
+    margin: 0 12px;
+  }
+  
+  .decorative-line-vertical {
+    width: 2px;
+    height: 12px;
+  }
+}
+
 
 /* Responsive Design */
 @media (max-width: 768px) {
   .section-title {
     gap: 12px;
     margin-bottom: 20px;
+  }
+  
+  .section-title--center {
+    gap: 14px;
+  }
+  
+  .section-title--center .section-title-content {
+    gap: 10px;
+  }
+  
+  .section-title--center .section-title-main {
+    font-size: 20px;
+  }
+  
+  .section-title--center .section-title-subtitle {
+    font-size: 12px;
   }
   
   .section-title-main {
@@ -154,7 +440,11 @@
   }
   
   .section-title--large .section-title-main {
-    font-size: 24px;
+    font-size: 22px;
+  }
+  
+  .section-title--large .section-title-subtitle {
+    font-size: 13px;
   }
 }
 
@@ -162,6 +452,22 @@
   .section-title {
     gap: 8px;
     margin-bottom: 16px;
+  }
+  
+  .section-title--center {
+    gap: 12px;
+  }
+  
+  .section-title--center .section-title-content {
+    gap: 8px;
+  }
+  
+  .section-title--center .section-title-main {
+    font-size: 18px;
+  }
+  
+  .section-title--center .section-title-subtitle {
+    font-size: 11px;
   }
   
   .section-title-main {
@@ -180,5 +486,9 @@
   
   .section-title--large .section-title-main {
     font-size: 20px;
+  }
+  
+  .section-title--large .section-title-subtitle {
+    font-size: 12px;
   }
 } 

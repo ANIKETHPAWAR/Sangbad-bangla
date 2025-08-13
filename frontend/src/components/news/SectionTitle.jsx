@@ -7,11 +7,15 @@ const SectionTitle = ({
   icon, 
   variant = 'default',
   showBorder = true,
-  align = 'left' 
+  align = 'left',
+  showDecorativeLines = false
 }) => {
   return (
     <div className={`section-title section-title--${variant} section-title--${align}`}>
-      {showBorder && <div className="section-title-border"></div>}
+      {/* Always show left border for non-center titles */}
+      {align !== 'center' && <div className="section-title-border-left"></div>}
+      
+      {/* Decorative lines for trending news */}
       
       <div className="section-title-content">
         {icon && (
@@ -32,7 +36,10 @@ const SectionTitle = ({
         </div>
       </div>
       
-      {showBorder && <div className="section-title-border"></div>}
+      
+      
+      {/* Always show right border for non-center titles */}
+      {align !== 'center' && <div className="section-title-border-right"></div>}
     </div>
   );
 };

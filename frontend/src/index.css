@@ -1,5 +1,5 @@
-/* Import Bengali fonts */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap');
 
 /* CSS Variables */
 :root {
@@ -25,13 +25,32 @@
   box-sizing: border-box;
 }
 
+html {
+  font-family: 'Noto Sans Bengali', 'Hind Siliguri', 'SolaimanLipi', Arial, sans-serif;
+  line-height: 1.15;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
-  font-family: var(--font-bengali);
+  margin: 0;
+  font-family: 'Noto Sans Bengali', 'Hind Siliguri', 'SolaimanLipi', Arial, sans-serif;
+  font-size: 14px;
   line-height: 1.6;
-  color: var(--color-text);
-  background-color: var(--color-background);
+  color: #212529;
+  background-color: #f8f9fa;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+/* Bengali text optimization */
+.bengali-text {
+  font-family: 'Noto Sans Bengali', 'Hind Siliguri', 'SolaimanLipi', Arial, sans-serif;
+  line-height: 1.8;
+  text-align: justify;
 }
 
 /* Bengali text styles */
@@ -100,4 +119,17 @@ body {
     --color-text: #000000;
     --color-text-light: #333333;
   }
+}
+
+/* Ensure proper rendering of Bengali characters */
+@font-face {
+  font-family: 'Noto Sans Bengali';
+  src: url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Hind Siliguri';
+  src: url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap');
+  font-display: swap;
 }

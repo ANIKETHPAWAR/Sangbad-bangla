@@ -1,10 +1,121 @@
 @import "tailwindcss";
 
-.app-layout {
-  display: block;
+/* App Styles */
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-.app-main {
+/* Main Content */
+.main-content {
+  margin-top: 200px; /* Account for fixed header height */
   min-height: calc(100vh - 200px);
-  width: 100%;
+  padding: 0;
+  background: #f8f9fa;
+}
+
+/* Ensure content is not hidden under fixed header */
+.news-container {
+  margin-top: 2rem;
+}
+
+/* Add spacing for the featured news section */
+.featured-news-section {
+  margin-top: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .main-content {
+    padding-top: 160px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    padding-top: 200px; /* Extra space for mobile header layout */
+  }
+}
+
+/* Cricket News Page Styles */
+.cricket-news-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.page-header h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.page-header p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.page-content {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 2rem;
+  align-items: start;
+}
+
+.main-content {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+}
+
+.cricket-info {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #6c757d;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+/* Responsive Design for Cricket Page */
+@media (max-width: 1200px) {
+  .page-content {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .trending-news-sidebar {
+    order: -1;
+    margin-bottom: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .cricket-news-page {
+    padding: 1rem;
+  }
+  
+  .page-header {
+    padding: 1.5rem;
+  }
+  
+  .page-header h1 {
+    font-size: 2rem;
+  }
+  
+  .main-content {
+    padding: 1.5rem;
+  }
 }

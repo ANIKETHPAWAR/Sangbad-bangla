@@ -1,88 +1,133 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { FiTrendingUp, FiTag, FiX } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
+import { useAuth0 } from '@auth0/auth0-react';
+import { FiChevronRight, FiUser, FiLogOut } from 'react-icons/fi';
 import './Sidebar.css';
 
 const Sidebar = ({ isOpen, onClose }) => {
-  const location = useLocation();
+  const { user, isAuthenticated, logout } = useAuth0();
 
-  const sections = [
+  const handleLogout = () => {
+    logout({ logoutParams: { returnTo: window.location.origin } });
+  };
+
+  // Main navigation categories - clean names without icons
+  const mainCategories = [
+    { id: 'home', name: 'হোম', path: '/' },
     { id: 'all-news', name: 'এক নজরে সব খবর', path: '/all-news' },
     { id: 'popular', name: 'জনপ্রিয়', path: '/popular' },
     { id: 'cricket', name: 'ক্রিকেট', path: '/cricket' },
-    { id: 'football', name: 'ফুটবলের মহারণ', path: '/football' },
     { id: 'bengal-face', name: 'বাংলার মুখ', path: '/bengal-face' },
     { id: 'astrology', name: 'ভাগ্যলিপি', path: '/astrology' },
+    { id: 'football', name: 'ফুটবলের মহারণ', path: '/football' },
     { id: 'bioscope', name: 'বায়োস্কোপ', path: '/bioscope' },
     { id: 'photo-gallery', name: 'ছবিঘর', path: '/photo-gallery' },
     { id: 'kolkata', name: 'কলকাতা', path: '/kolkata' },
+    { id: 'careers', name: 'কর্মখালি', path: '/careers' },
     { id: 'web-stories', name: 'ওয়েবস্টোরি', path: '/web-stories' },
-    { id: 'lifestyle', name: 'টুকিটাকি', path: '/lifestyle' },
-    { id: 'careers', name: 'কর্মখালি', path: '/careers' }
+    { id: 'lifestyle', name: 'টুকিটাকি', path: '/lifestyle' }
   ];
 
-  const trendingTopics = [
-    'লাইভ ক্রিকেট স্কোর',
-    'আইপিএলের সাতকাহন',
-    'আইপিএলের সূচি',
-    'পয়েন্ট তালিকা',
-    'আইপিএলের অরেঞ্জ ক্যাপ',
-    'পার্পল ক্যাপ',
-    'পরিসংখ্যান',
-    'ফিরে দেখুন IPL'
+  // Special sections - clean names without icons
+  const specialSections = [
+    { id: 'special-report', name: 'বিশেষ প্রতিবেদন', path: '/special-report' },
+    { id: 'horoscope', name: 'আজকের রাশিফল', path: '/horoscope' },
+    { id: 'gold-rate', name: 'সোনার দর', path: '/gold-rate' },
+    { id: 'cricket-live', name: 'ক্রিকেট লাইভ স্কোর', path: '/cricket-live' }
   ];
 
   return (
     <>
-      {/* Sidebar Overlay - Only shows when isOpen is true */}
+      {/* Overlay */}
       {isOpen && (
-        <div className="sidebar-overlay" onClick={onClose}>
-          <div className="sidebar mobile-sidebar" onClick={(e) => e.stopPropagation()}>
-            <div className="sidebar-header">
-              <h3>মেনু</h3>
-              <button className="sidebar-close" onClick={onClose}>
-                <FiX />
-              </button>
-            </div>
-            
-            <div className="sidebar-section">
-              <h3 className="sidebar-title">বিভাগ</h3>
-              <nav className="sidebar-nav">
-                {sections.map((item) => (
-                  <Link
-                    key={item.id}
-                    to={item.path}
-                    className={`sidebar-link ${location.pathname === item.path ? 'active' : ''}`}
-                    onClick={onClose}
-                  >
-                    <span>{item.name}</span>
-                  </Link>
-                ))}
-              </nav>
-            </div>
+        <div className="sidebar-overlay" onClick={onClose}></div>
+      )}
 
-            <div className="sidebar-section">
-              <h3 className="sidebar-title with-icon">
-                <FiTrendingUp className="sidebar-icon" />
-                ট্রেন্ডিং টপিকস
-              </h3>
-              <div className="sidebar-tags">
-                {trendingTopics.map((topic, idx) => (
-                  <Link 
-                    key={idx} 
-                    to={`/search?q=${encodeURIComponent(topic)}`} 
-                    className="sidebar-tag"
-                    onClick={onClose}
-                  >
-                    <FiTag />
-                    <span>{topic}</span>
-                  </Link>
-                ))}
+      {/* Sidebar */}
+      <div className={`sidebar ${isOpen ? 'open' : ''}`}>
+        {/* Header */}
+        <div className="sidebar-header">
+          <h3>সানবাদ বাংলা</h3>
+          <button className="close-btn" onClick={onClose}>
+            ✕
+          </button>
+        </div>
+
+        {/* User Section */}
+        {isAuthenticated ? (
+          <div className="user-section">
+            <div className="user-info">
+              <div className="user-avatar">
+                <FiUser />
+              </div>
+              <div className="user-details">
+                <span className="user-name">{user?.name || user?.email || 'User'}</span>
+                <span className="user-status">লগইন করা</span>
+              </div>
+              <FiChevronRight className="user-arrow" />
+            </div>
+          </div>
+        ) : (
+          <div className="user-section">
+            <div className="user-info">
+              <div className="user-avatar">
+                <FiUser />
+              </div>
+              <div className="user-details">
+                <span className="user-name">অতিথি ব্যবহারকারী</span>
+                <span className="user-status">সাইন ইন করুন</span>
               </div>
             </div>
           </div>
+        )}
+
+        {/* Main Navigation */}
+        <div className="sidebar-content">
+          <div className="nav-section">
+            <h4 className="section-title">মূল নেভিগেশন</h4>
+            {mainCategories.map((item) => (
+              <Link
+                key={item.id}
+                to={item.path}
+                onClick={onClose}
+                className="nav-link"
+              >
+                <span className="nav-text">{item.name}</span>
+              </Link>
+            ))}
+          </div>
+
+          {/* Special Sections */}
+          <div className="nav-section">
+            <h4 className="section-title">বিশেষ বিভাগ</h4>
+            {specialSections.map((item) => (
+              <Link
+                key={item.id}
+                to={item.path}
+                onClick={onClose}
+                className="nav-link special"
+              >
+                <span className="nav-text">{item.name}</span>
+              </Link>
+            ))}
+          </div>
         </div>
-      )}
+
+        {/* Bottom Section */}
+        <div className="sidebar-bottom">
+          {isAuthenticated ? (
+            <button onClick={handleLogout} className="logout-btn">
+              <FiLogOut />
+              <span>লগআউট</span>
+            </button>
+          ) : (
+            <Link to="/signin" onClick={onClose} className="signin-btn">
+              <FiUser />
+              <span>সাইন ইন</span>
+            </Link>
+          )}
+        </div>
+      </div>
     </>
   );
 };

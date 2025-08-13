@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GoogleLogin } from '@react-oauth/google';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth0 } from '@auth0/auth0-react';
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowLeft } from 'react-icons/fi';
 import './SignIn.css';
 
 const SignIn = () => {
   const navigate = useNavigate();
-  const { login, isAuthenticated } = useAuth();
+  const { loginWithRedirect, isAuthenticated, isLoading } = useAuth0();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   // Redirect if already authenticated
@@ -23,27 +21,10 @@ const SignIn = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleGoogleSuccess = async (credentialResponse) => {
-    setIsLoading(true);
-    setError('');
-    
-    try {
-      const result = login(credentialResponse.credential);
-      if (result.success) {
-        navigate('/');
-      } else {
-        setError(result.error || 'Login failed');
-      }
-    } catch (error) {
-      setError('An error occurred during login');
-      console.error('Google login error:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleGoogleError = () => {
-    setError('Google login failed. Please try again.');
+  const handleGoogleLogin = () => {
+    loginWithRedirect({
+      appState: { returnTo: '/' }
+    });
   };
 
   const handleInputChange = (e) => {
@@ -55,7 +36,10 @@ const SignIn = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setError('Please use Google login to sign in.');
+    // For now, redirect to Auth0 login
+    loginWithRedirect({
+      appState: { returnTo: '/' }
+    });
   };
 
   return (
@@ -84,24 +68,20 @@ const SignIn = () => {
           </div>
         )}
 
-        {/* Google Login */}
-        <div className="google-login-section">
+        {/* Auth0 Login */}
+        <div className="auth0-login-section">
           <div className="divider">
             <span>অথবা</span>
           </div>
           
-          <div className="google-login-container">
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={handleGoogleError}
-              useOneTap
-              theme="filled_blue"
-              size="large"
-              text="signin_with"
-              shape="rectangular"
-              locale="bn"
+          <div className="auth0-login-container">
+            <button
+              onClick={handleGoogleLogin}
+              className="auth0-login-button"
               disabled={isLoading}
-            />
+            >
+              {isLoading ? 'সাইন ইন হচ্ছে...' : '🔑 Login with Auth0'}
+            </button>
           </div>
         </div>
 
@@ -164,7 +144,7 @@ const SignIn = () => {
             অ্যাকাউন্ট নেই?{' '}
             <button 
               className="link-button"
-              onClick={() => setError('Please use Google login to create an account.')}
+              onClick={() => setError('Please use Auth0 login to create an account.')}
             >
               সাইন আপ করুন
             </button>
