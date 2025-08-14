@@ -285,6 +285,43 @@
 }
 
 /* Responsive Design */
+/* Tablet breakpoint - handle screens between 768px and 1200px */
+@media (min-width: 769px) and (max-width: 1200px) {
+  .news-container {
+    grid-template-columns: 1fr 320px;
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+  
+  .trending-news-sidebar {
+    position: sticky;
+    top: 8rem;
+    height: fit-content;
+    max-width: 320px;
+    margin-top: 2rem;
+  }
+  
+  .trending-news-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  /* Ensure trending header fits properly */
+  .trending-header {
+    margin-bottom: 1.5rem;
+    padding: 1.5rem 1rem;
+  }
+  
+  .section-header .section-title .section-title-main {
+    font-size: 20px !important;
+  }
+  
+  .section-header .section-title .section-title-subtitle {
+    font-size: 12px !important;
+  }
+}
+
 @media (max-width: 1200px) {
   .news-container {
     grid-template-columns: 1fr;
@@ -321,6 +358,8 @@
 @media (max-width: 768px) {
   .news-container {
     padding: 1rem;
+    /* Ensure single column layout when trending sidebar is hidden */
+    grid-template-columns: 1fr;
   }
   
   .featured-news-grid {
@@ -328,8 +367,9 @@
     gap: 1rem;
   }
   
-  .trending-news-list {
-    grid-template-columns: 1fr;
+  /* Hide trending news sidebar on mobile */
+  .trending-news-sidebar {
+    display: none !important;
   }
   
   /* Mobile section title adjustments */
@@ -371,10 +411,17 @@
 @media (max-width: 480px) {
   .news-container {
     padding: 0.5rem;
+    /* Ensure single column layout on small mobile */
+    grid-template-columns: 1fr;
   }
   
   .featured-news-grid {
     gap: 0.75rem;
+  }
+  
+  /* Ensure trending news sidebar remains hidden on small mobile */
+  .trending-news-sidebar {
+    display: none !important;
   }
   
   /* Small mobile section title adjustments */
