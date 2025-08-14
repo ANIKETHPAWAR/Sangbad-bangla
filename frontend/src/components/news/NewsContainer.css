@@ -288,37 +288,47 @@
 /* Tablet breakpoint - handle screens between 768px and 1200px */
 @media (min-width: 769px) and (max-width: 1200px) {
   .news-container {
+    display: grid;
     grid-template-columns: 1fr 320px;
     gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
     padding: 1.5rem;
+    position: relative;
   }
   
+  .news-main-content {
+    min-height: 500px;
+    width: 100%;
+  }
+  
+  .featured-news-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  /* Ensure trending sidebar is properly positioned */
   .trending-news-sidebar {
     position: sticky;
     top: 8rem;
     height: fit-content;
-    max-width: 320px;
-    margin-top: 2rem;
+    align-self: flex-start;
+    justify-self: end;
   }
   
-  .trending-news-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  /* Ensure trending header fits properly */
-  .trending-header {
-    margin-bottom: 1.5rem;
-    padding: 1.5rem 1rem;
+  /* Section header adjustments for tablet */
+  .section-header {
+    margin-bottom: 2rem;
+    margin-top: 1rem;
+    padding: 1rem 0;
   }
   
   .section-header .section-title .section-title-main {
-    font-size: 20px !important;
+    font-size: 24px !important;
   }
   
   .section-header .section-title .section-title-subtitle {
-    font-size: 12px !important;
+    font-size: 14px !important;
   }
 }
 
@@ -360,16 +370,12 @@
     padding: 1rem;
     /* Ensure single column layout when trending sidebar is hidden */
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
   
   .featured-news-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
-  }
-  
-  /* Hide trending news sidebar on mobile */
-  .trending-news-sidebar {
-    display: none !important;
   }
   
   /* Mobile section title adjustments */
@@ -413,15 +419,11 @@
     padding: 0.5rem;
     /* Ensure single column layout on small mobile */
     grid-template-columns: 1fr;
+    gap: 0.75rem;
   }
   
   .featured-news-grid {
     gap: 0.75rem;
-  }
-  
-  /* Ensure trending news sidebar remains hidden on small mobile */
-  .trending-news-sidebar {
-    display: none !important;
   }
   
   /* Small mobile section title adjustments */

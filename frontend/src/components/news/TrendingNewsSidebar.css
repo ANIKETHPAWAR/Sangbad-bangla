@@ -111,8 +111,6 @@
   opacity: 1 !important;
 }
 
-
-
 .trending-news-list {
   display: flex;
   flex-direction: column;
@@ -148,12 +146,6 @@
   color: #dc3545;
 }
 
-
-
-
-
-
-
 /* Responsive Design */
 /* Tablet breakpoint - handle screens between 768px and 1200px */
 @media (min-width: 769px) and (max-width: 1200px) {
@@ -163,12 +155,15 @@
     height: fit-content;
     background: white;
     border-radius: 12px;
-    padding: 16px;
+    padding: 18px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     border: 1px solid #e9ecef;
     margin-top: 2rem;
     width: 100%;
     max-width: 320px;
+    /* Ensure proper alignment */
+    align-self: flex-start;
+    justify-self: end;
   }
   
   .trending-header {
@@ -179,18 +174,39 @@
     border-radius: 12px;
     border: 2px solid #fed7d7;
     box-shadow: 0 4px 16px rgba(220, 53, 69, 0.15);
+    /* Ensure proper centering */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .trending-header .section-title {
+    width: 100%;
+    max-width: 280px;
+    margin: 0 auto;
   }
   
   .trending-header .section-title .section-title-main {
     font-size: 20px !important;
+    text-align: center;
+    margin-bottom: 10px !important;
   }
   
   .trending-header .section-title .section-title-subtitle {
     font-size: 12px !important;
+    text-align: center;
+    max-width: 240px;
+    margin: 0 auto !important;
   }
   
   .trending-header .section-title .section-title-icon {
     font-size: 18px !important;
+    margin-bottom: 8px !important;
+    text-align: center;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
   }
   
   .trending-news-list {
@@ -198,6 +214,13 @@
     flex-direction: column;
     gap: 1rem;
     margin-top: 1rem;
+    width: 100%;
+  }
+  
+  /* Ensure news cards are properly aligned */
+  .trending-news-list .news-card {
+    width: 100%;
+    max-width: 100%;
   }
 }
 
@@ -207,6 +230,7 @@
     order: -1;
     margin-bottom: 2rem;
     margin-top: 1rem;
+    max-width: 100%;
   }
   
   .trending-news-list {
@@ -232,15 +256,94 @@
 }
 
 @media (max-width: 768px) {
-  /* Hide trending news sidebar on mobile screens */
+  /* Mobile responsive design for trending news */
   .trending-news-sidebar {
-    display: none !important;
+    position: static;
+    order: -1;
+    margin: 1rem 0;
+    padding: 15px;
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+  
+  .trending-header {
+    margin-bottom: 1.5rem;
+    margin-top: 0.5rem;
+    padding: 1rem 0.5rem;
+    border-radius: 8px;
+    border: 1px solid #fed7d7;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.1);
+  }
+  
+  .trending-header .section-title .section-title-main {
+    font-size: 20px !important;
+    margin-bottom: 8px !important;
+  }
+  
+  .trending-header .section-title .section-title-subtitle {
+    font-size: 12px !important;
+    max-width: 200px !important;
+  }
+  
+  .trending-header .section-title .section-title-icon {
+    font-size: 18px !important;
+    margin-bottom: 6px !important;
+  }
+  
+  .trending-news-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+  }
+  
+  .trending-loading,
+  .trending-error,
+  .no-trending-news {
+    padding: 1.5rem 0.5rem;
   }
 }
 
 @media (max-width: 480px) {
-  /* Ensure trending news sidebar remains hidden on small mobile screens */
+  /* Small mobile responsive design */
   .trending-news-sidebar {
-    display: none !important;
+    margin: 0.75rem 0;
+    padding: 12px;
+    border-radius: 6px;
+  }
+  
+  .trending-header {
+    margin-bottom: 1rem;
+    margin-top: 0.25rem;
+    padding: 0.75rem 0.25rem;
+    border-radius: 6px;
+  }
+  
+  .trending-header .section-title .section-title-main {
+    font-size: 18px !important;
+    margin-bottom: 6px !important;
+  }
+  
+  .trending-header .section-title .section-title-subtitle {
+    font-size: 11px !important;
+    max-width: 180px !important;
+  }
+  
+  .trending-header .section-title .section-title-icon {
+    font-size: 16px !important;
+    margin-bottom: 4px !important;
+  }
+  
+  .trending-news-list {
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  
+  .trending-loading,
+  .trending-error,
+  .no-trending-news {
+    padding: 1rem 0.25rem;
+    font-size: 0.9rem;
   }
 }

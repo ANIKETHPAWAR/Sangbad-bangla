@@ -405,49 +405,6 @@
   }
 }
 
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .section-title {
-    gap: 12px;
-    margin-bottom: 20px;
-  }
-  
-  .section-title--center {
-    gap: 14px;
-  }
-  
-  .section-title--center .section-title-content {
-    gap: 10px;
-  }
-  
-  .section-title--center .section-title-main {
-    font-size: 20px;
-  }
-  
-  .section-title--center .section-title-subtitle {
-    font-size: 12px;
-  }
-  
-  .section-title-main {
-    font-size: 20px;
-  }
-  
-  .section-title-icon {
-    width: 32px;
-    height: 32px;
-    font-size: 16px;
-  }
-  
-  .section-title--large .section-title-main {
-    font-size: 22px;
-  }
-  
-  .section-title--large .section-title-subtitle {
-    font-size: 13px;
-  }
-}
-
 @media (max-width: 480px) {
   .section-title {
     gap: 8px;
@@ -490,5 +447,139 @@
   
   .section-title--large .section-title-subtitle {
     font-size: 12px;
+  }
+  
+  /* Small mobile decorative lines adjustments */
+  .decorative-line {
+    margin: 0 6px;
+  }
+  
+  .decorative-line-vertical {
+    width: 1.5px;
+    height: 10px;
+  }
+}
+
+
+/* Responsive Design */
+/* Tablet breakpoint - handle screens between 768px and 1200px */
+@media (min-width: 769px) and (max-width: 1200px) {
+  .section-title {
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  
+  .section-title--center {
+    gap: 18px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .section-title--center .section-title-content {
+    gap: 12px;
+    text-align: center;
+    max-width: 100%;
+  }
+  
+  .section-title--center .section-title-main {
+    font-size: 22px;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  
+  .section-title--center .section-title-subtitle {
+    font-size: 13px;
+    text-align: center;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+  
+  .section-title-main {
+    font-size: 22px;
+  }
+  
+  .section-title-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+  
+  .section-title--large .section-title-main {
+    font-size: 24px;
+  }
+  
+  .section-title--large .section-title-subtitle {
+    font-size: 14px;
+  }
+  
+  /* Tablet decorative lines adjustments */
+  .decorative-line {
+    margin: 0 12px;
+  }
+  
+  .decorative-line-vertical {
+    width: 2px;
+    height: 14px;
+  }
+  
+  /* Ensure proper spacing for trending news titles */
+  .trending-news-sidebar .section-title--center {
+    gap: 16px;
+  }
+  
+  .trending-news-sidebar .section-title--center .section-title-content {
+    max-width: 260px;
+  }
+}
+
+@media (max-width: 768px) {
+  .section-title {
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  
+  .section-title--center {
+    gap: 14px;
+  }
+  
+  .section-title--center .section-title-content {
+    gap: 10px;
+  }
+  
+  .section-title--center .section-title-main {
+    font-size: 20px;
+  }
+  
+  .section-title--center .section-title-subtitle {
+    font-size: 12px;
+  }
+  
+  .section-title-main {
+    font-size: 20px;
+  }
+  
+  .section-title-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+  
+  .section-title--large .section-title-main {
+    font-size: 22px;
+  }
+  
+  .section-title--large .section-title-subtitle {
+    font-size: 13px;
+  }
+  
+  /* Mobile decorative lines adjustments */
+  .decorative-line {
+    margin: 0 8px;
+  }
+  
+  .decorative-line-vertical {
+    width: 2px;
+    height: 12px;
   }
 } 
