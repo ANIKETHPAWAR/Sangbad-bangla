@@ -1,9 +1,9 @@
 .login-button {
-  background: none;
+  background-color: #007bff;
   border: none;
   font-size: 14px;
   font-weight: 500;
-  color: #333333;
+  color: #ffffff;
   cursor: pointer;
   transition: color 0.2s ease;
   padding: 8px 12px;
@@ -13,10 +13,12 @@
 }
 
 .login-button:hover {
-  color: #e74c3c;
+  color: #ffffff;
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
 }
 
 .login-button:focus {
-  outline: 2px solid #e74c3c;
+  outline: 2px solid #ffffff;
   outline-offset: 2px;
 }

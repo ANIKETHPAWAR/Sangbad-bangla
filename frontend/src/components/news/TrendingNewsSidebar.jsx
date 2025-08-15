@@ -67,7 +67,7 @@ const TrendingNewsSidebar = () => {
         <div className="trending-header">
           <SectionTitle 
             title="ট্রেন্ডিং খবর" 
-            subtitle="সর্বাধিক জনপ্রিয় এবং আলোচিত খবর"
+            
             icon={<FiTrendingUp />}
             variant="large"
             align="center"
@@ -89,7 +89,7 @@ const TrendingNewsSidebar = () => {
         <div className="trending-header">
           <SectionTitle 
             title="ট্রেন্ডিং খবর" 
-            subtitle="সর্বাধিক জনপ্রিয় এবং আলোচিত খবর"
+           
             icon={<FiTrendingUp />}
             variant="large"
             align="center"
@@ -109,7 +109,7 @@ const TrendingNewsSidebar = () => {
               <div className="trending-header">
           <SectionTitle 
             title="ট্রেন্ডিং খবর" 
-            subtitle="সর্বাধিক জনপ্রিয় এবং আলোচিত খবর"
+           
             icon={<FiTrendingUp />}
             variant="large"
             align="center"

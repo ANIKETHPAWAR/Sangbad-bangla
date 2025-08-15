@@ -10,7 +10,7 @@ const LoginButton = () => {
       className="login-button"
       onClick={() => loginWithRedirect()}
     >
-      সাইন ইন করুন
+      Sign In
     </button>
   );
 };

@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 0;
   position: relative;
   width: 100%;
   background: transparent;
@@ -51,6 +51,8 @@
   font-size: 22px;
   font-weight: 600;
   background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
 .section-title--center .section-title-subtitle {
@@ -63,6 +65,8 @@
   font-size: 13px;
   color: #777;
   background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
 .section-title--center .section-title-icon {
@@ -86,7 +90,7 @@
 
 /* Additional spacing for large variant */
 .section-title--large.section-title--center {
-  margin-bottom: 40px;
+  margin-bottom: 0;
   margin-top: 20px;
 }
 
@@ -95,7 +99,7 @@
   font-weight: 700;
   color: #2c3e50;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  margin-bottom: 12px;
+  margin-bottom: 0;
 }
 
 .section-title--large.section-title--center .section-title-subtitle {
@@ -110,7 +114,7 @@
 .section-title--large.section-title--center .section-title-icon {
   font-size: 28px;
   color: #007bff;
-  margin-bottom: 12px;
+  margin-bottom: 0;
 }
 
 .section-title--right {
@@ -204,6 +208,8 @@
   margin: 0;
   font-family: var(--font-bengali, 'Noto Sans Bengali', sans-serif);
   line-height: 1.2;
+  border: none;
+  box-shadow: none;
 }
 
 /* Special styling for trending news section */
@@ -222,6 +228,8 @@
   margin: 0;
   font-family: var(--font-bengali, 'Noto Sans Bengali', sans-serif);
   line-height: 1.4;
+  border: none;
+  box-shadow: none;
 }
 
 /* Variants */
@@ -257,7 +265,7 @@
 
 
 .section-title--large {
-  margin-bottom: 32px;
+  margin-bottom: 0;
 }
 
 .section-title--large .section-title-main {

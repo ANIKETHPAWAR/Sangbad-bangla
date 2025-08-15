@@ -96,9 +96,10 @@
   margin-top: 1rem;
   text-align: center;
   padding: 1rem 0;
-  background: linear-gradient(135deg, #f8f9fa, #ffffff);
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
 }
 
 /* Ensure section title is prominent */
