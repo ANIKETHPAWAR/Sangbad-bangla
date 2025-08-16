@@ -421,6 +421,10 @@
     /* Ensure single column layout on small mobile */
     grid-template-columns: 1fr;
     gap: 0.75rem;
+    /* Use scroll-margin-top to push content below fixed header */
+    scroll-margin-top: 120px;
+    /* Add top margin to ensure content is below header */
+    margin-top: 120px;
   }
   
   .featured-news-grid {
@@ -432,17 +436,73 @@
     margin-top: 0.25rem;
     margin-bottom: 1rem;
     padding: 0.5rem 0;
+    /* Ensure section headers are visible on mobile */
+    position: relative !important;
+    z-index: 100 !important;
+    /* Force visibility */
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    /* Ensure proper positioning */
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
   }
   
   .section-header .section-title .section-title-main {
     font-size: 20px !important;
+    /* Force visibility */
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
   
   .section-header .section-title .section-title-subtitle {
     font-size: 12px !important;
+    /* Force visibility */
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
   
   .section-header .section-title .section-title-icon {
     font-size: 18px !important;
+    /* Force visibility */
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  /* Ensure trending news section displays properly on mobile */
+  .trending-news-sidebar {
+    margin: 0.5rem 0;
+    padding: 10px;
+  }
+  
+  /* Optimize trending news grid for mobile 2-column layout */
+  .trending-news-sidebar .trending-news-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  
+  /* Ensure news cards fit properly in mobile grid */
+  .trending-news-sidebar .trending-news-list .news-card {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+  
+  /* Force section headers to be visible */
+  .section-header,
+  .section-header .section-title,
+  .section-header .section-title .section-title-main,
+  .section-header .section-title .section-title-subtitle,
+  .section-header .section-title .section-title-icon {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 100 !important;
   }
 } 

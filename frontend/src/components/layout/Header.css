@@ -405,78 +405,148 @@
 }
 
 @media (max-width: 480px) {
+  /* Reduce header height significantly */
+  .top-bar {
+    min-height: 25px;
+    padding: 1px 0;
+  }
+  
+  .logo-image {
+    height: 40px;
+    max-width: 160px;
+  }
+  
+  .header-center {
+    margin: 2px 0;
+  }
+  
+  /* Make navigation more compact */
+  .navigation-bar {
+    min-height: 20px;
+    padding: 0;
+  }
+  
+  .nav-link {
+    padding: 2px 6px;
+    font-size: 9px;
+    min-height: 20px;
+  }
+  
+  /* Make sub-navigation more compact */
+  .sub-navigation-bar {
+    padding: 4px 0 1px 0;
+    min-height: 16px;
+  }
+  
+  .sub-nav-link {
+    font-size: 8px;
+    padding: 1px 0;
+    min-height: 16px;
+  }
+  
+  /* Reduce action button sizes */
+  .action-btn {
+    width: 22px;
+    height: 22px;
+    padding: 1px;
+    font-size: 15px;
+  }
+  
+  .menu-btn {
+    width: 22px;
+    height: 22px;
+    padding: 1px;
+  }
+  
+  /* Reduce search container padding */
+  .search-container {
+    padding: 4px 0;
+  }
+  
+  .search-input {
+    padding: 3px 6px;
+    font-size: 10px;
+  }
+  
+  .search-submit {
+    padding: 3px 6px;
+  }
+  
+  /* Optimize container padding */
+  .container {
+    padding: 0 8px;
+  }
+  
+  /* Fix header layout - restore proper flexbox structure */
   .top-bar-content {
-    flex-wrap: wrap;
-    gap: 1px;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    gap: 8px;
+    min-height: 25px;
+  }
+  
+  /* Ensure proper positioning of header elements */
+  .header-left {
+    order: 1;
+    min-width: 50px;
+    display: flex;
+    align-items: center;
   }
   
   .header-center {
     order: 2;
-    flex-basis: 100%;
-    margin: 8px 0;
-  }
-  
-  .header-left {
-    order: 1;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 10px;
   }
   
   .header-right {
     order: 3;
-    min-width: auto;
+    min-width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-left: auto;
+    gap: 6px;
+  }
+  
+  /* Reduce separator height */
+  .separator {
+    height: 20px;
+    margin: 0 3px;
+  }
+  
+  /* Make user menu more compact */
+  .user-menu {
+    min-width: 80px;
+  }
+  
+  .user-greeting {
+    font-size: 10px;
+  }
+  
+  .user-date {
+    font-size: 8px;
+    margin-top: 1px;
+  }
+  
+  /* Remove any default margins/padding from logo */
+  .logo {
+    margin: 0;
+    padding: 0;
   }
   
   .logo-image {
-    height: 70px;
-    max-width: 280px;
+    margin: 0;
+    padding: 0;
+    display: block;
   }
   
-  .top-bar {
-    min-height: 45px;
-    padding: 3px 0;
-  }
-  
-  .navigation-bar {
-    min-height: 30px;
-  }
-  
-  .nav-link {
-    padding: 6px 10px;
-    font-size: 11px;
-  }
-  
-  .sub-navigation-bar {
-    padding: 12px 0 4px 0;
-    min-height: 25px;
-  }
-  
-  .sub-nav-link {
-    font-size: 10px;
-    padding: 4px 0;
-  }
-  
-  .action-btn {
-    width: 28px;
-    height: 28px;
-    padding: 4px;
-    font-size: 12px;
-  }
-  
-  .menu-btn {
-    width: 28px;
-    height: 28px;
-    padding: 4px;
-  }
-  
-  .search-container {
-    padding: 8px 0;
-  }
-  
-  .search-input {
-    padding: 6px 10px;
-    font-size: 12px;
-  }
-  
-  .search-submit {
-    padding: 6px 10px;
+  /* Make the entire header more compact */
+  .header {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   }
 } 

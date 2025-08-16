@@ -306,11 +306,16 @@
 }
 
 @media (max-width: 480px) {
-  /* Small mobile responsive design */
+  /* Small mobile responsive design with 2-column grid */
   .trending-news-sidebar {
     margin: 0.75rem 0;
     padding: 12px;
     border-radius: 6px;
+    /* Ensure proper positioning on mobile */
+    position: relative !important;
+    z-index: 50 !important;
+    /* Add top margin to ensure visibility */
+    margin-top: 1rem !important;
   }
   
   .trending-header {
@@ -318,26 +323,52 @@
     margin-top: 0.25rem;
     padding: 0.75rem 0.25rem;
     border-radius: 6px;
+    /* Force visibility */
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
   
   .trending-header .section-title .section-title-main {
     font-size: 18px !important;
     margin-bottom: 0 !important;
+    /* Force visibility */
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
   
   .trending-header .section-title .section-title-subtitle {
     font-size: 11px !important;
     max-width: 180px !important;
+    /* Force visibility */
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
   
   .trending-header .section-title .section-title-icon {
     font-size: 16px !important;
     margin-bottom: 0 !important;
+    /* Force visibility */
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
   
+  /* Implement 2-column grid layout for mobile (0-480px) */
   .trending-news-list {
-    gap: 0.5rem;
-    margin-top: 0.5rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+  }
+  
+  /* Ensure news cards fit properly in 2-column grid */
+  .trending-news-list .news-card {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
   }
   
   .trending-loading,

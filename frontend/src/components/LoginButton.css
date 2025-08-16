@@ -1,12 +1,12 @@
 .login-button {
   background-color: #007bff;
   border: none;
-  font-size: 14px;
+  font-size: 10px;
   font-weight: 500;
   color: #ffffff;
   cursor: pointer;
   transition: color 0.2s ease;
-  padding: 8px 12px;
+  padding: 6px 10px;
   border-radius: 6px;
   font-family: inherit;
   white-space: nowrap;
