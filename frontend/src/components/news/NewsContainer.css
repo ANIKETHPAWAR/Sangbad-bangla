@@ -422,9 +422,9 @@
     grid-template-columns: 1fr;
     gap: 0.75rem;
     /* Use scroll-margin-top to push content below fixed header */
-    scroll-margin-top: 120px;
+    scroll-margin-top: 20px;
     /* Add top margin to ensure content is below header */
-    margin-top: 120px;
+    margin-top: 20px;
   }
   
   .featured-news-grid {
