@@ -332,10 +332,11 @@
   }
   
   .new-badge {
-    top: 8px;
-    left: 8px;
-    padding: 3px 6px;
-    font-size: 0.65rem;
+    top: 6px;
+    left: 6px;
+    padding: 2px 4px;
+    font-size: 5px;
+    border-radius: 8px;
   }
   
   /* Mobile optimizations for trending news in 2-column grid */

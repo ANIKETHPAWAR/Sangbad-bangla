@@ -425,6 +425,10 @@
     min-height: 20px;
     padding: 0;
   }
+  .new-tag{
+    top: -8px;
+    font-size: 6px;
+  }
   
   .nav-link {
     padding: 2px 6px;
