@@ -68,3 +68,5 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+echo "sangbad-bangla-firebase-adminsdk-fbsvc-e41fc5a33a.json" >> backend/.gitignore
+echo "*.json" >> backend/.gitignore

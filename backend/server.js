@@ -9,14 +9,39 @@ const PORT = process.env.PORT || 5000;
 
 // Initialize Firebase Admin SDK
 try {
-  const serviceAccount = require('./firebase-service-account.json');
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    storageBucket: process.env.FIREBASE_STORAGE_BUCKET
-  });
-  console.log('✅ Firebase Admin SDK initialized successfully');
+  // Try to use environment variables first (production)
+  if (process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_PRIVATE_KEY && process.env.FIREBASE_CLIENT_EMAIL) {
+    const serviceAccount = {
+      type: "service_account",
+      project_id: process.env.FIREBASE_PROJECT_ID,
+      private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
+      private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+      client_email: process.env.FIREBASE_CLIENT_EMAIL,
+      client_id: process.env.FIREBASE_CLIENT_ID,
+      auth_uri: "https://accounts.google.com/o/oauth2/auth",
+      token_uri: "https://oauth2.googleapis.com/token",
+      auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
+      client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL
+    };
+    
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+      storageBucket: process.env.FIREBASE_STORAGE_BUCKET
+    });
+    console.log('✅ Firebase Admin SDK initialized successfully with environment variables');
+  } else {
+    // Fallback to JSON file (local development)
+    const serviceAccount = require('./firebase-service-account.json');
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+      storageBucket: process.env.FIREBASE_STORAGE_BUCKET
+    });
+    console.log('✅ Firebase Admin SDK initialized successfully with JSON file');
+  }
 } catch (error) {
   console.error('❌ Firebase initialization error:', error.message);
+  // Don't exit the process, let it continue without Firebase for now
+  console.log('⚠️ Continuing without Firebase Admin SDK...');
 }
 
 // Helper function to validate and format dates
