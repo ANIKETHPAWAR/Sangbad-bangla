@@ -1,0 +1,67 @@
+# Firebase Storage Security Rules for Sangbad Bangla News App
+
+# These rules ensure that only authenticated users with admin role can upload/delete images
+# Regular users can read all images
+
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    # News images - only admins can upload/delete, everyone can read
+    match /news-images/{allPaths=**} {
+      allow read: if true;  // Anyone can read news images
+      allow write: if request.auth != null && 
+                   request.auth.token.roles != null && 
+                   request.auth.token.roles.hasAny(['admin']);
+    }
+    
+    # Profile images - users can manage their own images
+    match /profile-images/{userId}/{allPaths=**} {
+      allow read: if true;  // Anyone can read profile images
+      allow write: if request.auth != null && 
+                   request.auth.uid == userId;
+    }
+    
+    # General uploads - only admins
+    match /uploads/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null && 
+                   request.auth.token.roles != null && 
+                   request.auth.token.roles.hasAny(['admin']);
+    }
+    
+    # Default rule - deny all other access
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+# Firestore Security Rules (for reference)
+# You'll need to add these to your Firestore console
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    # News collection - admins can read/write, users can read published news
+    match /news/{document=**} {
+      allow read: if true;  // Anyone can read news
+      allow write: if request.auth != null && 
+                   request.auth.token.roles != null && 
+                   request.auth.token.roles.hasAny(['admin']);
+    }
+    
+    # Users can read their own profile
+    match /users/{userId} {
+      allow read, write: if request.auth != null && 
+                        request.auth.uid == userId;
+    }
+    
+    # Default rule - deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

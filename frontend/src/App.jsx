@@ -16,6 +16,12 @@ import ArticlePage from './components/news/ArticlePage';
 import ArticleDetailPage from './components/news/ArticleDetailPage';
 import TrendingNewsSidebar from './components/news/TrendingNewsSidebar';
 
+// Admin Components
+import RequireAdmin from './components/admin/RequireAdmin';
+import AdminDashboard from './components/admin/AdminDashboard';
+import NewsForm from './components/admin/NewsForm';
+import TempLogin from './components/admin/TempLogin';
+
 
 // Simple Cricket News Page Component
 const CricketNewsPage = () => {
@@ -86,9 +92,27 @@ function App() {
             <Route path="/about-us" element={<NewsContainer />} />
             <Route path="/contact" element={<NewsContainer />} />
             <Route path="/signin" element={<SignIn />} />
+            <Route path="/admin-login" element={<TempLogin />} />
             <Route path="/profile" element={<NewsContainer />} />
             <Route path="/settings" element={<NewsContainer />} />
             <Route path="/help" element={<NewsContainer />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin" element={
+              <RequireAdmin>
+                <AdminDashboard />
+              </RequireAdmin>
+            } />
+            <Route path="/admin/new" element={
+              <RequireAdmin>
+                <NewsForm />
+              </RequireAdmin>
+            } />
+            <Route path="/admin/edit/:id" element={
+              <RequireAdmin>
+                <NewsForm />
+              </RequireAdmin>
+            } />
           </Routes>
         </main>
         

@@ -12,7 +12,7 @@ const NewsContainer = () => {
   const [featuredNews, setFeaturedNews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [newsCount, setNewsCount] = useState(UI_CONSTANTS.INITIAL_NEWS_COUNT);
+
   const [refreshInterval] = useState(NEWS_REFRESH_INTERVAL); // 5 minutes default - fixed for production
   const [showNewContentNotification, setShowNewContentNotification] = useState(false);
   const [newContentCount, setNewContentCount] = useState(0);
@@ -23,11 +23,11 @@ const NewsContainer = () => {
       setLoading(true);
       setError(null);
       
-      // Load featured news data
-      const featuredData = await newsDataService.getFeaturedNews();
+      // Load combined news data (Firestore + external)
+      const combinedData = await newsDataService.getCombinedNews();
       
       // Check for new content
-      const hasNewContent = checkForNewContent(featuredData);
+      const hasNewContent = checkForNewContent(combinedData.news);
       if (hasNewContent.newContent) {
         setShowNewContentNotification(true);
         setNewContentCount(hasNewContent.count);
@@ -38,7 +38,7 @@ const NewsContainer = () => {
         }, UI_CONSTANTS.NOTIFICATION_AUTO_HIDE_DELAY);
       }
       
-      setFeaturedNews(featuredData);
+      setFeaturedNews(combinedData.news);
     } catch (error) {
       console.error('Error loading news data:', error);
       setError('খবর লোড করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
@@ -66,9 +66,9 @@ const NewsContainer = () => {
       const newCount = newsCount + UI_CONSTANTS.LOAD_MORE_INCREMENT;
       setNewsCount(newCount);
       
-      // Fetch more news
-      const moreNews = await newsDataService.getFeaturedNews();
-      setFeaturedNews(moreNews);
+      // Fetch more combined news
+      const moreNews = await newsDataService.getCombinedNews();
+      setFeaturedNews(moreNews.news);
     } catch (error) {
       console.error('Error loading more news:', error);
     } finally {
@@ -99,7 +99,7 @@ const NewsContainer = () => {
 
   const handleNewsClick = (newsId) => {
     // Handle news click - navigate to detail page or open modal
-    console.log('News clicked:', newsId);
+    // console.log('News clicked:', newsId);
   };
 
   const dismissNotification = () => {
@@ -170,25 +170,19 @@ const NewsContainer = () => {
           {featuredNews.length > 0 ? (
             <>
               <div className="featured-news-grid">
-                                 {featuredNews.slice(0, newsCount).map((news) => (
-                   <NewsCard
-                     key={news.id}
-                     {...news}
-                     variant="featured"
-                     onClick={handleNewsClick}
-                     sectionName={news.sectionName}
-                     category={news.category}
-                   />
-                 ))}
+                {featuredNews.map((news) => (
+                  <NewsCard
+                    key={news.id}
+                    {...news}
+                    variant="featured"
+                    onClick={handleNewsClick}
+                    sectionName={news.sectionName}
+                    category={news.category}
+                  />
+                ))}
               </div>
               
-              {featuredNews.length > newsCount && (
-                <div className="load-more-container">
-                  <button onClick={handleLoadMore} className="load-more-button">
-                    <FiPlus /> আরও খবর দেখুন
-                  </button>
-                </div>
-              )}
+
             </>
           ) : (
             <div className="no-news-message">

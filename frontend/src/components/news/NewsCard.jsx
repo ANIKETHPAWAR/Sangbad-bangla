@@ -48,7 +48,8 @@ const NewsCard = ({
   variant = 'default', // 'default', 'featured', 'trending'
   isNew = false,
   onClick,
-  onReadMore 
+  onReadMore,
+  source // Added source prop
 }) => {
   const navigate = useNavigate();
 
@@ -62,7 +63,27 @@ const NewsCard = ({
     if (!dateString) return '';
     
     try {
-      const date = new Date(dateString);
+      let date;
+      
+      // Handle different date formats
+      if (dateString instanceof Date) {
+        date = dateString;
+      } else if (typeof dateString === 'string') {
+        // Try to parse the date string
+        date = new Date(dateString);
+        
+        // Check if the date is valid
+        if (isNaN(date.getTime())) {
+          console.warn('Invalid date string:', dateString);
+          return '';
+        }
+      } else if (dateString && typeof dateString === 'object' && dateString.toDate) {
+        // Handle Firestore timestamp objects
+        date = dateString.toDate();
+      } else {
+        console.warn('Unsupported date format:', dateString);
+        return '';
+      }
       
       if (variant === 'trending') {
         // For trending news, show relative time
@@ -90,7 +111,7 @@ const NewsCard = ({
         });
       }
     } catch (error) {
-      console.error('Error formatting date:', error);
+      console.error('Error formatting date:', error, 'Date string:', dateString);
       return '';
     }
   };
@@ -98,7 +119,13 @@ const NewsCard = ({
   const handleReadMore = (e) => {
     e.stopPropagation();
     
-    // Use sectionName if available, otherwise fallback to category
+    // For admin-created news (internal source), always go to article detail page
+    if (source === 'internal') {
+      navigate(`/article/${id}`);
+      return;
+    }
+    
+    // For external news (Hindustan Times), use section navigation
     const sectionToUse = sectionName && sectionName.trim() !== '' ? sectionName : category;
     
     if (sectionToUse && sectionToUse.trim() !== '') {

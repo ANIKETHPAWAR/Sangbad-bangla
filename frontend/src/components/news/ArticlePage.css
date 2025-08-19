@@ -2,156 +2,123 @@
 .article-page {
   min-height: 100vh;
   background: #f8f9fa;
-  font-size: 14px;
+  font-size: 14px; /* Zoomed out like HT */
   font-family: 'Noto Sans Bengali', 'Hind Siliguri', 'SolaimanLipi', Arial, sans-serif;
+  padding-top: 20px;
 }
 
-.container {
-  max-width: 1200px; /* Match Hindustan Times layout */
+/* Additional HT-style improvements */
+.article-page-layout {
+  max-width: 1400px; /* Wider container like HT */
   margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 320px; /* Main content + sidebar */
+  gap: 30px;
   padding: 0 20px;
+  align-items: start; /* Align items to top */
 }
 
-/* Article Header */
-.article-header {
+/* Main Article Content - Left Side */
+.article-main-content {
+  min-width: 0; /* Prevent grid overflow */
+  max-width: 100%;
+}
+
+.article-container {
   background: white;
-  border-bottom: 1px solid #e9ecef;
-  padding: 16px 0;
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  border: 1px solid #e9ecef; /* Subtle border like HT */
 }
 
-.article-header .container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* Back Navigation */
+.article-back-nav {
+  padding: 16px 20px 0 20px;
+  border-bottom: 1px solid #e9ecef;
 }
 
-.back-button {
-  background: #f8f9fa;
-  border: 1px solid #dee2e6;
-  color: #495057;
-  padding: 8px 16px;
-  border-radius: 20px;
-  cursor: pointer;
+.back-nav-button {
+  background: transparent;
+  border: none;
+  color: #6c757d;
   font-size: 0.85rem;
+  cursor: pointer;
+  padding: 6px 0;
   display: flex;
   align-items: center;
   gap: 6px;
   transition: all 0.2s ease;
-}
-
-.back-button:hover {
-  background: #e9ecef;
-  border-color: #adb5bd;
-  transform: translateX(-2px);
-}
-
-.article-meta {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  font-size: 0.8rem;
-  color: #6c757d;
-}
-
-.article-date {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.article-read-time {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: #007bff;
-}
-
-/* Main Article Content */
-.article-main {
-  padding: 30px 0;
-}
-
-.article-main .container {
-  display: grid;
-  grid-template-columns: 1fr 300px; /* Match Hindustan Times sidebar width */
-  gap: 30px;
-  align-items: start;
-}
-
-/* Article Content Wrapper */
-.article-content-wrapper {
-  background: white;
-  border-radius: 8px; /* Match Hindustan Times style */
-  padding: 30px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Article Title */
-.article-title {
-  font-size: 1.8rem; /* Match Hindustan Times headline size */
-  font-weight: 700;
-  color: #212529;
-  line-height: 1.3;
-  margin-bottom: 16px;
-  text-align: left; /* Left align like Hindustan Times */
   font-family: 'Noto Sans Bengali', 'Hind Siliguri', 'SolaimanLipi', Arial, sans-serif;
 }
 
-.article-subtitle {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #6c757d;
-  line-height: 1.4;
-  margin-bottom: 20px;
-  text-align: left;
-  font-style: italic;
+.back-nav-button:hover {
+  color: #007bff;
+  transform: translateX(-4px);
 }
 
-/* Article Image */
+/* Article Title Section */
+.article-title-section {
+  margin: 20px 20px 24px 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f1f3f4; /* Subtle separator like HT */
+}
+
+.article-title {
+  font-size: 1.8rem; /* Zoomed out like HT */
+  font-weight: 700;
+  color: #1a1a1a; /* Darker text like HT */
+  line-height: 1.3;
+  margin: 0;
+  text-align: left;
+  word-wrap: break-word;
+  hyphens: auto;
+  font-family: 'Noto Sans Bengali', 'Hind Siliguri', 'SolaimanLipi', Arial, sans-serif;
+}
+
+/* Article Image Container */
 .article-image-container {
-  margin-bottom: 24px;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 0 0 24px 0;
+  text-align: center;
+  background: #f8f9fa;
+  padding: 20px;
+  border-bottom: 1px solid #f1f3f4; /* Subtle separator */
 }
 
 .article-image {
-  width: 100%;
+  max-width: 100%;
   height: auto;
-  display: block;
-  transition: transform 0.3s ease;
+  border-radius: 6px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease; /* Smooth hover effect */
 }
 
 .article-image:hover {
-  transform: scale(1.02);
+  transform: scale(1.01); /* Subtle zoom on hover */
 }
 
 /* Article Content */
 .article-content {
-  margin-top: 24px;
+  padding: 0 20px 24px 20px;
 }
 
 .content-text {
-  font-size: 1rem;
-  line-height: 1.8;
-  color: #212529;
+  font-size: 1rem; /* Zoomed out like HT */
+  line-height: 1.7;
+  color: #2c3e50;
   text-align: justify;
+  font-family: 'Noto Sans Bengali', 'Hind Siliguri', 'SolaimanLipi', Arial, sans-serif;
 }
 
 .article-paragraph {
-  margin-bottom: 1.5rem;
-  text-indent: 0;
+  margin-bottom: 1.2rem;
+  text-indent: 0; /* No indentation like HT */
   font-family: 'Noto Sans Bengali', 'Hind Siliguri', 'SolaimanLipi', Arial, sans-serif;
-  font-size: 1.1rem;
-  line-height: 1.8;
+  font-size: 1rem;
+  line-height: 1.7;
   color: #2c3e50;
   text-align: justify;
-  word-spacing: 0.1em;
-  letter-spacing: 0.01em;
+  word-spacing: 0.02em; /* Better word spacing for Bengali */
 }
 
 /* Bengali text specific styling */
@@ -175,22 +142,23 @@
 /* Article Actions */
 .article-actions {
   display: flex;
-  gap: 16px;
-  justify-content: flex-start; /* Left align like Hindustan Times */
-  padding-top: 30px;
+  gap: 12px;
+  justify-content: flex-start;
+  padding: 20px 20px 24px 20px;
   border-top: 1px solid #e9ecef;
+  background: #f8f9fa;
 }
 
 .share-button,
 .external-link-button {
-  padding: 12px 24px;
-  border-radius: 25px;
+  padding: 10px 20px;
+  border-radius: 20px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   transition: all 0.3s ease;
   border: none;
 }
@@ -198,63 +166,30 @@
 .share-button {
   background: linear-gradient(135deg, #007bff, #0056b3);
   color: white;
-  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+  box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
 }
 
 .share-button:hover {
   background: linear-gradient(135deg, #0056b3, #004085);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 123, 255, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 12px rgba(0, 123, 255, 0.4);
 }
 
 .external-link-button {
   background: linear-gradient(135deg, #28a745, #20c997);
   color: white;
-  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+  box-shadow: 0 2px 6px rgba(40, 167, 69, 0.3);
 }
 
 .external-link-button:hover {
   background: linear-gradient(135deg, #20c997, #17a2b8);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(40, 167, 69, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 12px rgba(40, 167, 69, 0.4);
 }
 
-/* Similar Stories Sidebar */
-.similar-stories-sidebar {
-  background: white;
-  border-radius: 8px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 100px;
-}
-
-.sidebar-title {
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #212529;
-  margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid #007bff;
-  text-align: center;
-  font-family: 'Noto Sans Bengali', 'Hind Siliguri', 'SolaimanLipi', Arial, sans-serif;
-}
-
-.similar-stories-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.similar-story-link {
-  text-decoration: none;
-  color: inherit;
-  transition: transform 0.2s ease;
-}
-
-.similar-story-link:hover {
-  transform: translateY(-2px);
-}
+/* Trending News Sidebar - Right Side (HT Style) */
+/* Note: This is now handled by the TrendingNewsSidebar component */
+/* The component will use its own CSS from TrendingNewsSidebar.css */
 
 /* Loading and Error States */
 .loading-container,
@@ -297,49 +232,46 @@
 
 /* Responsive Design */
 @media (max-width: 1024px) {
-  .article-main .container {
+  .article-page-layout {
     grid-template-columns: 1fr;
     gap: 24px;
   }
   
-  .similar-stories-sidebar {
-    position: static;
-    order: -1;
-  }
-  
-  .similar-stories-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-  }
+  /* TrendingNewsSidebar will handle its own responsive behavior */
 }
 
 @media (max-width: 768px) {
-  .container {
-    padding: 0 16px;
+  .article-page {
+    font-size: 16px; /* Slightly larger on mobile */
+    padding-top: 10px;
   }
   
-  .article-header .container {
-    flex-direction: column;
-    gap: 12px;
-    align-items: flex-start;
-  }
-  
-  .article-content-wrapper {
-    padding: 20px;
+  .article-page-layout {
+    padding: 0 15px;
+    gap: 20px;
   }
   
   .article-title {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
   }
   
-  .article-subtitle {
-    font-size: 0.9rem;
+  .article-container {
+    border-radius: 6px;
+  }
+  
+  .article-content {
+    padding: 0 15px 20px 15px;
+  }
+  
+  .content-text {
+    font-size: 1.1rem;
+    line-height: 1.8;
   }
   
   .article-actions {
+    padding: 16px 15px 20px 15px;
     flex-direction: column;
-    align-items: flex-start;
+    gap: 10px;
   }
   
   .share-button,
@@ -347,46 +279,23 @@
     width: 100%;
     justify-content: center;
   }
-  
-  .similar-stories-sidebar {
-    padding: 20px;
-  }
-  
-  .similar-stories-list {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 480px) {
-  .article-header {
-    padding: 12px 0;
+  .article-page {
+    font-size: 18px;
   }
   
-  .article-content-wrapper {
-    padding: 16px;
+  .article-page-layout {
+    padding: 0 10px;
+    gap: 16px;
   }
   
   .article-title {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
   }
   
-  .article-subtitle {
-    font-size: 0.85rem;
-  }
-  
-  .article-paragraph {
-    font-size: 0.9rem;
-    margin-bottom: 16px;
-  }
-  
-  .back-button {
-    padding: 6px 12px;
-    font-size: 0.8rem;
-  }
-  
-  .article-meta {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+  .content-text {
+    font-size: 1.2rem;
   }
 }

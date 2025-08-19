@@ -3,8 +3,9 @@ import { mockNewsData } from '../data/mockNewsData.js';
 
 class NewsDataService {
   constructor() {
-    // Use production backend URL if available, otherwise fall back to proxy
-    this.baseUrl = import.meta.env.VITE_API_BASE_URL || '/api';
+    // Use environment variable for production, fallback to localhost for development
+    this.baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://sangbadbangla1.onrender.com';
+    
     console.log('NewsDataService initialized with baseUrl:', this.baseUrl);
   }
 
@@ -171,13 +172,11 @@ class NewsDataService {
       console.log('✅ Fresh Popular Stories API Response:', data);
       
       if (data.success && data.stories) {
-        // Transform and sort by publish date - latest first
+        // Transform and return all stories in API order
         const transformedNews = data.stories
-          .map(item => this.transformNewsItem(item))
-          .sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate))
-          .slice(0, 10);
+          .map(item => this.transformNewsItem(item));
         
-        console.log('✅ Fresh Transformed and Sorted Featured News (Latest First):', transformedNews);
+        console.log('✅ Fresh Transformed Featured News (API Order):', transformedNews);
         return transformedNews;
       }
       return [];
@@ -214,11 +213,9 @@ class NewsDataService {
         const data = await response.json();
         if (data.success && data.stories) {
           console.log('✅ Fresh Trending Stories API Response:', data);
-          // Sort by publish date - latest first
+          // Return all stories in API order
           return data.stories
-            .map(item => this.transformNewsItem(item))
-            .sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate))
-            .slice(0, 8);
+            .map(item => this.transformNewsItem(item));
         }
       }
       
@@ -254,16 +251,9 @@ class NewsDataService {
           .map(item => this.transformNewsItem(item))
           .sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate));
         
-        // Get trending news by taking items from different parts, but prioritize latest
-        const trendingItems = [
-          ...allTransformedStories.slice(0, 3),     // Latest 3 stories
-          ...allTransformedStories.slice(4, 7),     // Skip one, take next 3
-          ...allTransformedStories.slice(8, 10)     // Take 2 more recent ones
-        ];
-        
-        console.log('✅ Fresh Trending News (Latest First):', trendingItems);
-        return trendingItems
-          .slice(0, 8)
+        // Return all stories in API order
+        console.log('✅ Fresh Trending News (API Order):', allTransformedStories);
+        return allTransformedStories
           .filter(item => item.publishDate); // Ensure we have valid dates
       }
       
@@ -293,36 +283,13 @@ class NewsDataService {
       const data = await response.json();
       
       if (data.success && data.stories) {
-        // Transform and sort by publish date - latest first
+        // Transform and return all stories in API order
         const allTransformedStories = data.stories
-          .map(item => this.transformNewsItem(item))
-          .sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate));
+          .map(item => this.transformNewsItem(item));
         
-        // Create diverse trending selection while prioritizing latest news
-        let trendingSelection = [];
-        
-        if (allTransformedStories.length >= 12) {
-          trendingSelection = [
-            ...allTransformedStories.slice(0, 2),    // Latest 2 stories
-            ...allTransformedStories.slice(3, 5),    // Skip one, take next 2
-            ...allTransformedStories.slice(6, 8),    // Skip one, take next 2
-            ...allTransformedStories.slice(9, 11)    // Take 2 more recent ones
-          ];
-        } else if (allTransformedStories.length >= 8) {
-          trendingSelection = [
-            ...allTransformedStories.slice(0, 2),    // Latest 2 stories
-            ...allTransformedStories.slice(2, 4),    // Take next 2
-            ...allTransformedStories.slice(5, 7),    // Skip one, take next 2
-            ...allTransformedStories.slice(7, 9)     // Take last 2
-          ];
-        } else {
-          // If we have fewer stories, prioritize latest
-          trendingSelection = allTransformedStories.slice(0, Math.min(8, allTransformedStories.length));
-        }
-        
-        console.log('Enhanced Fresh Trending News (Latest First):', trendingSelection);
-        return trendingSelection
-          .slice(0, 8)
+        // Return all stories in API order
+        console.log('Enhanced Fresh Trending News (API Order):', allTransformedStories);
+        return allTransformedStories
           .filter(item => item.publishDate); // Ensure we have valid dates
       }
       
@@ -355,44 +322,13 @@ class NewsDataService {
       const data = await response.json();
       
       if (data.success && data.stories) {
-        // Transform and sort by publish date - latest first
+        // Transform and return all stories in API order
         const allTransformedStories = data.stories
-          .map(item => this.transformNewsItem(item))
-          .sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate));
+          .map(item => this.transformNewsItem(item));
         
-        let trendingSet = [];
-        
-        // Create different trending sets while prioritizing latest news
-        switch (setIndex % 3) {
-          case 0: // First set: latest stories + some variety
-            trendingSet = [
-              ...allTransformedStories.slice(0, 3),    // Latest 3 stories
-              ...allTransformedStories.slice(4, 7),    // Skip one, take next 3
-              ...allTransformedStories.slice(8, 10)    // Take 2 more recent ones
-            ];
-            break;
-          case 1: // Second set: latest stories + different variety
-            trendingSet = [
-              ...allTransformedStories.slice(0, 2),    // Latest 2 stories
-              ...allTransformedStories.slice(3, 5),    // Take next 2
-              ...allTransformedStories.slice(6, 8),    // Take next 2
-              ...allTransformedStories.slice(9, 11)    // Take 2 more
-            ];
-            break;
-          case 2: // Third set: latest stories + mixed variety
-            trendingSet = [
-              ...allTransformedStories.slice(0, 4),    // Latest 4 stories
-              ...allTransformedStories.slice(5, 7),    // Skip one, take next 2
-              ...allTransformedStories.slice(8, 10)    // Take 2 more
-            ];
-            break;
-          default:
-            trendingSet = allTransformedStories.slice(0, 8); // Default: latest 8
-        }
-        
-        console.log(`Fresh Trending News Set ${setIndex} (Latest First):`, trendingSet);
-        return trendingSet
-          .slice(0, 8)
+        // Return all stories in API order
+        console.log(`Fresh Trending News Set ${setIndex} (API Order):`, allTransformedStories);
+        return allTransformedStories
           .filter(item => item.publishDate); // Ensure we have valid dates
       }
       
@@ -407,7 +343,7 @@ class NewsDataService {
   async getNewsByCategory(category) {
     try {
       // Use the section feed API with the category name
-      const response = await fetch(`${this.baseUrl}/api/section-feed/${encodeURIComponent(category)}/10`);
+      const response = await fetch(`${this.baseUrl}/api/section-feed/${encodeURIComponent(category)}/15`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -416,10 +352,9 @@ class NewsDataService {
       const data = await response.json();
       
       if (data.success && data.stories) {
-        // Transform and sort by publish date - latest first
+        // Transform and return all stories in API order
         return data.stories
-          .map(item => this.transformNewsItem(item))
-          .sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate));
+          .map(item => this.transformNewsItem(item));
       }
       
       return [];
@@ -450,10 +385,9 @@ class NewsDataService {
           item.keywords?.some(keyword => keyword.toLowerCase().includes(query.toLowerCase()))
         );
         
-        // Transform and sort by publish date - latest first
+        // Transform and return all stories in API order
         return searchResults
-          .map(item => this.transformNewsItem(item))
-          .sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate));
+          .map(item => this.transformNewsItem(item));
       }
       
       return [];
@@ -464,7 +398,7 @@ class NewsDataService {
   }
 
   // Get section feed for detailed article view
-  async getSectionFeed(sectionName, numStories = 10) {
+  async getSectionFeed(sectionName, numStories = 15) {
     try {
       console.log('🔍 Fetching section feed for:', sectionName, 'with', numStories, 'stories');
       
@@ -488,7 +422,7 @@ class NewsDataService {
     }
   }
 
-  async getDetailedArticle(sectionName, numberOfStories = 10) {
+  async getDetailedArticle(sectionName, numberOfStories = 15) {
     try {
       console.log('🔍 Fetching detailed articles for section:', sectionName);
       
@@ -539,20 +473,21 @@ class NewsDataService {
     
     const transformed = stories.map((item, index) => {
       try {
+        // Map Hindustan Times API fields correctly
         const transformedItem = {
-          id: item.id || item.itemId || item.storyId || index,
-          title: item.title || item.headLine || item.headline || `Story ${index + 1}`,
+          id: item.id || item.storyId || item.itemId || index,
+          title: item.title || item.headline || item.headLine || `Story ${index + 1}`,
           subtitle: item.subtitle || item.subHead || item.subHeadline || '',
           excerpt: item.excerpt || item.shortDescription || item.description || '',
           content: item.content || item.body || '',
-          imageUrl: item.imageUrl || item.wallpaperLarge || item.mediumRes || item.thumbImage || item.image || item.leadImage || '',
+          imageUrl: item.imageUrl || item.imageObject?.bigImage || item.imageObject?.mediumImage || item.imageObject?.thumbnailImage || item.wallpaperLarge || item.mediumRes || item.thumbImage || item.image || item.leadImage || '',
           publishDate: this.parseDate(item.publishDate || item.publishedDate || item.date),
           readTime: item.readTime || item.timeToRead || item.readingTime || 3,
           authorName: item.authorName || item.author || item.byline || '',
           category: item.category || item.section || item.sectionName || '',
           contentType: item.contentType || 'News',
-          detailUrl: item.detailUrl || item.detailFeedURL || item.url || item.link || '',
-          websiteUrl: item.websiteUrl || item.websiteURL || item.sourceUrl || '',
+          detailUrl: item.detailUrl || item.storyURL || item.detailFeedURL || item.url || item.link || '',
+          websiteUrl: item.websiteUrl || item.storyURL || item.websiteURL || item.sourceUrl || '',
           keywords: item.keywords || item.tags || [],
           sectionName: item.sectionName || item.section || ''
         };
@@ -571,11 +506,15 @@ class NewsDataService {
 
   // Fallback mock data methods
   getMockFeaturedNews() {
-    return mockNewsData.featuredNews;
+    // Return more mock stories to match our increased limits
+    const allMockNews = [...mockNewsData.featuredNews, ...mockNewsData.trendingNews];
+    return allMockNews;
   }
 
   getMockTrendingNews() {
-    return mockNewsData.trendingNews;
+    // Return more mock stories to match our increased limits
+    const allMockNews = [...mockNewsData.featuredNews, ...mockNewsData.trendingNews];
+    return allMockNews.slice(0, 12); // Return 12 trending stories
   }
 
   getMockNewsByCategory(category) {
@@ -674,6 +613,87 @@ class NewsDataService {
     } catch (error) {
       console.error('Error fetching cricket data:', error);
       throw error;
+    }
+  }
+
+  // Get combined news (Firestore + external) from backend
+  async getCombinedNews(page = 1, limit = 20, category = null) {
+    try {
+      console.log('📡 Fetching combined news from backend...');
+      
+      // Use the proxy URL format
+      let url = `${this.baseUrl}/api/combined-news?page=${page}&limit=${limit}`;
+      if (category) {
+        url += `&category=${encodeURIComponent(category)}`;
+      }
+      
+      console.log('🌐 Fetching from URL:', url);
+      
+      // Add timeout to prevent hanging
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
+      const response = await fetch(url, {
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      console.log('✅ Combined news response:', result);
+      
+      if (result.success && result.data) {
+        // Transform the combined news to match our frontend format
+        const transformedNews = result.data.map(item => {
+          if (item.source === 'internal') {
+            // Firestore news - already in correct format
+            return {
+              ...item,
+              publishDate: item.createdAt || item.publishDate,
+              sectionName: item.category,
+              excerpt: item.excerpt || item.content?.substring(0, 200) + '...'
+            };
+          } else {
+            // External news - transform using existing method
+            return this.transformNewsItem(item);
+          }
+        });
+        
+        console.log('🔄 Transformed news:', transformedNews.length, 'articles');
+        
+        return {
+          news: transformedNews,
+          pagination: result.pagination,
+          sources: result.sources
+        };
+      }
+      
+      return {
+        news: [],
+        pagination: { currentPage: 1, totalPages: 1, totalItems: 0 },
+        sources: { firestore: 0, external: 0, total: 0 }
+      };
+    } catch (error) {
+      console.error('❌ Error fetching combined news:', error);
+      
+      // Check if it's a timeout or network error
+      if (error.name === 'AbortError') {
+        console.log('⏰ Request timed out, falling back to mock data...');
+      } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+        console.log('🌐 Network error, falling back to mock data...');
+      }
+      
+      // Fallback to mock data to avoid infinite loop
+      console.log('🔄 Falling back to mock data due to error...');
+      return {
+        news: this.getMockFeaturedNews(),
+        pagination: { currentPage: 1, totalPages: 1, totalItems: 0 },
+        sources: { firestore: 0, external: 0, total: 0 }
+      };
     }
   }
 }

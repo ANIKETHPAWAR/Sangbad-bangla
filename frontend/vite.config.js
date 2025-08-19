@@ -26,61 +26,7 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      // Development proxy - commented out for production
-      // Route our new API endpoints to local backend
-      /*
-      '/api/popular-stories': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-        secure: false,
-        configure: (proxy, options) => {
-          proxy.on('error', (err, req, res) => {
-            console.log('❌ LOCAL API PROXY ERROR:', err);
-            console.log('Request URL:', req.url);
-          });
-          proxy.on('proxyReq', (proxyReq, req, res) => {
-            console.log('📤 Sending Request to Local Backend:', req.method, req.url);
-          });
-          proxy.on('proxyRes', (proxyRes, req, res) => {
-            console.log('📥 Received Response from Local Backend:', proxyRes.statusCode, req.url);
-          });
-        }
-      },
-      '/api/section-feed': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-        secure: false,
-        configure: (proxy, options) => {
-          proxy.on('error', (err, req, res) => {
-            console.log('❌ LOCAL API PROXY ERROR:', err);
-            console.log('Request URL:', req.url);
-          });
-          proxy.on('proxyReq', (proxyReq, req, res) => {
-            console.log('📤 Sending Request to Local Backend:', req.method, req.url);
-          });
-          proxy.on('proxyRes', (proxyRes, req, res) => {
-            console.log('📥 Received Response from Local Backend:', proxyRes.statusCode, req.url);
-          });
-        }
-      },
-      '/api/proxy-hindustantimes': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-        secure: false,
-        configure: (proxy, options) => {
-          proxy.on('error', (err, req, res) => {
-            console.log('❌ LOCAL API PROXY ERROR:', err);
-            console.log('Request URL:', req.url);
-          });
-          proxy.on('proxyReq', (proxyReq, req, res) => {
-            console.log('📤 Sending Request to Local Backend:', req.method, req.url);
-          });
-          proxy.on('proxyRes', (proxyRes, req, res) => {
-            console.log('📥 Received Response from Local Backend:', proxyRes.statusCode, req.url);
-          });
-        }
-      },
-      */
+      // Removed proxy configuration - now using deployed backend directly
       // Keep existing proxy for external Hindustan Times API calls
       '/api/sectionfeedperp': {
         target: 'https://bangla.hindustantimes.com',

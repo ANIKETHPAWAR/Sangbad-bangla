@@ -6,7 +6,7 @@ import newsDataService from '../../services/newsDataService';
 import { NEWS_REFRESH_INTERVAL, TRENDING_NEWS_ROTATION_INTERVAL } from '../../config/constants';
 import './TrendingNewsSidebar.css';
 
-const TrendingNewsSidebar = () => {
+const TrendingNewsSidebar = ({ similarStories = null, isArticlePage = false }) => {
   const [trendingNews, setTrendingNews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -23,9 +23,9 @@ const TrendingNewsSidebar = () => {
       }
       setError(null);
       
-      // Use rotation system for more variety
-      const data = await newsDataService.getTrendingNewsSet(rotationIndex);
-      setTrendingNews(data);
+      // Use combined news for trending content
+      const data = await newsDataService.getCombinedNews(1, 10);
+      setTrendingNews(data.news);
     } catch (err) {
       console.error('Error loading trending news:', err);
       setError('ট্রেন্ডিং খবর লোড করতে সমস্যা হয়েছে।');
@@ -36,6 +36,7 @@ const TrendingNewsSidebar = () => {
 
   // Auto-refresh functionality - always enabled in production
   useEffect(() => {
+    // Always load trending news, regardless of page type
     loadTrendingNews();
     
     const interval = setInterval(() => {
@@ -59,15 +60,26 @@ const TrendingNewsSidebar = () => {
     console.log('News clicked:', newsId);
   };
 
+  // Determine which data to display
+  // Always show trending news like homepage, ignore similarStories for admin articles
+  const displayData = trendingNews; // Always use trending news
+  const displayTitle = 'ট্রেন্ডিং খবর'; // Always show trending news title
 
+  // Debug logging
+  console.log('TrendingNewsSidebar Debug:', {
+    isArticlePage,
+    similarStoriesLength: similarStories?.length,
+    trendingNewsLength: trendingNews?.length,
+    displayDataLength: displayData?.length,
+    displayTitle
+  });
 
   if (loading) {
     return (
       <aside className="trending-news-sidebar">
         <div className="trending-header">
           <SectionTitle 
-            title="ট্রেন্ডিং খবর" 
-            
+            title={displayTitle}
             icon={<FiTrendingUp />}
             variant="large"
             align="center"
@@ -88,8 +100,7 @@ const TrendingNewsSidebar = () => {
       <aside className="trending-news-sidebar">
         <div className="trending-header">
           <SectionTitle 
-            title="ট্রেন্ডিং খবর" 
-           
+            title={displayTitle}
             icon={<FiTrendingUp />}
             variant="large"
             align="center"
@@ -104,24 +115,22 @@ const TrendingNewsSidebar = () => {
     );
   }
 
-             return (
-       <aside className="trending-news-sidebar">
-              <div className="trending-header">
-          <SectionTitle 
-            title="ট্রেন্ডিং খবর" 
-           
-            icon={<FiTrendingUp />}
-            variant="large"
-            align="center"
-            showBorder={true}
-            showDecorativeLines={true}
-          />
-        </div>
+  return (
+    <aside className="trending-news-sidebar">
+      <div className="trending-header">
+        <SectionTitle 
+          title={displayTitle}
+          icon={<FiTrendingUp />}
+          variant="large"
+          align="center"
+          showBorder={true}
+          showDecorativeLines={true}
+        />
+      </div>
       
-      
-      {trendingNews.length > 0 ? (
+      {displayData && displayData.length > 0 ? (
         <div className="trending-news-list">
-          {trendingNews.map((news) => (
+          {displayData.map((news) => (
             <NewsCard
               key={news.id}
               {...news}
