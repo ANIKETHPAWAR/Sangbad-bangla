@@ -21,6 +21,9 @@ import RequireAdmin from './components/admin/RequireAdmin';
 import AdminDashboard from './components/admin/AdminDashboard';
 import NewsForm from './components/admin/NewsForm';
 import TempLogin from './components/admin/TempLogin';
+import Advertise from './pages/Advertise';
+import StaticPage from './pages/StaticPage';
+import { staticPages } from './pages/static/content';
 
 
 // Simple Cricket News Page Component
@@ -88,9 +91,15 @@ function App() {
             <Route path="/tech-talk" element={<NewsContainer />} />
             <Route path="/sports" element={<NewsContainer />} />
             <Route path="/must-see" element={<NewsContainer />} />
-            <Route path="/about" element={<NewsContainer />} />
-            <Route path="/about-us" element={<NewsContainer />} />
-            <Route path="/contact" element={<NewsContainer />} />
+            <Route path="/rss" element={<StaticPage title={staticPages.rss.title}> <div dangerouslySetInnerHTML={{ __html: staticPages.rss.html }} /> </StaticPage>} />
+            <Route path="/about" element={<StaticPage title={staticPages.about.title}> <div dangerouslySetInnerHTML={{ __html: staticPages.about.html }} /> </StaticPage>} />
+            <Route path="/about-us" element={<StaticPage title={staticPages.about.title}> <div dangerouslySetInnerHTML={{ __html: staticPages.about.html }} /> </StaticPage>} />
+            <Route path="/contact" element={<StaticPage title={staticPages.contact.title}> <div dangerouslySetInnerHTML={{ __html: staticPages.contact.html }} /> </StaticPage>} />
+            <Route path="/privacy" element={<StaticPage title={staticPages.privacy.title}> <div dangerouslySetInnerHTML={{ __html: staticPages.privacy.html }} /> </StaticPage>} />
+            <Route path="/terms" element={<StaticPage title={staticPages.terms.title}> <div dangerouslySetInnerHTML={{ __html: staticPages.terms.html }} /> </StaticPage>} />
+            <Route path="/sitemap" element={<StaticPage title={staticPages.sitemap.title}> <div dangerouslySetInnerHTML={{ __html: staticPages.sitemap.html }} /> </StaticPage>} />
+            <Route path="/archive" element={<StaticPage title={staticPages.archive.title}> <div dangerouslySetInnerHTML={{ __html: staticPages.archive.html }} /> </StaticPage>} />
+            <Route path="/advertise" element={<Advertise />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/admin-login" element={<TempLogin />} />
             <Route path="/profile" element={<NewsContainer />} />

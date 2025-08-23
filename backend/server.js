@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const fetch = require('node-fetch');
 const admin = require('firebase-admin');
+const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const app = express();
@@ -122,6 +123,70 @@ app.get('/test', (req, res) => {
     message: 'Server is working!',
     timestamp: new Date().toISOString()
   });
+});
+
+// Advertising enquiry - email submission endpoint
+app.post('/api/advertise', async (req, res) => {
+  try {
+    const { name, company, email, phone, adType, message } = req.body || {};
+
+    // Basic validation
+    if (!name || !company || !email || !phone) {
+      return res.status(400).json({ success: false, message: 'Missing required fields' });
+    }
+
+    // Ensure SMTP configuration is available
+    const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, MAIL_TO, MAIL_FROM, SMTP_SECURE } = process.env;
+    if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS || !MAIL_TO) {
+      console.error('Email configuration missing. Please set SMTP_* and MAIL_TO env vars');
+      return res.status(500).json({ success: false, message: 'Email service not configured' });
+    }
+
+    const transporter = nodemailer.createTransport({
+      host: SMTP_HOST,
+      port: parseInt(SMTP_PORT, 10),
+      secure: (SMTP_SECURE === 'true') || parseInt(SMTP_PORT, 10) === 465,
+      auth: { user: SMTP_USER, pass: SMTP_PASS }
+    });
+
+    const subject = `New Advertise Enquiry - ${company} (${adType || 'N/A'})`;
+    const text = `New advertising enquiry\n\n` +
+      `Name: ${name}\n` +
+      `Company: ${company}\n` +
+      `Email: ${email}\n` +
+      `Phone: ${phone}\n` +
+      `Ad Type: ${adType || 'N/A'}\n` +
+      `Message: ${message || ''}\n` +
+      `Submitted: ${new Date().toISOString()}`;
+
+    const html = `
+      <h2>New advertising enquiry</h2>
+      <ul>
+        <li><strong>Name:</strong> ${name}</li>
+        <li><strong>Company:</strong> ${company}</li>
+        <li><strong>Email:</strong> ${email}</li>
+        <li><strong>Phone:</strong> ${phone}</li>
+        <li><strong>Ad Type:</strong> ${adType || 'N/A'}</li>
+      </ul>
+      ${message ? `<p><strong>Message:</strong><br/>${String(message).replace(/\n/g, '<br/>')}</p>` : ''}
+      <p style="color:#666">Submitted: ${new Date().toLocaleString()}</p>
+    `;
+
+    const info = await transporter.sendMail({
+      from: MAIL_FROM || SMTP_USER,
+      to: MAIL_TO,
+      replyTo: email,
+      subject,
+      text,
+      html
+    });
+
+    console.log('📧 Advertise enquiry email sent:', info.messageId);
+    res.json({ success: true, message: 'Enquiry submitted successfully' });
+  } catch (error) {
+    console.error('❌ Failed to send advertise enquiry:', error.message);
+    res.status(500).json({ success: false, message: 'Failed to send enquiry' });
+  }
 });
 
 // Get combined news (Firestore + external) for frontend

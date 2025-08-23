@@ -54,6 +54,11 @@ const NewsCard = ({
   const navigate = useNavigate();
 
   const handleClick = () => {
+    // For trending variant, clicking the entire card should behave like "Read more"
+    if (variant === 'trending') {
+      handleReadMore();
+      return;
+    }
     if (onClick) {
       onClick(id);
     }
@@ -117,7 +122,7 @@ const NewsCard = ({
   };
 
   const handleReadMore = (e) => {
-    e.stopPropagation();
+    if (e && e.stopPropagation) e.stopPropagation();
     
     // For admin-created news (internal source), always go to article detail page
     if (source === 'internal') {
@@ -191,12 +196,14 @@ const NewsCard = ({
           </p>
         )}
         
-        <button 
-          onClick={handleReadMore}
-          className="read-more-button"
-        >
-          আরও পড়ুন <FiArrowRight />
-        </button>
+        {!isTrending && (
+          <button 
+            onClick={handleReadMore}
+            className="read-more-button"
+          >
+            আরও পড়ুন <FiArrowRight />
+          </button>
+        )}
       </div>
     </article>
   );
