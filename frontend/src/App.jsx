@@ -15,6 +15,7 @@ import NewsContainer from './components/news/NewsContainer';
 import ArticlePage from './components/news/ArticlePage';
 import ArticleDetailPage from './components/news/ArticleDetailPage';
 import TrendingNewsSidebar from './components/news/TrendingNewsSidebar';
+import CategoryNewsPage from './components/news/CategoryNewsPage';
 
 // Admin Components
 import RequireAdmin from './components/admin/RequireAdmin';
@@ -71,15 +72,15 @@ function App() {
             <Route path="/section/:sectionName/:numberOfStories" element={<ArticleDetailPage />} />
             <Route path="/popular" element={<NewsContainer />} />
             <Route path="/cricket" element={<CricketNewsPage />} />
-            <Route path="/bengal-face" element={<NewsContainer />} />
-            <Route path="/astrology" element={<NewsContainer />} />
-            <Route path="/football" element={<NewsContainer />} />
-            <Route path="/bioscope" element={<NewsContainer />} />
-            <Route path="/photo-gallery" element={<NewsContainer />} />
-            <Route path="/kolkata" element={<NewsContainer />} />
-            <Route path="/careers" element={<NewsContainer />} />
-            <Route path="/web-stories" element={<NewsContainer />} />
-            <Route path="/lifestyle" element={<NewsContainer />} />
+            <Route path="/bengal-face" element={<CategoryNewsPage sectionKey="bengal" title="বাংলার মুখ" />} />
+            <Route path="/astrology" element={<CategoryNewsPage sectionKey="astrology" title="ভাগ্যলিপি" />} />
+            <Route path="/football" element={<CategoryNewsPage sectionKey="football" title="ফুটবলের মহারণ" />} />
+            <Route path="/bioscope" element={<CategoryNewsPage sectionKey="bioscope" title="বায়োস্কোপ" />} />
+            <Route path="/photo-gallery" element={<CategoryNewsPage sectionKey="pictures" title="ছবিঘর" />} />
+            <Route path="/kolkata" element={<CategoryNewsPage sectionKey="kolkata" title="কলকাতা" />} />
+            <Route path="/careers" element={<CategoryNewsPage sectionKey="careers" title="কর্মখালি" />} />
+            <Route path="/web-stories" element={<CategoryNewsPage sectionKey="web-stories" title="ওয়েবস্টোরি" />} />
+            <Route path="/lifestyle" element={<CategoryNewsPage sectionKey="lifestyle" title="টুকিটাকি" />} />
             <Route path="/special-report" element={<NewsContainer />} />
             <Route path="/horoscope" element={<NewsContainer />} />
             <Route path="/gold-rate" element={<NewsContainer />} />

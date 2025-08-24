@@ -292,107 +292,55 @@ app.get('/api/combined-news', async (req, res) => {
   }
 });
 
-// Section feed endpoint for detailed article view
+// Section feed endpoint for detailed article view (proxying HT sectionFeedPerp)
 app.get('/api/section-feed/:sectionName/:numStories', async (req, res) => {
   try {
     const { sectionName, numStories } = req.params;
     const limit = parseInt(numStories) || 10;
     
-    console.log(`📰 Fetching section feed for: ${sectionName}, stories: ${limit}`);
-    
-    // Use the same API as combined-news but filter by section if possible
-    const url = `https://personalize.hindustantimes.com/popular-story?propertyId=bg&platformId=web&articleType=story&numStories=${Math.min(limit * 2, 50)}`;
-    
-    const response = await fetch(url);
+    console.log(`📰 Fetching section feed (HT) for: ${sectionName}, stories: ${limit}`);
+
+    // Build the Hindustan Times Bangla sectionFeedPerp URL
+    // Map route aliases to HT section names
+    const map = {
+      football: 'sports'
+    };
+    const htSection = map[sectionName] || sectionName;
+    const htUrl = `https://bangla.hindustantimes.com/api/app/sectionFeedPerp/v1/${encodeURIComponent(htSection)}/${Math.min(limit, 50)}`;
+
+    const response = await fetch(htUrl, {
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'User-Agent': 'Mozilla/5.0',
+        'Referer': 'https://bangla.hindustantimes.com/'
+      },
+      timeout: 10000
+    });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const data = await response.json();
-    console.log(`✅ Section feed API response for ${sectionName}:`, {
-      hasData: !!data,
-      dataKeys: data ? Object.keys(data) : [],
-      itemsLength: data?.items?.length || 0,
-      firstItem: data?.items?.[0] ? Object.keys(data.items[0]) : []
-    });
-    
-    if (data && data.status === 'success' && data.items && Array.isArray(data.items) && data.items.length > 0) {
-      // Filter stories by section if sectionName is provided and not generic
-      let filteredStories = data.items;
-      
-      // If sectionName is specific (not generic terms), try to filter
-      const genericSections = ['all', 'news', 'latest', 'trending', 'popular'];
-      if (!genericSections.includes(sectionName.toLowerCase())) {
-        // Try to filter by section/category
-        filteredStories = data.items.filter(story => {
-          const storySection = story.sectionName || story.section || story.category || '';
-          return storySection.toLowerCase().includes(sectionName.toLowerCase()) ||
-                 sectionName.toLowerCase().includes(storySection.toLowerCase());
-        });
-        
-        // If no filtered results, use all stories
-        if (filteredStories.length === 0) {
-          console.log(`⚠️ No specific section matches for ${sectionName}, using all stories`);
-          filteredStories = data.items;
-        }
-      }
-      
-      // Limit to requested number of stories
-      const limitedStories = filteredStories.slice(0, limit);
-      
-      console.log(`✅ Returning ${limitedStories.length} stories for section: ${sectionName}`);
-      
-      res.json({
+    // Expected: { content: { sectionItems: [...], sectionName, sectionUrl } }
+    const sectionItems = data?.content?.sectionItems || [];
+
+    if (Array.isArray(sectionItems) && sectionItems.length > 0) {
+      const limitedStories = sectionItems.slice(0, limit);
+      console.log(`✅ Returning ${limitedStories.length} HT stories for section: ${sectionName}`);
+
+      return res.json({
         success: true,
         stories: limitedStories,
-        sectionName: sectionName,
+        sectionName: data?.content?.sectionName || sectionName,
         totalStories: limitedStories.length,
-        requestedStories: limit
+        requestedStories: limit,
+        source: 'ht-sectionFeedPerp',
+        upstreamUrl: htUrl
       });
-    } else {
-      console.warn(`⚠️ Section feed for ${sectionName} returned no content. Data structure:`, {
-        hasData: !!data,
-        dataKeys: data ? Object.keys(data) : [],
-        status: data?.status,
-        itemsLength: data?.items?.length || 0
-      });
-      
-      // Try to find alternative data structure
-      let alternativeStories = [];
-      if (data && data.stories && Array.isArray(data.stories)) {
-        alternativeStories = data.stories;
-      } else if (data && data.articles && Array.isArray(data.articles)) {
-        alternativeStories = data.articles;
-      } else if (data && data.content && Array.isArray(data.content)) {
-        alternativeStories = data.content;
-      }
-      
-      if (alternativeStories.length > 0) {
-        console.log(`✅ Found alternative data structure with ${alternativeStories.length} stories`);
-        const limitedStories = alternativeStories.slice(0, limit);
-        
-        res.json({
-          success: true,
-          stories: limitedStories,
-          sectionName: sectionName,
-          totalStories: limitedStories.length,
-          requestedStories: limit,
-          note: 'Using alternative data structure'
-        });
-      } else {
-        res.json({
-          success: false,
-          stories: [],
-          message: 'No content found for this section',
-          debug: {
-            hasData: !!data,
-            dataKeys: data ? Object.keys(data) : [],
-            status: data?.status,
-            itemsLength: data?.items?.length || 0
-          }
-        });
-      }
     }
+
+    console.warn(`⚠️ No section items found for ${sectionName}. Data keys:`, Object.keys(data || {}));
+    return res.json({ success: false, stories: [], sectionName, requestedStories: limit, upstreamUrl: htUrl });
   } catch (error) {
     console.error(`❌ Error fetching section feed for ${sectionName}:`, error.message);
     res.status(500).json({ 
@@ -400,6 +348,34 @@ app.get('/api/section-feed/:sectionName/:numStories', async (req, res) => {
       error: 'Failed to fetch section feed',
       message: error.message 
     });
+  }
+});
+
+// Lightweight image proxy to avoid hotlink/referrer issues
+app.get('/api/image', async (req, res) => {
+  try {
+    const targetUrl = req.query.url;
+    if (!targetUrl) {
+      return res.status(400).send('Missing url');
+    }
+    const upstream = await fetch(targetUrl, {
+      headers: {
+        'Accept': 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
+        'User-Agent': 'Mozilla/5.0',
+        'Referer': 'https://bangla.hindustantimes.com/'
+      },
+      timeout: 10000
+    });
+    if (!upstream.ok) {
+      return res.status(upstream.status).send('Failed to load image');
+    }
+    const contentType = upstream.headers.get('content-type') || 'image/jpeg';
+    res.setHeader('Content-Type', contentType);
+    const buf = await upstream.buffer();
+    res.send(buf);
+  } catch (err) {
+    console.error('Image proxy error:', err.message);
+    res.status(500).send('Image proxy error');
   }
 });
 
