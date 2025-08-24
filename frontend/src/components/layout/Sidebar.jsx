@@ -48,7 +48,7 @@ const Sidebar = ({ isOpen, onClose }) => {
       <div className={`sidebar ${isOpen ? 'open' : ''}`}>
         {/* Header */}
         <div className="sidebar-header">
-          <h3>সানবাদ বাংলা</h3>
+          <h3>সংবাদ বাংলা</h3>
           <button className="close-btn" onClick={onClose}>
             ✕
           </button>
