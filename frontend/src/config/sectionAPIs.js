@@ -14,7 +14,7 @@ export const ROUTE_TO_SECTION_KEY = {
   '/bioscope': 'bioscope',
   '/photo-gallery': 'pictures', // confirmed mapping
   '/kolkata': 'kolkata',
-  '/careers': 'careers', // confirmed mapping
+  '/careers': 'career', // confirmed mapping
   '/web-stories': 'web-stories',
   '/lifestyle': 'lifestyle', // confirmed mapping
   '/popular': 'popular',
