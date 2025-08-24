@@ -78,7 +78,7 @@ function App() {
             <Route path="/bioscope" element={<CategoryNewsPage sectionKey="bioscope" title="বায়োস্কোপ" />} />
             <Route path="/photo-gallery" element={<CategoryNewsPage sectionKey="pictures" title="ছবিঘর" />} />
             <Route path="/kolkata" element={<CategoryNewsPage sectionKey="kolkata" title="কলকাতা" />} />
-            <Route path="/careers" element={<CategoryNewsPage sectionKey="careers" title="কর্মখালি" />} />
+            <Route path="/careers" element={<CategoryNewsPage sectionKey="career" title="কর্মখালি" />} />
             <Route path="/web-stories" element={<CategoryNewsPage sectionKey="web-stories" title="ওয়েবস্টোরি" />} />
             <Route path="/lifestyle" element={<CategoryNewsPage sectionKey="lifestyle" title="টুকিটাকি" />} />
             <Route path="/special-report" element={<NewsContainer />} />

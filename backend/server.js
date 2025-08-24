@@ -303,7 +303,8 @@ app.get('/api/section-feed/:sectionName/:numStories', async (req, res) => {
     // Build the Hindustan Times Bangla sectionFeedPerp URL
     // Map route aliases to HT section names
     const map = {
-      football: 'sports'
+      football: 'sports',
+      careers: 'career'
     };
     const htSection = map[sectionName] || sectionName;
     const htUrl = `https://bangla.hindustantimes.com/api/app/sectionFeedPerp/v1/${encodeURIComponent(htSection)}/${Math.min(limit, 50)}`;
