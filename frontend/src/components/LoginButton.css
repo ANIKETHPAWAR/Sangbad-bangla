@@ -1,24 +1,24 @@
-.login-button {
-  background-color: #007bff;
-  border: none;
-  font-size: 10px;
-  font-weight: 500;
-  color: #ffffff;
-  cursor: pointer;
-  transition: color 0.2s ease;
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-family: inherit;
-  white-space: nowrap;
+button.login-button {
+  background-color: #007bff !important;
+  border: none !important;
+  font-size: 8px !important;
+  font-weight: 400 !important;
+  color: #ffffff !important;
+  cursor: pointer !important;
+  transition: color 0.2s ease !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+  font-family: inherit !important;
+  white-space: nowrap !important;
 }
 
-.login-button:hover {
-  color: #ffffff;
-  transform: scale(1.05);
-  transition: transform 0.2s ease;
+button.login-button:hover {
+  color: #ffffff !important;
+  transform: scale(1.05) !important;
+  transition: transform 0.2s ease !important;
 }
 
-.login-button:focus {
-  outline: 2px solid #ffffff;
-  outline-offset: 2px;
+button.login-button:focus {
+  outline: 2px solid #ffffff !important;
+  outline-offset: 2px !important;
 }

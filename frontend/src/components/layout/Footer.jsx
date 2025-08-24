@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import logo from '../../assets/logo-1.png';
+import logo from '../../assets/logo-3.jpg';
 import './Footer.css';
 
 const Footer = () => {
@@ -61,14 +61,14 @@ const Footer = () => {
 
         <div className="footer-meta">
           <div className="footer-meta-links">
-            <a href="#">RSS</a>
-            <a href="#">Advertise with us</a>
-            <a href="#">About us</a>
-            <a href="#">Contact us</a>
-            <a href="#">Privacy</a>
-            <a href="#">Terms of Use</a>
-            <a href="#">Sitemap</a>
-            <a href="#">Archive</a>
+            <Link to="/rss">RSS</Link>
+            <Link to="/advertise">Advertise with us</Link>
+            <Link to="/about">About us</Link>
+            <Link to="/contact">Contact us</Link>
+            <Link to="/privacy">Privacy</Link>
+            <Link to="/terms">Terms of Use</Link>
+            <Link to="/sitemap">Sitemap</Link>
+            <Link to="/archive">Archive</Link>
           </div>
           <div className="footer-bottom">
             <div className="footer-copy">© {year} Sangbad Bangla</div>

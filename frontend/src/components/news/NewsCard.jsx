@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiArrowRight } from 'react-icons/fi';
 import './NewsCard.css';
@@ -37,6 +37,9 @@ const sanitizeHTML = (html) => {
 const NewsCard = ({ 
   id,
   imageUrl, 
+  wallpaperLarge,
+  mediumRes,
+  thumbImage,
   title, 
   excerpt, 
   publishDate, 
@@ -53,7 +56,23 @@ const NewsCard = ({
 }) => {
   const navigate = useNavigate();
 
+  // Build image candidates preferring wallpaperLarge from API
+  const imageCandidates = useMemo(() => {
+    const list = [wallpaperLarge, mediumRes, thumbImage, imageUrl].filter(Boolean);
+    // Remove duplicates while preserving order
+    return Array.from(new Set(list));
+  }, [wallpaperLarge, mediumRes, thumbImage, imageUrl]);
+
+  const [imgIndex, setImgIndex] = useState(0);
+  const currentImgSrc = imageCandidates[imgIndex] || '';
+  const isImageEmpty = !currentImgSrc || (typeof currentImgSrc === 'string' && currentImgSrc.trim() === '');
+
   const handleClick = () => {
+    // For trending variant, clicking the entire card should behave like "Read more"
+    if (variant === 'trending') {
+      handleReadMore();
+      return;
+    }
     if (onClick) {
       onClick(id);
     }
@@ -117,7 +136,7 @@ const NewsCard = ({
   };
 
   const handleReadMore = (e) => {
-    e.stopPropagation();
+    if (e && e.stopPropagation) e.stopPropagation();
     
     // For admin-created news (internal source), always go to article detail page
     if (source === 'internal') {
@@ -145,18 +164,21 @@ const NewsCard = ({
       onClick={handleClick}
     >
       <div className="news-image-container">
-        <img 
-          src={imageUrl} 
-          alt={title}
-          className="news-image"
-          loading="lazy"
-          onError={(e) => {
-            const fallbackUrl = isFeatured 
-              ? `https://picsum.photos/600/338?random=${Math.random()}`
-              : `https://picsum.photos/250/250?random=${Math.random()}`;
-            e.target.src = fallbackUrl;
-          }}
-        />
+        {!isImageEmpty && (
+          <img 
+            src={currentImgSrc} 
+            alt={title}
+            className="news-image"
+            loading="lazy"
+            decoding="async"
+            referrerPolicy="no-referrer"
+            crossOrigin="anonymous"
+            onError={() => {
+              // Try next candidate (mediumRes, then thumbImage). Do not use unrelated placeholders.
+              setImgIndex(prev => (prev < imageCandidates.length - 1 ? prev + 1 : prev));
+            }}
+          />
+        )}
         
         {isNew && (
           <div className="new-badge">
@@ -191,12 +213,14 @@ const NewsCard = ({
           </p>
         )}
         
-        <button 
-          onClick={handleReadMore}
-          className="read-more-button"
-        >
-          আরও পড়ুন <FiArrowRight />
-        </button>
+        {!isTrending && (
+          <button 
+            onClick={handleReadMore}
+            className="read-more-button"
+          >
+            আরও পড়ুন <FiArrowRight />
+          </button>
+        )}
       </div>
     </article>
   );

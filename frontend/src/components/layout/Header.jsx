@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FiSearch, FiX, FiFacebook, FiMenu, FiChevronDown, FiUserX } from 'react-icons/fi';
+import { FiSearch, FiX, FiFacebook, FiMenu, FiChevronDown, FiUserX,FiInstagram  } from 'react-icons/fi';
 import { useAuth0 } from '@auth0/auth0-react';
 import LoginButton from '../LoginButton';
 import LogoutButton from '../LogoutButton';
-import logo from '../../assets/logo-1.png';
+import logo from '../../assets/logo-3.jpg';
 import './Header.css';
 import X from '../../assets/X-icon.svg';
 import YT from '../../assets/icons8-youtube.svg';
@@ -100,7 +100,7 @@ const Header = ({ onMenuClick }) => {
               </button>
               
               <a 
-                href="https://facebook.com" 
+                href="https://www.facebook.com/share/19eQCyXZS8/" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="action-btn facebook-btn"
@@ -109,16 +109,16 @@ const Header = ({ onMenuClick }) => {
                 <FiFacebook />
               </a>
               <a 
-                href="https://x.com" 
+                href="https://www.instagram.com/sangbadbanglalive?igsh=MTl4YnRrc2ZzY2p4dw==" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="action-btn X-btn"
-                aria-label="X"
+                className="action-btn facebook-btn"
+                aria-label="Facebook"
               >
-                 <img src={X} alt="X" />
+                <FiInstagram />
               </a>
               <a 
-                href="https://x.com" 
+                href="https://youtube.com/@sangbadbanglalive?si=9y6uq8Nc4Vr-PcjJ" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="action-btn YT-btn"
@@ -183,7 +183,7 @@ const Header = ({ onMenuClick }) => {
       </div>
 
       {/* Sub-Navigation Bar */}
-      <div className="sub-navigation-bar">
+      {/* <div className="sub-navigation-bar">
         <div className="container">
           <div className="sub-nav-links">
             {subNavItems.map((item) => (
@@ -198,7 +198,7 @@ const Header = ({ onMenuClick }) => {
             ))}
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

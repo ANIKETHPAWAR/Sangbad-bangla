@@ -1,5 +1,6 @@
 // News Data Service - Integrated with Hindustan Times Bangla API
 import { mockNewsData } from '../data/mockNewsData.js';
+import { SECTION_API_OVERRIDES } from '../config/sectionAPIs.js';
 
 class NewsDataService {
   constructor() {
@@ -7,25 +8,44 @@ class NewsDataService {
     this.baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://sangbadbangla1.onrender.com';
     
     console.log('NewsDataService initialized with baseUrl:', this.baseUrl);
+    // Decide if we should route images via backend proxy (only if same host)
+    try {
+      const baseHost = new URL(this.baseUrl).host;
+      const currentHost = typeof window !== 'undefined' && window.location ? window.location.host : '';
+      this.shouldProxyImages = baseHost === currentHost; // proxy only when backend is same origin
+    } catch (e) {
+      this.shouldProxyImages = false;
+    }
   }
 
   // Transform API response to match our frontend structure
   transformNewsItem(apiItem) {
     console.log('Transforming API item:', apiItem);
+    // Broad image extraction to handle different API shapes
+    const bigImage = apiItem.imageObject?.bigImage || apiItem.bigImage || apiItem.leadImage || apiItem.image;
+    const mediumImage = apiItem.imageObject?.mediumImage || apiItem.mediumImage;
+    const thumb = apiItem.imageObject?.thumbnailImage || apiItem.thumbnailImage;
+    const preferredImage = apiItem.wallpaperLarge || bigImage || apiItem.mediumRes || mediumImage || apiItem.thumbImage || thumb || apiItem.imageUrl;
+
     const transformed = {
-      id: apiItem.id || apiItem.itemId,
-      imageUrl: apiItem.imageUrl || apiItem.wallpaperLarge || apiItem.mediumRes || apiItem.thumbImage,
-      title: apiItem.title || apiItem.headLine,
-      excerpt: apiItem.excerpt || apiItem.shortDescription,
-      publishDate: this.parseDate(apiItem.publishDate || apiItem.publishedDate),
-      readTime: apiItem.readTime || apiItem.timeToRead || 3,
-      detailUrl: apiItem.detailUrl || apiItem.detailFeedURL,
-      websiteUrl: apiItem.websiteUrl || apiItem.websiteURL,
-      contentType: apiItem.contentType,
-      sectionName: apiItem.sectionName || apiItem.section,
-      category: apiItem.category || apiItem.sectionName || apiItem.section,
-      authorName: apiItem.authorName,
-      keywords: apiItem.keywords || []
+      id: apiItem.id || apiItem.itemId || apiItem.storyId,
+      // Prefer large image, then medium, then thumb
+      imageUrl: preferredImage,
+      // keep raw image fields to improve fallback rendering
+      wallpaperLarge: apiItem.wallpaperLarge || bigImage || null,
+      mediumRes: apiItem.mediumRes || mediumImage || null,
+      thumbImage: apiItem.thumbImage || thumb || null,
+      title: apiItem.title || apiItem.headLine || apiItem.headline,
+      excerpt: apiItem.excerpt || apiItem.shortDescription || apiItem.description,
+      publishDate: this.parseDate(apiItem.publishDate || apiItem.publishedDate || apiItem.date),
+      readTime: apiItem.readTime || apiItem.timeToRead || apiItem.readingTime || 3,
+      detailUrl: apiItem.detailUrl || apiItem.detailFeedURL || apiItem.storyURL || apiItem.url,
+      websiteUrl: apiItem.websiteUrl || apiItem.websiteURL || apiItem.storyURL,
+      contentType: apiItem.contentType || 'News',
+      sectionName: apiItem.sectionName || apiItem.section || '',
+      category: apiItem.category || apiItem.sectionName || apiItem.section || '',
+      authorName: apiItem.authorName || apiItem.author || apiItem.byline || '',
+      keywords: apiItem.keywords || apiItem.tags || []
     };
     console.log('Transformed item:', transformed);
     return transformed;
@@ -342,8 +362,15 @@ class NewsDataService {
   // Get news by category using section feed API
   async getNewsByCategory(category) {
     try {
-      // Use the section feed API with the category name
-      const response = await fetch(`${this.baseUrl}/api/section-feed/${encodeURIComponent(category)}/15`);
+      // Try override first (direct HT endpoint provided by you)
+      const overrideUrl = SECTION_API_OVERRIDES[category];
+      let response;
+      if (overrideUrl) {
+        response = await fetch(overrideUrl);
+      } else {
+        // Default: use backend proxy which mirrors homepage pattern
+        response = await fetch(`${this.baseUrl}/api/section-feed/${encodeURIComponent(category)}/15`);
+      }
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -361,6 +388,39 @@ class NewsDataService {
     } catch (error) {
       console.error('Error fetching news by category from API:', error);
       return this.getMockNewsByCategory(category);
+    }
+  }
+
+  // Generic section news fetcher with explicit limit
+  async getSectionNews(sectionKey, limit = 15) {
+    try {
+      const overrideUrl = SECTION_API_OVERRIDES[sectionKey];
+      // Always use backend proxy in dev/staging to normalize responses
+      let response = await fetch(`${this.baseUrl}/api/section-feed/${encodeURIComponent(sectionKey)}/${limit}`);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (data.success && Array.isArray(data.stories)) {
+        const transformed = data.stories.map(item => this.transformNewsItem(item));
+        if (this.shouldProxyImages) {
+          // Rewrite images through proxy when backend is same origin
+          return transformed.map(n => ({
+            ...n,
+            wallpaperLarge: n.wallpaperLarge ? `${this.baseUrl}/api/image?url=${encodeURIComponent(n.wallpaperLarge)}` : undefined,
+            mediumRes: n.mediumRes ? `${this.baseUrl}/api/image?url=${encodeURIComponent(n.mediumRes)}` : undefined,
+            thumbImage: n.thumbImage ? `${this.baseUrl}/api/image?url=${encodeURIComponent(n.thumbImage)}` : undefined,
+            imageUrl: n.wallpaperLarge ? `${this.baseUrl}/api/image?url=${encodeURIComponent(n.wallpaperLarge)}` : (n.imageUrl ? `${this.baseUrl}/api/image?url=${encodeURIComponent(n.imageUrl)}` : undefined)
+          }));
+        }
+        return transformed;
+      }
+      return [];
+    } catch (error) {
+      console.error('Error fetching section news:', sectionKey, error);
+      return this.getMockNewsByCategory(sectionKey);
     }
   }
 

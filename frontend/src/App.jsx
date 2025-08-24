@@ -15,12 +15,16 @@ import NewsContainer from './components/news/NewsContainer';
 import ArticlePage from './components/news/ArticlePage';
 import ArticleDetailPage from './components/news/ArticleDetailPage';
 import TrendingNewsSidebar from './components/news/TrendingNewsSidebar';
+import CategoryNewsPage from './components/news/CategoryNewsPage';
 
 // Admin Components
 import RequireAdmin from './components/admin/RequireAdmin';
 import AdminDashboard from './components/admin/AdminDashboard';
 import NewsForm from './components/admin/NewsForm';
 import TempLogin from './components/admin/TempLogin';
+import Advertise from './pages/Advertise';
+import StaticPage from './pages/StaticPage';
+import { staticPages } from './pages/static/content';
 
 
 // Simple Cricket News Page Component
@@ -68,15 +72,15 @@ function App() {
             <Route path="/section/:sectionName/:numberOfStories" element={<ArticleDetailPage />} />
             <Route path="/popular" element={<NewsContainer />} />
             <Route path="/cricket" element={<CricketNewsPage />} />
-            <Route path="/bengal-face" element={<NewsContainer />} />
-            <Route path="/astrology" element={<NewsContainer />} />
-            <Route path="/football" element={<NewsContainer />} />
-            <Route path="/bioscope" element={<NewsContainer />} />
-            <Route path="/photo-gallery" element={<NewsContainer />} />
-            <Route path="/kolkata" element={<NewsContainer />} />
-            <Route path="/careers" element={<NewsContainer />} />
-            <Route path="/web-stories" element={<NewsContainer />} />
-            <Route path="/lifestyle" element={<NewsContainer />} />
+            <Route path="/bengal-face" element={<CategoryNewsPage sectionKey="bengal" title="বাংলার মুখ" />} />
+            <Route path="/astrology" element={<CategoryNewsPage sectionKey="astrology" title="ভাগ্যলিপি" />} />
+            <Route path="/football" element={<CategoryNewsPage sectionKey="football" title="ফুটবলের মহারণ" />} />
+            <Route path="/bioscope" element={<CategoryNewsPage sectionKey="bioscope" title="বায়োস্কোপ" />} />
+            <Route path="/photo-gallery" element={<CategoryNewsPage sectionKey="pictures" title="ছবিঘর" />} />
+            <Route path="/kolkata" element={<CategoryNewsPage sectionKey="kolkata" title="কলকাতা" />} />
+            <Route path="/careers" element={<CategoryNewsPage sectionKey="careers" title="কর্মখালি" />} />
+            <Route path="/web-stories" element={<CategoryNewsPage sectionKey="web-stories" title="ওয়েবস্টোরি" />} />
+            <Route path="/lifestyle" element={<CategoryNewsPage sectionKey="lifestyle" title="টুকিটাকি" />} />
             <Route path="/special-report" element={<NewsContainer />} />
             <Route path="/horoscope" element={<NewsContainer />} />
             <Route path="/gold-rate" element={<NewsContainer />} />
@@ -88,9 +92,15 @@ function App() {
             <Route path="/tech-talk" element={<NewsContainer />} />
             <Route path="/sports" element={<NewsContainer />} />
             <Route path="/must-see" element={<NewsContainer />} />
-            <Route path="/about" element={<NewsContainer />} />
-            <Route path="/about-us" element={<NewsContainer />} />
-            <Route path="/contact" element={<NewsContainer />} />
+            <Route path="/rss" element={<StaticPage title={staticPages.rss.title}> <div dangerouslySetInnerHTML={{ __html: staticPages.rss.html }} /> </StaticPage>} />
+            <Route path="/about" element={<StaticPage title={staticPages.about.title}> <div dangerouslySetInnerHTML={{ __html: staticPages.about.html }} /> </StaticPage>} />
+            <Route path="/about-us" element={<StaticPage title={staticPages.about.title}> <div dangerouslySetInnerHTML={{ __html: staticPages.about.html }} /> </StaticPage>} />
+            <Route path="/contact" element={<StaticPage title={staticPages.contact.title}> <div dangerouslySetInnerHTML={{ __html: staticPages.contact.html }} /> </StaticPage>} />
+            <Route path="/privacy" element={<StaticPage title={staticPages.privacy.title}> <div dangerouslySetInnerHTML={{ __html: staticPages.privacy.html }} /> </StaticPage>} />
+            <Route path="/terms" element={<StaticPage title={staticPages.terms.title}> <div dangerouslySetInnerHTML={{ __html: staticPages.terms.html }} /> </StaticPage>} />
+            <Route path="/sitemap" element={<StaticPage title={staticPages.sitemap.title}> <div dangerouslySetInnerHTML={{ __html: staticPages.sitemap.html }} /> </StaticPage>} />
+            <Route path="/archive" element={<StaticPage title={staticPages.archive.title}> <div dangerouslySetInnerHTML={{ __html: staticPages.archive.html }} /> </StaticPage>} />
+            <Route path="/advertise" element={<Advertise />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/admin-login" element={<TempLogin />} />
             <Route path="/profile" element={<NewsContainer />} />

@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import { FiChevronRight, FiUser, FiLogOut } from 'react-icons/fi';
+import LoginButton from '../LoginButton';
 import './Sidebar.css';
 
 const Sidebar = ({ isOpen, onClose }) => {
@@ -121,10 +122,7 @@ const Sidebar = ({ isOpen, onClose }) => {
               <span>লগআউট</span>
             </button>
           ) : (
-            <Link to="/signin" onClick={onClose} className="signin-btn">
-              <FiUser />
-              <span>সাইন ইন</span>
-            </Link>
+            <LoginButton />
           )}
         </div>
       </div>

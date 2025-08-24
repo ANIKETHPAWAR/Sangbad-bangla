@@ -26,6 +26,9 @@
 
 .news-card.featured .news-image-container {
   order: 1;
+  width: 100%;
+  aspect-ratio: 16/9;
+  overflow: hidden;
 }
 
 .news-card.featured .news-content {
@@ -107,6 +110,21 @@
   flex-direction: column;
   height: 100%;
 }
+
+/* Ensure images always render */
+.news-image-container {
+  width: 100%;
+}
+
+.news-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* For featured cards, fill the aspect-ratio container */
+.news-card.featured .news-image { height: 100%; object-fit: cover; }
 
 /* Meta Information */
 .news-meta {

@@ -1,0 +1,118 @@
+.adv-page {
+  display: flex;
+  justify-content: center;
+  padding: 72px 16px 80px;
+  /* background: #fbfbfb; */
+}
+
+.adv-card {
+  width: 100%;
+  max-width: 680px; /* compact width */
+  background: #ffffff;
+  border: 1px solid #e6e6e6;
+  border-radius: 14px;
+  padding: 26px 24px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+}
+
+.adv-header {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.adv-title {
+  font-size: 26px;
+  line-height: 32px;
+  margin: 0 0 8px;
+  color: #0f0f0f;
+  font-weight: 800;
+  display: inline-block;
+  padding-bottom: 6px;
+  border-bottom: 3px solid #0f0f0f;
+}
+
+.adv-subtitle {
+  margin: 0;
+  color: #2a2a2a;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.adv-alert {
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 12px 0;
+  font-size: 14px;
+}
+.adv-alert.success { background: #f0fdf4; color: #14532d; border: 1px solid #86efac; }
+.adv-alert.error { background: #fef2f2; color: #7f1d1d; border: 1px solid #fecaca; }
+
+.adv-form { display: grid; gap: 14px; }
+
+.adv-row { display: grid; gap: 12px; grid-template-columns: 1fr; }
+@media (min-width: 640px) { .adv-row { grid-template-columns: 1fr 1fr; } }
+
+.adv-field label {
+  display: block;
+  font-size: 13px;
+  color: #0f0f0f;
+  margin-bottom: 6px;
+  font-weight: 700; /* bolder labels */
+  letter-spacing: 0.2px;
+}
+
+.adv-field input,
+.adv-field select,
+.adv-field textarea {
+  width: 100%;
+  border: 1.5px solid #cfcfcf;
+  background: #ffffff;
+  color: #111;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
+}
+
+.adv-field input::placeholder,
+.adv-field textarea::placeholder { color: #8d8d8d; }
+
+.adv-field input:hover,
+.adv-field select:hover,
+.adv-field textarea:hover {
+  border-color: #0f0f0f;
+}
+
+.adv-field input:focus,
+.adv-field select:focus,
+.adv-field textarea:focus {
+  border-color: #0f0f0f;
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.08);
+  background-color: #fdfdfd;
+}
+
+.adv-actions { display: flex; justify-content: flex-end; margin-top: 8px; }
+
+.adv-submit {
+  background: #0f0f0f;
+  color: #fff;
+  border: 1px solid #0f0f0f;
+  padding: 12px 18px;
+  font-size: 14px;
+  font-weight: 800;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+.adv-submit:hover { filter: brightness(1.05); }
+
+.adv-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Light page background behind the compact card */
+body {
+  /* --adv-bg: #f7f7f7; */
+}
+.adv-page { background: var(--adv-bg); }
+
+
