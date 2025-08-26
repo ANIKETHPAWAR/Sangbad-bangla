@@ -76,6 +76,10 @@
   justify-content: center;
 }
 
+/* Prevent focus ring on mouse click for the logo; still visible via keyboard */
+.logo:focus { outline: none; }
+.logo:focus-visible { outline: none; }
+
 .logo-image {
   height: 120px;
   width: auto;
