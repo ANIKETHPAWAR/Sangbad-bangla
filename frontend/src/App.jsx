@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import './App.css';
 
 // Layout Components
@@ -47,6 +47,17 @@ const CricketNewsPage = () => {
   );
 };
 
+// Scroll to top on route change
+function ScrollToTop() {
+  const location = useLocation();
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    }
+  }, [location.pathname]);
+  return null;
+}
+
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
@@ -61,6 +72,7 @@ function App() {
   return (
     <Router>
       <div className="App">
+        <ScrollToTop />
         <Header onMenuClick={toggleSidebar} />
         <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
         

@@ -51,7 +51,12 @@ const Footer = () => {
               <ul className="footer-links">
                 {section.links.map((link, i) => (
                   <li key={i}>
-                    <Link to={link.to}>{link.label}</Link>
+                    <Link
+                      to={link.to}
+                      onClick={() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' })}
+                    >
+                      {link.label}
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -61,20 +66,20 @@ const Footer = () => {
 
         <div className="footer-meta">
           <div className="footer-meta-links">
-            <Link to="/rss">RSS</Link>
-            <Link to="/advertise">Advertise with us</Link>
-            <Link to="/about">About us</Link>
-            <Link to="/contact">Contact us</Link>
-            <Link to="/privacy">Privacy</Link>
-            <Link to="/terms">Terms of Use</Link>
-            <Link to="/sitemap">Sitemap</Link>
-            <Link to="/archive">Archive</Link>
+            <Link to="/rss" onClick={() => window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })}>RSS</Link>
+            <Link to="/advertise" onClick={() => window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })}>Advertise with us</Link>
+            <Link to="/about" onClick={() => window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })}>About us</Link>
+            <Link to="/contact" onClick={() => window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })}>Contact us</Link>
+            <Link to="/privacy" onClick={() => window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })}>Privacy</Link>
+            <Link to="/terms" onClick={() => window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })}>Terms of Use</Link>
+            <Link to="/sitemap" onClick={() => window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })}>Sitemap</Link>
+            <Link to="/archive" onClick={() => window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })}>Archive</Link>
           </div>
           <div className="footer-bottom">
             <div className="footer-copy">© {year} Sangbad Bangla</div>
             {/* Footer Logo */}
             <div className="footer-logo-section">
-              <Link to="/" className="footer-logo">
+              <Link to="/" className="footer-logo" onClick={() => window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })}>
                 <img src={logo} alt="Sangbad Bangla" className="footer-logo-image" />
               </Link>
             </div>
