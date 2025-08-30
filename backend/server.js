@@ -212,54 +212,51 @@ app.get('/api/combined-news', async (req, res) => {
       console.log('⚠️ Firestore news fetch failed, continuing with external news only:', error.message);
     }
     
-    // Get external news from popular stories API
+    // Get external news from popular stories API (best-effort; never block internal)
     let externalNews = [];
-    try {
-      const response = await fetch('https://personalize.hindustantimes.com/popular-story?propertyId=bg&platformId=web&articleType=story&numStories=20', {
-        headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'application/json, text/plain, */*',
-        'Accept-Language': 'bn-IN,bn;q=0.9,en;q=0.8',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'Connection': 'keep-alive',
-        'Referer': 'https://bangla.hindustantimes.com/',
-        'Origin': 'https://bangla.hindustantimes.com'
-        },
-        timeout: 10000
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        if (data && data.status === 'success' && data.items && Array.isArray(data.items)) {
-          externalNews = data.items.slice(0, limit).map(item => ({
-            id: item.storyId || `external_${Date.now()}_${Math.random()}`,
-            title: item.headline || 'News Story',
-            excerpt: item.shortDescription || '',
-            imageUrl: item.imageObject?.bigImage || item.imageObject?.mediumImage || item.imageObject?.thumbnailImage || '',
-            publishDate: validateAndFormatDate(item.publishDate || item.date) || new Date().toISOString(),
-            readTime: item.timeToRead || 3,
-            detailUrl: item.storyURL || '',
-            websiteUrl: item.storyURL || '',
-            contentType: item.contentType || 'story',
-            sectionName: item.sectionName || '',
-            category: item.sectionName || '',
-            authorName: item.authorName || '',
-            keywords: item.keywords || [],
-            source: 'external'
-          }));
+    if (!category) {
+      try {
+        const response = await fetch('https://personalize.hindustantimes.com/popular-story?propertyId=bg&platformId=web&articleType=story&numStories=20', {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'application/json, text/plain, */*',
+            'Accept-Language': 'bn-IN,bn;q=0.9,en;q=0.8'
+          },
+          timeout: 8000
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data && data.status === 'success' && Array.isArray(data.items)) {
+            externalNews = data.items.slice(0, limit).map(item => ({
+              id: item.storyId || `external_${Date.now()}_${Math.random()}`,
+              title: item.headline || 'News Story',
+              excerpt: item.shortDescription || '',
+              imageUrl: item.imageObject?.bigImage || item.imageObject?.mediumImage || item.imageObject?.thumbnailImage || '',
+              publishDate: validateAndFormatDate(item.publishDate || item.date) || new Date().toISOString(),
+              readTime: item.timeToRead || 3,
+              detailUrl: item.storyURL || '',
+              websiteUrl: item.storyURL || '',
+              contentType: item.contentType || 'story',
+              sectionName: item.sectionName || '',
+              category: item.sectionName || '',
+              authorName: item.authorName || '',
+              keywords: item.keywords || [],
+              source: 'external'
+            }));
+          }
         }
+      } catch (error) {
+        console.log('⚠️ External news fetch failed, returning internal news only:', error.message);
       }
-    } catch (error) {
-      console.log('⚠️ External news fetch failed, continuing with Firestore news only:', error.message);
     }
     
-    // Combine and sort by date (latest first)
-    const combinedNews = [...firestoreNews, ...externalNews];
-    combinedNews.sort((a, b) => {
+    // Order: internal first (newest first within group), then external (newest first)
+    const sortByDate = (arr) => arr.sort((a, b) => {
       const dateA = new Date(a.createdAt || a.publishDate || a.publishedDate);
       const dateB = new Date(b.createdAt || b.publishDate || b.publishedDate);
       return dateB - dateA;
     });
+    const combinedNews = [...sortByDate(firestoreNews), ...sortByDate(externalNews)];
     
     // Apply pagination
     const startIndex = (page - 1) * limit;

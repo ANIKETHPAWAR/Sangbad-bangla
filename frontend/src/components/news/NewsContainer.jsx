@@ -24,7 +24,7 @@ const NewsContainer = () => {
       setError(null);
       
       // Load combined news data (Firestore + external)
-      const combinedData = await newsDataService.getCombinedNews();
+      const combinedData = await newsDataService.getCombinedNews(1, 20);
       
       // Check for new content
       const hasNewContent = checkForNewContent(combinedData.news);
@@ -67,7 +67,7 @@ const NewsContainer = () => {
       setNewsCount(newCount);
       
       // Fetch more combined news
-      const moreNews = await newsDataService.getCombinedNews();
+      const moreNews = await newsDataService.getCombinedNews(1, 20);
       setFeaturedNews(moreNews.news);
     } catch (error) {
       console.error('Error loading more news:', error);

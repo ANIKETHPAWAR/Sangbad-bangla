@@ -194,11 +194,12 @@ class NewsService {
    */
   async getNewsByCategory(category, limit = 20) {
     try {
+      // Use equality filters only to avoid composite index requirements,
+      // then sort in memory by createdAt desc and apply the limit.
+      // Query only by category to avoid composite index requirements,
+      // we'll filter by published in memory.
       const snapshot = await this.db.collection(this.newsCollection)
-        .where('published', '==', true)
         .where('category', '==', category)
-        .orderBy('createdAt', 'desc')
-        .limit(limit)
         .get();
       
       const news = [];
@@ -212,14 +213,21 @@ class NewsService {
           updatedAt: data.updatedAt ? data.updatedAt.toDate().toISOString() : new Date().toISOString(),
           publishDate: data.publishDate ? (data.publishDate.toDate ? data.publishDate.toDate().toISOString() : data.publishDate) : new Date().toISOString()
         };
-        news.push(newsItem);
+        // Only include published items
+        if (newsItem.published !== false) {
+          news.push(newsItem);
+        }
       });
+
+      // Sort newest first and apply limit
+      news.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      const limited = news.slice(0, limit);
       
       return {
         success: true,
-        data: news,
+        data: limited,
         category,
-        count: news.length
+        count: limited.length
       };
     } catch (error) {
       console.error(`Error getting news by category ${category}:`, error);

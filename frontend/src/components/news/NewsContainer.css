@@ -337,11 +337,20 @@
   .news-container {
     grid-template-columns: 1fr;
     gap: 1rem;
+    padding: 1rem;
+    /* Add top margin to prevent content from being hidden under fixed navbar */
+    margin-top: 20px;
   }
   
+  /* Move trending news below category news on mobile */
   .trending-news-sidebar {
     position: static;
-    order: -1;
+    order: 2; /* Show after main content */
+    margin-top: 2rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
   
   .trending-news-list {
@@ -355,6 +364,9 @@
     margin-top: 0.5rem;
     margin-bottom: 2rem;
     padding: 0.75rem 0;
+    /* Ensure proper positioning above navbar */
+    position: relative;
+    z-index: 10;
   }
   
   .section-header .section-title .section-title-main {
@@ -418,13 +430,9 @@
 @media (max-width: 480px) {
   .news-container {
     padding: 0.5rem;
-    /* Ensure single column layout on small mobile */
-    grid-template-columns: 1fr;
     gap: 0.75rem;
-    /* Use scroll-margin-top to push content below fixed header */
     scroll-margin-top: 20px;
-    /* Add top margin to ensure content is below header */
-    margin-top: 20px;
+    margin-top: 60px; /* Increased to provide adequate navbar clearance */
   }
   
   .featured-news-grid {
@@ -433,17 +441,14 @@
   
   /* Small mobile section title adjustments */
   .section-header {
-    margin-top: 0.25rem;
+    margin-top: 2rem; /* Increased to provide adequate navbar clearance */
     margin-bottom: 1rem;
     padding: 0.5rem 0;
-    /* Ensure section headers are visible on mobile */
     position: relative !important;
     z-index: 100 !important;
-    /* Force visibility */
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
-    /* Ensure proper positioning */
     top: 0 !important;
     left: 0 !important;
     right: 0 !important;
@@ -451,7 +456,6 @@
   
   .section-header .section-title .section-title-main {
     font-size: 20px !important;
-    /* Force visibility */
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
@@ -459,7 +463,6 @@
   
   .section-header .section-title .section-title-subtitle {
     font-size: 12px !important;
-    /* Force visibility */
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
@@ -467,13 +470,12 @@
   
   .section-header .section-title .section-title-icon {
     font-size: 18px !important;
-    /* Force visibility */
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
   }
   
-  /* Ensure trending news section displays properly on mobile */
+  /* Small mobile trending news adjustments */
   .trending-news-sidebar {
     margin: 0.5rem 0;
     padding: 10px;

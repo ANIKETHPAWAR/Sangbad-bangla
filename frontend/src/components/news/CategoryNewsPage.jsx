@@ -20,7 +20,8 @@ const CategoryNewsPage = ({ sectionKey: propSectionKey, title, subtitle }) => {
     try {
       setLoading(true);
       setError(null);
-      const data = await newsDataService.getSectionNews(resolvedSectionKey, 15);
+      // Use combined category news (internal Firestore + external HT) with internal-first ordering
+      const data = await newsDataService.getCategoryNews(resolvedSectionKey, 15);
       setFeaturedNews(data);
     } catch (err) {
       console.error('Error loading section news:', err);
