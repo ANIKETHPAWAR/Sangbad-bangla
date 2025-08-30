@@ -424,6 +424,46 @@ class NewsDataService {
     }
   }
 
+  // Get category page news by combining Firestore (internal) + HT section feed (external)
+  async getCategoryNews(sectionKey, limit = 15, internalKeyOverride) {
+    try {
+      // Run both requests in parallel
+      const internalKey = internalKeyOverride || sectionKey;
+      const [combinedResult, sectionStories] = await Promise.all([
+        this.getCombinedNews(1, limit, internalKey),
+        this.getSectionNews(sectionKey, limit)
+      ]);
+
+      const internalNews = (combinedResult?.news || []).filter(item => item.source === 'internal');
+      const externalNews = Array.isArray(sectionStories) ? sectionStories : [];
+
+      // Merge and de-duplicate (by id/detailUrl/title)
+      const seen = new Set();
+      const mergeKey = (n) => n.id || n.detailUrl || n.title;
+      const merged = [];
+      [...internalNews, ...externalNews].forEach(n => {
+        const key = mergeKey(n);
+        if (!key) return;
+        if (!seen.has(key)) {
+          seen.add(key);
+          merged.push(n);
+        }
+      });
+
+      // Order: internal first (newest first), then external (newest first)
+      const internalSorted = merged
+        .filter(n => n.source === 'internal')
+        .sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate));
+      const externalSorted = merged
+        .filter(n => n.source !== 'internal')
+        .sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate));
+      return [...internalSorted, ...externalSorted].slice(0, Math.max(limit, 15));
+    } catch (error) {
+      console.error('Error fetching combined category news:', sectionKey, error);
+      return this.getMockNewsByCategory(sectionKey);
+    }
+  }
+
   // Search news from popular stories
   async searchNews(query) {
     try {

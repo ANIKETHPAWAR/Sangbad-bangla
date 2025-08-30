@@ -213,14 +213,12 @@ const NewsCard = ({
           </p>
         )}
         
-        {!isTrending && (
-          <button 
-            onClick={handleReadMore}
-            className="read-more-button"
-          >
-            আরও পড়ুন <FiArrowRight />
-          </button>
-        )}
+        <button 
+          onClick={handleReadMore}
+          className="read-more-button"
+        >
+          আরও পড়ুন <FiArrowRight />
+        </button>
       </div>
     </article>
   );

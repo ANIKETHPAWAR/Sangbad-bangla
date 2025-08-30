@@ -36,7 +36,7 @@ const ArticlePage = () => {
       setError(null);
 
       // Fetch all news to find the specific article
-      const allNewsData = await newsDataService.getCombinedNews();
+      const allNewsData = await newsDataService.getCombinedNews(1, 20);
       const allNews = allNewsData.news;
       
       const foundArticle = allNews.find(news => {

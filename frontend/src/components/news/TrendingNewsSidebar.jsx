@@ -24,7 +24,7 @@ const TrendingNewsSidebar = ({ similarStories = null, isArticlePage = false }) =
       setError(null);
       
       // Use combined news for trending content
-      const data = await newsDataService.getCombinedNews(1, 10);
+      const data = await newsDataService.getCombinedNews(1, 20);
       setTrendingNews(data.news);
     } catch (err) {
       console.error('Error loading trending news:', err);
