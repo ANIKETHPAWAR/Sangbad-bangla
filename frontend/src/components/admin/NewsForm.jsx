@@ -39,7 +39,6 @@ const NewsForm = () => {
     'astrology',
     'lifestyle',
     'bengal',
-    'kolkata',
     'cricket',
     'football',
     'breaking',

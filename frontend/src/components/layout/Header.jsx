@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FiSearch, FiX, FiFacebook, FiMenu, FiChevronDown, FiUserX,FiInstagram  } from 'react-icons/fi';
+import { FiFacebook, FiMenu, FiChevronDown, FiUserX,FiInstagram  } from 'react-icons/fi';
 import { useAuth0 } from '@auth0/auth0-react';
 import LoginButton from '../LoginButton';
 import LogoutButton from '../LogoutButton';
@@ -11,8 +11,6 @@ import YT from '../../assets/icons8-youtube.svg';
 
 const Header = ({ onMenuClick }) => {
   const { user, isAuthenticated } = useAuth0();
-  const [isSearchOpen, setIsSearchOpen] = React.useState(false);
-  const [searchQuery, setSearchQuery] = React.useState('');
   const [currentDate, setCurrentDate] = useState('');
 
   // Update current date
@@ -34,10 +32,7 @@ const Header = ({ onMenuClick }) => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    console.log('Searching for:', searchQuery);
-  };
+
 
   // Navigation categories matching the design
   const navigationItems = [
@@ -47,11 +42,8 @@ const Header = ({ onMenuClick }) => {
     { id: 'bengal-face', name: 'বাংলার মুখ', path: '/bengal-face' },
     { id: 'astrology', name: 'ভাগ্যলিপি', path: '/astrology' },
     { id: 'football', name: 'ফুটবলের মহারণ', path: '/football' },
-    { id: 'bioscope', name: 'বায়োস্কোপ', path: '/bioscope' },
     { id: 'photo-gallery', name: 'ছবিঘর', path: '/photo-gallery' },
-    { id: 'kolkata', name: 'কলকাতা', path: '/kolkata' },
     { id: 'careers', name: 'কর্মখালি', path: '/careers' },
-    { id: 'web-stories', name: 'ওয়েবস্টোরি', path: '/web-stories' },
     { id: 'lifestyle', name: 'টুকিটাকি', path: '/lifestyle' }
   ];
 
@@ -91,14 +83,6 @@ const Header = ({ onMenuClick }) => {
 
             {/* Right Side - Actions */}
             <div className="header-right">
-              <button 
-                className="action-btn search-btn"
-                onClick={() => setIsSearchOpen(!isSearchOpen)}
-                aria-label="Search"
-              >
-                {isSearchOpen ? <FiX /> : <FiSearch />}
-              </button>
-              
               <a 
                 href="https://www.facebook.com/share/19eQCyXZS8/" 
                 target="_blank" 
@@ -143,26 +127,7 @@ const Header = ({ onMenuClick }) => {
           </div>
         </div>
 
-        {/* Search Bar */}
-        {isSearchOpen && (
-          <div className="search-container">
-            <div className="container">
-              <form onSubmit={handleSearch} className="search-form">
-                <input
-                  type="text"
-                  placeholder="খবর খুঁজুন..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="search-input"
-                  autoFocus
-                />
-                <button type="submit" className="search-submit">
-                  <FiSearch />
-                </button>
-              </form>
-            </div>
-          </div>
-        )}
+
       </div>
 
       {/* Navigation Bar */}

@@ -195,11 +195,8 @@ class NewsService {
       'bengal-face': 'বাংলার মুখ',
       'astrology': 'ভাগ্যলিপি',
       'football': 'ফুটবল',
-      'bioscope': 'বায়োস্কোপ',
       'photo-gallery': 'ছবিঘর',
-      'kolkata': 'কলকাতা',
       'careers': 'কর্মখালি',
-      'web-stories': 'ওয়েবস্টোরি',
       'lifestyle': 'টুকিটাকি'
     };
 

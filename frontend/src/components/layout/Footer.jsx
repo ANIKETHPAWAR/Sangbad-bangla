@@ -20,7 +20,6 @@ const Footer = () => {
     {
       title: 'বাংলার মুখ',
       links: [
-        { label: 'কলকাতা', to: '/kolkata' },
         { label: 'অন্যান্য জেলা', to: '/bengal-face' }
       ]
     },

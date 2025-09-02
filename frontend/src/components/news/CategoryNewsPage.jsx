@@ -22,14 +22,17 @@ const CategoryNewsPage = ({ sectionKey: propSectionKey, title, subtitle }) => {
       setError(null);
       // Use combined category news (internal Firestore + external HT) with internal-first ordering
       const data = await newsDataService.getCategoryNews(resolvedSectionKey, 15);
-      setFeaturedNews(data);
+      setFeaturedNews(data || []);
     } catch (err) {
       console.error('Error loading section news:', err);
-      setError('খবর লোড করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+      // Only show error if we have no cached data
+      if (featuredNews.length === 0) {
+        setError('খবর লোড করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+      }
     } finally {
       setLoading(false);
     }
-  }, [resolvedSectionKey]);
+  }, [resolvedSectionKey, featuredNews.length]);
 
   useEffect(() => {
     if (resolvedSectionKey) {
@@ -39,7 +42,10 @@ const CategoryNewsPage = ({ sectionKey: propSectionKey, title, subtitle }) => {
 
   const handleNewsClick = () => {};
 
-  if (loading && featuredNews.length === 0) {
+  // Show loading state immediately if no data
+  const isLoading = loading || (featuredNews.length === 0 && !error);
+
+  if (isLoading) {
     return (
       <div className="news-container">
         <div className="loading-container">

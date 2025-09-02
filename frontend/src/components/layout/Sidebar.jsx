@@ -21,21 +21,12 @@ const Sidebar = ({ isOpen, onClose }) => {
     { id: 'bengal-face', name: 'বাংলার মুখ', path: '/bengal-face' },
     { id: 'astrology', name: 'ভাগ্যলিপি', path: '/astrology' },
     { id: 'football', name: 'ফুটবলের মহারণ', path: '/football' },
-    { id: 'bioscope', name: 'বায়োস্কোপ', path: '/bioscope' },
     { id: 'photo-gallery', name: 'ছবিঘর', path: '/photo-gallery' },
-    { id: 'kolkata', name: 'কলকাতা', path: '/kolkata' },
     { id: 'careers', name: 'কর্মখালি', path: '/careers' },
-    { id: 'web-stories', name: 'ওয়েবস্টোরি', path: '/web-stories' },
     { id: 'lifestyle', name: 'টুকিটাকি', path: '/lifestyle' }
   ];
 
-  // Special sections - clean names without icons
-  const specialSections = [
-    { id: 'special-report', name: 'বিশেষ প্রতিবেদন', path: '/special-report' },
-    { id: 'horoscope', name: 'আজকের রাশিফল', path: '/horoscope' },
-    { id: 'gold-rate', name: 'সোনার দর', path: '/gold-rate' },
-    { id: 'cricket-live', name: 'ক্রিকেট লাইভ স্কোর', path: '/cricket-live' }
-  ];
+
 
   return (
     <>
@@ -98,20 +89,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             ))}
           </div>
 
-          {/* Special Sections */}
-          <div className="nav-section">
-            <h4 className="section-title">বিশেষ বিভাগ</h4>
-            {specialSections.map((item) => (
-              <Link
-                key={item.id}
-                to={item.path}
-                onClick={onClose}
-                className="nav-link special"
-              >
-                <span className="nav-text">{item.name}</span>
-              </Link>
-            ))}
-          </div>
+
         </div>
 
         {/* Bottom Section */}

@@ -11,11 +11,8 @@ export const ROUTE_TO_SECTION_KEY = {
   '/bengal-face': 'bengal',
   '/astrology': 'astrology',
   '/football': 'sports',
-  '/bioscope': 'bioscope',
   '/photo-gallery': 'pictures', // confirmed mapping
-  '/kolkata': 'kolkata',
   '/careers': 'career', // confirmed mapping
-  '/web-stories': 'web-stories',
   '/lifestyle': 'lifestyle', // confirmed mapping
   '/popular': 'popular',
   // Add more as needed
