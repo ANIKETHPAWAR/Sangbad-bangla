@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import { FiHome, FiPlus, FiRefreshCw } from 'react-icons/fi';
 import NewsCard from './NewsCard';
 import SectionTitle from './SectionTitle';
@@ -9,6 +10,7 @@ import newsDataService from '../../services/newsDataService';
 import './NewsContainer.css';
 
 const NewsContainer = () => {
+  const location = useLocation();
   const [featuredNews, setFeaturedNews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,6 +18,10 @@ const NewsContainer = () => {
   const [refreshInterval] = useState(NEWS_REFRESH_INTERVAL); // 5 minutes default - fixed for production
   const [showNewContentNotification, setShowNewContentNotification] = useState(false);
   const [newContentCount, setNewContentCount] = useState(0);
+  const [newsCount, setNewsCount] = useState(UI_CONSTANTS.INITIAL_NEWS_COUNT);
+
+  // Determine if this is the popular news page
+  const isPopularNews = location.pathname === '/popular';
 
   // Load news data from service
   const loadNewsData = useCallback(async () => {
@@ -23,32 +29,47 @@ const NewsContainer = () => {
       setLoading(true);
       setError(null);
       
-      // Load combined news data (Firestore + external)
-      const combinedData = await newsDataService.getCombinedNews(1, 20);
-      
-      // Check for new content
-      const hasNewContent = checkForNewContent(combinedData.news);
-      if (hasNewContent.newContent) {
-        setShowNewContentNotification(true);
-        setNewContentCount(hasNewContent.count);
-        
-        // Auto-hide notification after 10 seconds
-        setTimeout(() => {
-          setShowNewContentNotification(false);
-        }, UI_CONSTANTS.NOTIFICATION_AUTO_HIDE_DELAY);
+      // Load news data based on route
+      let combinedData;
+      if (isPopularNews) {
+        // Use popular news with rotation for different content
+        combinedData = await newsDataService.getPopularNews(1, 20);
+        console.log('🔥 Loaded popular news with rotation');
+      } else {
+        // Use regular combined news for all other routes
+        combinedData = await newsDataService.getCombinedNews(1, 20);
+        console.log('📰 Loaded regular combined news');
       }
       
-      setFeaturedNews(combinedData.news);
+      // Check for new content only if we have news
+      if (combinedData.news && combinedData.news.length > 0) {
+        const hasNewContent = checkForNewContent(combinedData.news);
+        if (hasNewContent.newContent) {
+          setShowNewContentNotification(true);
+          setNewContentCount(hasNewContent.count);
+          
+          // Auto-hide notification after 10 seconds
+          setTimeout(() => {
+            setShowNewContentNotification(false);
+          }, UI_CONSTANTS.NOTIFICATION_AUTO_HIDE_DELAY);
+        }
+      }
+      
+      setFeaturedNews(combinedData.news || []);
     } catch (error) {
       console.error('Error loading news data:', error);
-      setError('খবর লোড করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+      // Only show error if we have no cached data
+      if (featuredNews.length === 0) {
+        setError('খবর লোড করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+      }
     } finally {
       setLoading(false);
     }
-  }, [refreshInterval]);
+  }, [refreshInterval, featuredNews.length, isPopularNews]);
 
   // Auto-refresh functionality - always enabled in production
   useEffect(() => {
+    // Load data immediately on mount
     loadNewsData();
     
     const interval = setInterval(() => {
@@ -58,6 +79,9 @@ const NewsContainer = () => {
     return () => clearInterval(interval);
   }, [loadNewsData, refreshInterval]);
 
+  // Show loading state immediately if no data
+  const isLoading = loading || (featuredNews.length === 0 && !error);
+
 
 
   const handleLoadMore = async () => {
@@ -66,8 +90,16 @@ const NewsContainer = () => {
       const newCount = newsCount + UI_CONSTANTS.LOAD_MORE_INCREMENT;
       setNewsCount(newCount);
       
-      // Fetch more combined news
-      const moreNews = await newsDataService.getCombinedNews(1, 20);
+      // Fetch more news based on route
+      let moreNews;
+      if (isPopularNews) {
+        moreNews = await newsDataService.getPopularNews(1, newCount);
+        console.log('🔥 Loaded more popular news with rotation');
+      } else {
+        moreNews = await newsDataService.getCombinedNews(1, newCount);
+        console.log('📰 Loaded more regular combined news');
+      }
+      
       setFeaturedNews(moreNews.news);
     } catch (error) {
       console.error('Error loading more news:', error);
@@ -108,7 +140,7 @@ const NewsContainer = () => {
 
 
 
-  if (loading && featuredNews.length === 0) {
+  if (isLoading) {
     return (
       <div className="news-container">
         <div className="loading-container">
@@ -125,9 +157,9 @@ const NewsContainer = () => {
         <div className="error-container">
           <div className="error-icon">⚠️</div>
           <p className="error-message">{error}</p>
-                     <button onClick={loadNewsData} className="retry-button">
-             <FiRefreshCw /> আবার চেষ্টা করুন
-           </button>
+          <button onClick={loadNewsData} className="retry-button">
+            <FiRefreshCw /> আবার চেষ্টা করুন
+          </button>
         </div>
       </div>
     );
@@ -159,8 +191,8 @@ const NewsContainer = () => {
         <section className="featured-news-section">
           <div className="section-header">
             <SectionTitle 
-              title="সর্বশেষ খবর" 
-              subtitle="আজকের গুরুত্বপূর্ণ এবং জনপ্রিয় খবর"
+              title={isPopularNews ? "জনপ্রিয় খবর" : "সর্বশেষ খবর"} 
+              subtitle={isPopularNews ? "সর্বাধিক পঠিত এবং আলোচিত খবর" : "আজকের গুরুত্বপূর্ণ এবং জনপ্রিয় খবর"}
               icon={<FiHome />}
               variant="large"
               align="center"

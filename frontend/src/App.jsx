@@ -7,6 +7,10 @@ import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import Sidebar from './components/layout/Sidebar';
 
+// New Components
+import ConsentBanner from './components/ConsentBanner';
+import NotificationPermission from './components/NotificationPermission';
+
 // Page Components
 import SignIn from './pages/SignIn';
 
@@ -77,6 +81,12 @@ function App() {
         <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
         
         <main className="main-content">
+          {/* Cookie Consent Banner */}
+          <ConsentBanner />
+          
+          {/* Notification Permission Banner */}
+          <NotificationPermission />
+          
           <Routes>
             <Route path="/" element={<NewsContainer />} />
             <Route path="/all-news" element={<NewsContainer />} />
@@ -87,11 +97,8 @@ function App() {
             <Route path="/bengal-face" element={<CategoryNewsPage sectionKey="bengal" title="বাংলার মুখ" />} />
             <Route path="/astrology" element={<CategoryNewsPage sectionKey="astrology" title="ভাগ্যলিপি" />} />
             <Route path="/football" element={<CategoryNewsPage sectionKey="football" title="ফুটবলের মহারণ" />} />
-            <Route path="/bioscope" element={<CategoryNewsPage sectionKey="bioscope" title="বায়োস্কোপ" />} />
             <Route path="/photo-gallery" element={<CategoryNewsPage sectionKey="pictures" title="ছবিঘর" />} />
-            <Route path="/kolkata" element={<CategoryNewsPage sectionKey="kolkata" title="কলকাতা" />} />
             <Route path="/careers" element={<CategoryNewsPage sectionKey="career" title="কর্মখালি" />} />
-            <Route path="/web-stories" element={<CategoryNewsPage sectionKey="web-stories" title="ওয়েবস্টোরি" />} />
             <Route path="/lifestyle" element={<CategoryNewsPage sectionKey="lifestyle" title="টুকিটাকি" />} />
             <Route path="/special-report" element={<NewsContainer />} />
             <Route path="/horoscope" element={<NewsContainer />} />

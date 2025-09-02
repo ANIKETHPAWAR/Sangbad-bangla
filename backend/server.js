@@ -381,6 +381,14 @@ app.get('/api/image', async (req, res) => {
 const adminRoutes = require('./routes/admin');
 app.use('/api/admin', adminRoutes);
 
+// Import and use notification routes
+const notificationRoutes = require('./routes/notifications');
+app.use('/api/notifications', notificationRoutes);
+
+// Import and use config routes
+const configRoutes = require('./routes/config');
+app.use('/api/config', configRoutes);
+
 // Error handling middleware
 app.use((error, req, res, next) => {
   console.error('Unhandled error:', error);

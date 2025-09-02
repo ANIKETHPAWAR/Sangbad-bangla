@@ -1,5 +1,6 @@
 const admin = require('firebase-admin');
 const { v4: uuidv4 } = require('uuid');
+const notificationService = require('./notificationService');
 
 class NewsService {
   constructor() {
@@ -33,6 +34,14 @@ class NewsService {
       };
 
       await this.db.collection(this.newsCollection).doc(newsId).set(news);
+      
+      // Send push notification for new article
+      try {
+        await notificationService.sendNewArticleNotification(news);
+      } catch (notificationError) {
+        console.error('⚠️ Failed to send notification for new article:', notificationError.message);
+        // Don't fail the article creation if notification fails
+      }
       
       return {
         success: true,

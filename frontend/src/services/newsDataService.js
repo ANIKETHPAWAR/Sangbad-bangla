@@ -16,6 +16,57 @@ class NewsDataService {
     } catch (e) {
       this.shouldProxyImages = false;
     }
+    
+    // Initialize cache
+    this.cache = new Map();
+    this.cacheTimestamps = new Map();
+  }
+
+  // Simple in-memory cache methods
+  setCache(key, data, ttl = 120000) { // 2 minutes default TTL
+    this.cache.set(key, data);
+    this.cacheTimestamps.set(key, Date.now() + ttl);
+  }
+
+  getFromCache(key) {
+    const expiry = this.cacheTimestamps.get(key);
+    if (expiry && Date.now() < expiry) {
+      return this.cache.get(key);
+    }
+    // Clean up expired cache
+    this.cache.delete(key);
+    this.cacheTimestamps.delete(key);
+    return null;
+  }
+
+  clearCache() {
+    this.cache.clear();
+    this.cacheTimestamps.clear();
+  }
+
+  // Get popular news with rotation to show different content than all news
+  async getPopularNews(page = 1, limit = 20) {
+    try {
+      console.log('🔥 Fetching popular news with rotation...');
+      
+      // Generate rotation offset based on current time to ensure different content
+      // This creates a rotation that changes every 5 minutes
+      const rotationInterval = 5 * 60 * 1000; // 5 minutes in milliseconds
+      const rotationOffset = Math.floor(Date.now() / rotationInterval) % 10; // Rotate through 10 different offsets
+      
+      console.log(`🔄 Popular News Rotation: Using offset ${rotationOffset} (changes every 5 minutes)`);
+      console.log(`🔄 This ensures popular news shows different content than all news`);
+      
+      // Use the same API as all news but with rotation
+      const result = await this.getCombinedNews(page, limit, null, rotationOffset);
+      
+      return result;
+    } catch (error) {
+      console.error('❌ Error fetching popular news:', error);
+      
+      // Fallback to regular combined news without rotation
+      return await this.getCombinedNews(page, limit, null, 0);
+    }
   }
 
   // Transform API response to match our frontend structure
@@ -164,25 +215,36 @@ class NewsDataService {
     try {
       console.log('🔍 Fetching featured news from:', `${this.baseUrl}/api/popular-stories`);
       
-      // Force fresh data with aggressive cache busting
-      const timestamp = Date.now();
-      const randomParam = Math.random().toString(36).substring(7);
-      const fullUrl = `${this.baseUrl}/api/popular-stories?t=${timestamp}&r=${randomParam}&fresh=true`;
+      // Check cache first
+      const cacheKey = 'featured-news';
+      const cachedData = this.getFromCache(cacheKey);
+      if (cachedData) {
+        console.log('⚡ Loading featured news from cache');
+        return cachedData;
+      }
+      
+      // Use the proxy URL format
+      const fullUrl = `${this.baseUrl}/api/popular-stories`;
       
       console.log('📡 Full API URL:', fullUrl);
       console.log('🌐 Base URL being used:', this.baseUrl);
       
+      // Reduced timeout for faster user feedback
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+      
       const response = await fetch(fullUrl, {
         method: 'GET',
+        signal: controller.signal,
         headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0'
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
         }
       });
       
+      clearTimeout(timeoutId);
+      
       console.log('📥 Response status:', response.status);
-      console.log('📥 Response headers:', Object.fromEntries(response.headers.entries()));
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -197,18 +259,27 @@ class NewsDataService {
           .map(item => this.transformNewsItem(item));
         
         console.log('✅ Fresh Transformed Featured News (API Order):', transformedNews);
+        
+        // Cache for 2 minutes
+        this.setCache(cacheKey, transformedNews, 120000);
+        
         return transformedNews;
       }
       return [];
     } catch (error) {
       console.error('❌ Error fetching popular stories from API:', error);
-      console.error('❌ Error details:', {
-        message: error.message,
-        stack: error.stack,
-        baseUrl: this.baseUrl,
-        fullUrl: `${this.baseUrl}/api/popular-stories`
-      });
-      return this.getMockFeaturedNews();
+      
+      // Check cache for fallback
+      const cacheKey = 'featured-news';
+      const cachedData = this.getFromCache(cacheKey);
+      if (cachedData) {
+        console.log('🔄 Using cached featured news as fallback');
+        return cachedData;
+      }
+      
+      // No mock data fallback - return empty array
+      console.log('❌ No cached data available, returning empty state');
+      return [];
     }
   }
 
@@ -217,15 +288,29 @@ class NewsDataService {
     try {
       console.log('🔍 Fetching trending news from:', `${this.baseUrl}/api/trending-stories`);
       
+      // Check cache first
+      const cacheKey = 'trending-news';
+      const cachedData = this.getFromCache(cacheKey);
+      if (cachedData) {
+        console.log('⚡ Loading trending news from cache');
+        return cachedData;
+      }
+      
+      // Reduced timeout for faster user feedback
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+      
       // First try to get trending stories from a dedicated trending endpoint
       let response = await fetch(`${this.baseUrl}/api/trending-stories`, {
         method: 'GET',
+        signal: controller.signal,
         headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0'
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
         }
       });
+      
+      clearTimeout(timeoutId);
       
       console.log('📥 Trending stories response status:', response.status);
       
@@ -234,28 +319,36 @@ class NewsDataService {
         if (data.success && data.stories) {
           console.log('✅ Fresh Trending Stories API Response:', data);
           // Return all stories in API order
-          return data.stories
+          const transformedNews = data.stories
             .map(item => this.transformNewsItem(item));
+          
+          // Cache for 2 minutes
+          this.setCache(cacheKey, transformedNews, 120000);
+          
+          return transformedNews;
         }
       }
       
       console.log('🔄 Falling back to popular stories for trending news...');
       
-      // Fallback: Get fresh trending data by calling popular stories with aggressive cache busting
-      const timestamp = Date.now();
-      const randomParam = Math.random().toString(36).substring(7);
-      const fallbackUrl = `${this.baseUrl}/api/popular-stories?t=${timestamp}&r=${randomParam}&trending=true`;
+      // Fallback: Get trending data from popular stories
+      const fallbackUrl = `${this.baseUrl}/api/popular-stories`;
       
       console.log('📡 Fallback API URL:', fallbackUrl);
       
+      const fallbackController = new AbortController();
+      const fallbackTimeoutId = setTimeout(() => fallbackController.abort(), 3000);
+      
       response = await fetch(fallbackUrl, {
         method: 'GET',
+        signal: fallbackController.signal,
         headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0'
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
         }
       });
+      
+      clearTimeout(fallbackTimeoutId);
       
       console.log('📥 Fallback response status:', response.status);
       
@@ -273,28 +366,54 @@ class NewsDataService {
         
         // Return all stories in API order
         console.log('✅ Fresh Trending News (API Order):', allTransformedStories);
-        return allTransformedStories
+        
+        const filteredNews = allTransformedStories
           .filter(item => item.publishDate); // Ensure we have valid dates
+        
+        // Cache for 2 minutes
+        this.setCache(cacheKey, filteredNews, 120000);
+        
+        return filteredNews;
       }
       
       return [];
     } catch (error) {
       console.error('❌ Error fetching trending news:', error);
-      console.error('❌ Error details:', {
-        message: error.message,
-        stack: error.stack,
-        baseUrl: this.baseUrl
-      });
-      return this.getMockTrendingNews();
+      
+      // Check cache for fallback
+      const cacheKey = 'trending-news';
+      const cachedData = this.getFromCache(cacheKey);
+      if (cachedData) {
+        console.log('🔄 Using cached trending news as fallback');
+        return cachedData;
+      }
+      
+      // No mock data fallback - return empty array
+      console.log('❌ No cached data available, returning empty state');
+      return [];
     }
   }
 
   // Get fresh trending news with enhanced data selection
   async getFreshTrendingNews() {
     try {
-      // Add cache busting to ensure fresh data
-      const timestamp = Date.now();
-      const response = await fetch(`${this.baseUrl}/api/popular-stories?t=${timestamp}&fresh=true`);
+      // Check cache first
+      const cacheKey = 'fresh-trending-news';
+      const cachedData = this.getFromCache(cacheKey);
+      if (cachedData) {
+        console.log('⚡ Loading fresh trending news from cache');
+        return cachedData;
+      }
+      
+      // Reduced timeout for faster user feedback
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+      
+      const response = await fetch(`${this.baseUrl}/api/popular-stories`, {
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -309,31 +428,59 @@ class NewsDataService {
         
         // Return all stories in API order
         console.log('Enhanced Fresh Trending News (API Order):', allTransformedStories);
-        return allTransformedStories
+        
+        const filteredNews = allTransformedStories
           .filter(item => item.publishDate); // Ensure we have valid dates
+        
+        // Cache for 2 minutes
+        this.setCache(cacheKey, filteredNews, 120000);
+        
+        return filteredNews;
       }
       
       return [];
     } catch (error) {
       console.error('Error fetching fresh trending news:', error);
-      return this.getMockTrendingNews();
+      
+      // Check cache for fallback
+      const cacheKey = 'fresh-trending-news';
+      const cachedData = this.getFromCache(cacheKey);
+      if (cachedData) {
+        console.log('🔄 Using cached fresh trending news as fallback');
+        return cachedData;
+      }
+      
+      // No mock data fallback - return empty array
+      console.log('❌ No cached data available for fresh trending news');
+      return [];
     }
   }
 
   // Get different trending news sets for rotation
   async getTrendingNewsSet(setIndex = 0) {
     try {
-      // Force fresh data with aggressive cache busting
-      const timestamp = Date.now();
-      const randomParam = Math.random().toString(36).substring(7);
-      const response = await fetch(`${this.baseUrl}/api/popular-stories?t=${timestamp}&r=${randomParam}&set=${setIndex}&fresh=true`, {
+      // Check cache first
+      const cacheKey = `trending-news-set-${setIndex}`;
+      const cachedData = this.getFromCache(cacheKey);
+      if (cachedData) {
+        console.log('⚡ Loading trending news set from cache:', setIndex);
+        return cachedData;
+      }
+      
+      // Reduced timeout for faster user feedback
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+      
+      const response = await fetch(`${this.baseUrl}/api/popular-stories`, {
         method: 'GET',
+        signal: controller.signal,
         headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0'
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
         }
       });
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -348,29 +495,63 @@ class NewsDataService {
         
         // Return all stories in API order
         console.log(`Fresh Trending News Set ${setIndex} (API Order):`, allTransformedStories);
-        return allTransformedStories
+        
+        const filteredNews = allTransformedStories
           .filter(item => item.publishDate); // Ensure we have valid dates
+        
+        // Cache for 2 minutes
+        this.setCache(cacheKey, filteredNews, 120000);
+        
+        return filteredNews;
       }
       
       return [];
     } catch (error) {
       console.error(`Error fetching trending news set ${setIndex}:`, error);
-      return this.getMockTrendingNews();
+      
+      // Check cache for fallback
+      const cacheKey = `trending-news-set-${setIndex}`;
+      const cachedData = this.getFromCache(cacheKey);
+      if (cachedData) {
+        console.log('🔄 Using cached trending news set as fallback:', setIndex);
+        return cachedData;
+      }
+      
+      // No mock data fallback - return empty array
+      console.log('❌ No cached data available for trending news set:', setIndex);
+      return [];
     }
   }
 
   // Get news by category using section feed API
   async getNewsByCategory(category) {
     try {
+      // Check cache first
+      const cacheKey = `category-news-${category}`;
+      const cachedData = this.getFromCache(cacheKey);
+      if (cachedData) {
+        console.log('⚡ Loading category news from cache:', category);
+        return cachedData;
+      }
+      
       // Try override first (direct HT endpoint provided by you)
       const overrideUrl = SECTION_API_OVERRIDES[category];
       let response;
+      
+      // Reduced timeout for faster user feedback
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+      
       if (overrideUrl) {
-        response = await fetch(overrideUrl);
+        response = await fetch(overrideUrl, { signal: controller.signal });
       } else {
         // Default: use backend proxy which mirrors homepage pattern
-        response = await fetch(`${this.baseUrl}/api/section-feed/${encodeURIComponent(category)}/15`);
+        response = await fetch(`${this.baseUrl}/api/section-feed/${encodeURIComponent(category)}/15`, { 
+          signal: controller.signal 
+        });
       }
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -380,23 +561,56 @@ class NewsDataService {
       
       if (data.success && data.stories) {
         // Transform and return all stories in API order
-        return data.stories
+        const transformedNews = data.stories
           .map(item => this.transformNewsItem(item));
+        
+        // Cache for 2 minutes
+        this.setCache(cacheKey, transformedNews, 120000);
+        
+        return transformedNews;
       }
       
       return [];
     } catch (error) {
       console.error('Error fetching news by category from API:', error);
-      return this.getMockNewsByCategory(category);
+      
+      // Check cache for fallback
+      const cacheKey = `category-news-${category}`;
+      const cachedData = this.getFromCache(cacheKey);
+      if (cachedData) {
+        console.log('🔄 Using cached category news as fallback:', category);
+        return cachedData;
+      }
+      
+      // No mock data fallback - return empty array
+      console.log('❌ No cached data available for category:', category);
+      return [];
     }
   }
 
   // Generic section news fetcher with explicit limit
   async getSectionNews(sectionKey, limit = 15) {
     try {
+      // Check cache first
+      const cacheKey = `section-news-${sectionKey}-${limit}`;
+      const cachedData = this.getFromCache(cacheKey);
+      if (cachedData) {
+        console.log('⚡ Loading section news from cache:', sectionKey);
+        return cachedData;
+      }
+      
       const overrideUrl = SECTION_API_OVERRIDES[sectionKey];
+      
+      // Reduced timeout for faster user feedback
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+      
       // Always use backend proxy in dev/staging to normalize responses
-      let response = await fetch(`${this.baseUrl}/api/section-feed/${encodeURIComponent(sectionKey)}/${limit}`);
+      let response = await fetch(`${this.baseUrl}/api/section-feed/${encodeURIComponent(sectionKey)}/${limit}`, {
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -405,9 +619,11 @@ class NewsDataService {
       const data = await response.json();
       if (data.success && Array.isArray(data.stories)) {
         const transformed = data.stories.map(item => this.transformNewsItem(item));
+        let finalData = transformed;
+        
         if (this.shouldProxyImages) {
           // Rewrite images through proxy when backend is same origin
-          return transformed.map(n => ({
+          finalData = transformed.map(n => ({
             ...n,
             wallpaperLarge: n.wallpaperLarge ? `${this.baseUrl}/api/image?url=${encodeURIComponent(n.wallpaperLarge)}` : undefined,
             mediumRes: n.mediumRes ? `${this.baseUrl}/api/image?url=${encodeURIComponent(n.mediumRes)}` : undefined,
@@ -415,19 +631,42 @@ class NewsDataService {
             imageUrl: n.wallpaperLarge ? `${this.baseUrl}/api/image?url=${encodeURIComponent(n.wallpaperLarge)}` : (n.imageUrl ? `${this.baseUrl}/api/image?url=${encodeURIComponent(n.imageUrl)}` : undefined)
           }));
         }
-        return transformed;
+        
+        // Cache for 2 minutes
+        this.setCache(cacheKey, finalData, 120000);
+        
+        return finalData;
       }
       return [];
     } catch (error) {
       console.error('Error fetching section news:', sectionKey, error);
-      return this.getMockNewsByCategory(sectionKey);
+      
+      // Check cache for fallback
+      const cacheKey = `section-news-${sectionKey}-${limit}`;
+      const cachedData = this.getFromCache(cacheKey);
+      if (cachedData) {
+        console.log('🔄 Using cached section news as fallback:', sectionKey);
+        return cachedData;
+      }
+      
+      // No mock data fallback - return empty array
+      console.log('❌ No cached data available for section:', sectionKey);
+      return [];
     }
   }
 
   // Get category page news by combining Firestore (internal) + HT section feed (external)
   async getCategoryNews(sectionKey, limit = 15, internalKeyOverride) {
     try {
-      // Run both requests in parallel
+      // Check cache first
+      const cacheKey = `category-combined-${sectionKey}-${limit}`;
+      const cachedData = this.getFromCache(cacheKey);
+      if (cachedData) {
+        console.log('⚡ Loading combined category news from cache:', sectionKey);
+        return cachedData;
+      }
+      
+      // Run both requests in parallel with reduced timeouts
       const internalKey = internalKeyOverride || sectionKey;
       const [combinedResult, sectionStories] = await Promise.all([
         this.getCombinedNews(1, limit, internalKey),
@@ -457,17 +696,50 @@ class NewsDataService {
       const externalSorted = merged
         .filter(n => n.source !== 'internal')
         .sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate));
-      return [...internalSorted, ...externalSorted].slice(0, Math.max(limit, 15));
+      
+      const finalResult = [...internalSorted, ...externalSorted].slice(0, Math.max(limit, 15));
+      
+      // Cache for 2 minutes
+      this.setCache(cacheKey, finalResult, 120000);
+      
+      return finalResult;
     } catch (error) {
       console.error('Error fetching combined category news:', sectionKey, error);
-      return this.getMockNewsByCategory(sectionKey);
+      
+      // Check cache for fallback
+      const cacheKey = `category-combined-${sectionKey}-${limit}`;
+      const cachedData = this.getFromCache(cacheKey);
+      if (cachedData) {
+        console.log('🔄 Using cached combined category news as fallback:', sectionKey);
+        return cachedData;
+      }
+      
+      // No mock data fallback - return empty array
+      console.log('❌ No cached data available for combined category:', sectionKey);
+      return [];
     }
   }
 
   // Search news from popular stories
   async searchNews(query) {
     try {
-      const response = await fetch(`${this.baseUrl}/api/popular-stories`);
+      // Check cache first
+      const cacheKey = `search-${query.toLowerCase()}`;
+      const cachedData = this.getFromCache(cacheKey);
+      if (cachedData) {
+        console.log('⚡ Loading search results from cache:', query);
+        return cachedData;
+      }
+      
+      // Reduced timeout for faster user feedback
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+      
+      const response = await fetch(`${this.baseUrl}/api/popular-stories`, {
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -486,14 +758,30 @@ class NewsDataService {
         );
         
         // Transform and return all stories in API order
-        return searchResults
+        const transformedResults = searchResults
           .map(item => this.transformNewsItem(item));
+        
+        // Cache for 1 minute (shorter for search results)
+        this.setCache(cacheKey, transformedResults, 60000);
+        
+        return transformedResults;
       }
       
       return [];
     } catch (error) {
       console.error('Error searching news from API:', error);
-      return this.getMockSearchNews(query);
+      
+      // Check cache for fallback
+      const cacheKey = `search-${query.toLowerCase()}`;
+      const cachedData = this.getFromCache(cacheKey);
+      if (cachedData) {
+        console.log('🔄 Using cached search results as fallback:', query);
+        return cachedData;
+      }
+      
+      // No mock data fallback - return empty array
+      console.log('❌ No cached data available for search:', query);
+      return [];
     }
   }
 
@@ -526,8 +814,24 @@ class NewsDataService {
     try {
       console.log('🔍 Fetching detailed articles for section:', sectionName);
       
+      // Check cache first
+      const cacheKey = `detailed-article-${sectionName}-${numberOfStories}`;
+      const cachedData = this.getFromCache(cacheKey);
+      if (cachedData) {
+        console.log('⚡ Loading detailed articles from cache:', sectionName);
+        return cachedData;
+      }
+      
+      // Reduced timeout for faster user feedback
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+      
       // Use the backend section feed endpoint
-      const response = await fetch(`${this.baseUrl}/api/section-feed/${encodeURIComponent(sectionName)}/${numberOfStories}`);
+      const response = await fetch(`${this.baseUrl}/api/section-feed/${encodeURIComponent(sectionName)}/${numberOfStories}`, {
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -542,24 +846,30 @@ class NewsDataService {
         const sortedStories = transformedStories.sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate));
         
         console.log('✅ Transformed and sorted detailed articles:', sortedStories);
+        
+        // Cache for 2 minutes
+        this.setCache(cacheKey, sortedStories, 120000);
+        
         return sortedStories;
       } else {
         console.warn('⚠️ No stories found for section:', sectionName);
-        // Fallback to mock data instead of empty array
-        return this.getMockNewsByCategory(sectionName);
+        // No mock data fallback - return empty array
+        return [];
       }
     } catch (error) {
       console.error('❌ Error fetching detailed article:', error);
-      console.error('❌ Error details:', {
-        message: error.message,
-        sectionName,
-        numberOfStories,
-        baseUrl: this.baseUrl
-      });
       
-      // Fallback to mock data instead of throwing error
-      console.log('🔄 Falling back to mock data for section:', sectionName);
-      return this.getMockNewsByCategory(sectionName);
+      // Check cache for fallback
+      const cacheKey = `detailed-article-${sectionName}-${numberOfStories}`;
+      const cachedData = this.getFromCache(cacheKey);
+      if (cachedData) {
+        console.log('🔄 Using cached detailed articles as fallback:', sectionName);
+        return cachedData;
+      }
+      
+      // No mock data fallback - return empty array
+      console.log('❌ No cached data available for detailed articles:', sectionName);
+      return [];
     }
   }
 
@@ -604,64 +914,25 @@ class NewsDataService {
     return transformed;
   }
 
-  // Fallback mock data methods
+  // Mock data methods removed - returning empty arrays for better performance
   getMockFeaturedNews() {
-    // Return more mock stories to match our increased limits
-    const allMockNews = [...mockNewsData.featuredNews, ...mockNewsData.trendingNews];
-    return allMockNews;
+    console.log('❌ Mock data disabled - returning empty array');
+    return [];
   }
 
   getMockTrendingNews() {
-    // Return more mock stories to match our increased limits
-    const allMockNews = [...mockNewsData.featuredNews, ...mockNewsData.trendingNews];
-    return allMockNews.slice(0, 12); // Return 12 trending stories
+    console.log('❌ Mock data disabled - returning empty array');
+    return [];
   }
 
   getMockNewsByCategory(category) {
-    console.log('🔄 Getting mock news for category:', category);
-    
-    const allNews = [...mockNewsData.featuredNews, ...mockNewsData.trendingNews];
-    
-    // First try to find exact category match
-    let filteredNews = allNews.filter(news => 
-      news.category && news.category.toLowerCase().includes(category.toLowerCase())
-    );
-    
-    // If no exact match, return all news (fallback)
-    if (filteredNews.length === 0) {
-      console.log('⚠️ No exact category match found, returning all mock news as fallback');
-      filteredNews = allNews;
-    }
-    
-    // Ensure we have at least some news
-    if (filteredNews.length === 0) {
-      console.log('⚠️ No mock news available, creating default news');
-      filteredNews = [
-        {
-          id: 'fallback-1',
-          imageUrl: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=400&fit=crop',
-          title: `${category} সম্পর্কিত খবর`,
-          subtitle: 'এই বিভাগের জন্য খবর লোড হচ্ছে',
-          excerpt: 'আপনার নির্বাচিত বিভাগের জন্য খবর লোড হচ্ছে। কিছুক্ষণ অপেক্ষা করুন।',
-          publishDate: new Date().toISOString(),
-          category: category,
-          author: 'সিস্টেম',
-          readTime: 3
-        }
-      ];
-    }
-    
-    console.log(`✅ Returning ${filteredNews.length} mock news items for category: ${category}`);
-    return filteredNews;
+    console.log('❌ Mock data disabled for category:', category);
+    return [];
   }
 
   getMockSearchNews(query) {
-    const allNews = [...mockNewsData.featuredNews, ...mockNewsData.trendingNews];
-    return allNews.filter(news => 
-      news.title.toLowerCase().includes(query.toLowerCase()) ||
-      news.excerpt?.toLowerCase().includes(query.toLowerCase()) ||
-      news.category?.toLowerCase().includes(query.toLowerCase())
-    );
+    console.log('❌ Mock data disabled for search:', query);
+    return [];
   }
 
   // Force refresh all news data with aggressive cache busting
@@ -717,9 +988,17 @@ class NewsDataService {
   }
 
   // Get combined news (Firestore + external) from backend
-  async getCombinedNews(page = 1, limit = 20, category = null) {
+  async getCombinedNews(page = 1, limit = 20, category = null, rotationOffset = 0) {
     try {
       console.log('📡 Fetching combined news from backend...');
+      
+      // Check cache first for immediate loading
+      const cacheKey = `combined-news-${page}-${limit}-${category || 'all'}-${rotationOffset}`;
+      const cachedData = this.getFromCache(cacheKey);
+      if (cachedData) {
+        console.log('⚡ Loading from cache:', cacheKey);
+        return cachedData;
+      }
       
       // Use the proxy URL format
       let url = `${this.baseUrl}/api/combined-news?page=${page}&limit=${limit}`;
@@ -729,12 +1008,16 @@ class NewsDataService {
       
       console.log('🌐 Fetching from URL:', url);
       
-      // Add timeout to prevent hanging
+      // Reduced timeout for faster user feedback
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
       
       const response = await fetch(url, {
-        signal: controller.signal
+        signal: controller.signal,
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
       });
       
       clearTimeout(timeoutId);
@@ -748,7 +1031,7 @@ class NewsDataService {
       
       if (result.success && result.data) {
         // Transform the combined news to match our frontend format
-        const transformedNews = result.data.map(item => {
+        let transformedNews = result.data.map(item => {
           if (item.source === 'internal') {
             // Firestore news - already in correct format
             return {
@@ -763,13 +1046,29 @@ class NewsDataService {
           }
         });
         
+        // Apply rotation offset if specified
+        if (rotationOffset > 0 && transformedNews.length > 0) {
+          const rotatedNews = [...transformedNews];
+          const offset = rotationOffset % rotatedNews.length;
+          transformedNews = [
+            ...rotatedNews.slice(offset),
+            ...rotatedNews.slice(0, offset)
+          ];
+          console.log(`🔄 Applied rotation offset ${offset} to ${transformedNews.length} articles`);
+        }
+        
         console.log('🔄 Transformed news:', transformedNews.length, 'articles');
         
-        return {
+        const responseData = {
           news: transformedNews,
           pagination: result.pagination,
           sources: result.sources
         };
+        
+        // Cache the response for 2 minutes
+        this.setCache(cacheKey, responseData, 120000);
+        
+        return responseData;
       }
       
       return {
@@ -780,17 +1079,18 @@ class NewsDataService {
     } catch (error) {
       console.error('❌ Error fetching combined news:', error);
       
-      // Check if it's a timeout or network error
-      if (error.name === 'AbortError') {
-        console.log('⏰ Request timed out, falling back to mock data...');
-      } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-        console.log('🌐 Network error, falling back to mock data...');
+      // Check cache for fallback data
+      const cacheKey = `combined-news-${page}-${limit}-${category || 'all'}-${rotationOffset}`;
+      const cachedData = this.getFromCache(cacheKey);
+      if (cachedData) {
+        console.log('🔄 Using cached data as fallback');
+        return cachedData;
       }
       
-      // Fallback to mock data to avoid infinite loop
-      console.log('🔄 Falling back to mock data due to error...');
+      // No mock data fallback - return empty state
+      console.log('❌ No cached data available, returning empty state');
       return {
-        news: this.getMockFeaturedNews(),
+        news: [],
         pagination: { currentPage: 1, totalPages: 1, totalItems: 0 },
         sources: { firestore: 0, external: 0, total: 0 }
       };

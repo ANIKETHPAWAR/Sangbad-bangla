@@ -39,11 +39,8 @@ const Navigation = ({
     { id: 'bengal-face', name: 'বাংলার মুখ', path: '/bengal-face', icon: '🏛️' },
     { id: 'astrology', name: 'ভাগ্যলিপি', path: '/astrology', icon: '🔮' },
     { id: 'football', name: 'ফুটবলের মহারণ', path: '/football', icon: '⚽' },
-    { id: 'bioscope', name: 'বায়োস্কোপ', path: '/bioscope', icon: '🎬' },
     { id: 'photo-gallery', name: 'ছবিঘর', path: '/photo-gallery', icon: '📸' },
-    { id: 'kolkata', name: 'কলকাতা', path: '/kolkata', icon: '🏙️' },
     { id: 'careers', name: 'কর্মখালি', path: '/careers', icon: '💼' },
-    { id: 'web-stories', name: 'ওয়েবস্টোরি', path: '/web-stories', icon: '📱' },
     { id: 'lifestyle', name: 'টুকিটাকি', path: '/lifestyle', icon: '💄' }
   ];
 
