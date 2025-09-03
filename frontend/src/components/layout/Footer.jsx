@@ -27,15 +27,13 @@ const Footer = () => {
       title: 'ক্রিকেট',
       links: [
         { label: 'লাইভ ক্রিকেট স্কোর', to: '/cricket' },
-        { label: 'আইপিএলের সূচি', to: '/cricket' },
-        { label: 'পয়েন্ট তালিকা', to: '/cricket' }
+        
       ]
     },
     {
       title: 'ভাগ্যলিপি',
       links: [
-        { label: 'রাশিফল', to: '/astrology' },
-        { label: 'উৎসব সূচি', to: '/astrology' }
+        { label: 'রাশিফল', to: '/astrology' }
       ]
     }
   ];
