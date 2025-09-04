@@ -3,10 +3,26 @@ import { Link } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import { FiChevronRight, FiUser, FiLogOut } from 'react-icons/fi';
 import LoginButton from '../LoginButton';
+import AuthWrapper from '../AuthWrapper';
 import './Sidebar.css';
 
 const Sidebar = ({ isOpen, onClose }) => {
-  const { user, isAuthenticated, logout } = useAuth0();
+  return (
+    <AuthWrapper>
+      {({ user, isAuthenticated, logout }) => (
+        <SidebarContent 
+          user={user} 
+          isAuthenticated={isAuthenticated} 
+          logout={logout}
+          isOpen={isOpen} 
+          onClose={onClose} 
+        />
+      )}
+    </AuthWrapper>
+  );
+};
+
+const SidebarContent = ({ user, isAuthenticated, logout, isOpen, onClose }) => {
 
   const handleLogout = () => {
     logout({ logoutParams: { returnTo: window.location.origin } });
