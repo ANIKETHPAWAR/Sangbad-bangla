@@ -25,6 +25,31 @@
   margin-top: 0.5rem; /* Reduced from 1rem */
 }
 
+/* iPhone specific fixes */
+@media only screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) {
+  .main-content {
+    margin-top: 80px;
+    padding-top: 0;
+  }
+  
+  .news-container {
+    margin-top: 20px;
+    padding-top: 0;
+  }
+}
+
+@media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) {
+  .main-content {
+    margin-top: 90px;
+    padding-top: 0;
+  }
+  
+  .news-container {
+    margin-top: 20px;
+    padding-top: 0;
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .main-content {

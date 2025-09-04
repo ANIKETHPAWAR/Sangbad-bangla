@@ -8,6 +8,10 @@
   right: 0;
   z-index: 1000;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .container {
@@ -405,6 +409,36 @@
   
   .search-submit {
     padding: 8px 12px;
+  }
+}
+
+/* iPhone specific fixes */
+@media only screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) {
+  .top-bar {
+    min-height: 60px;
+    padding: 8px 0;
+  }
+  
+  .logo-image {
+    height: 50px;
+    max-width: 200px;
+  }
+  
+  .header-center {
+    margin: 0 5px;
+  }
+  
+  .action-btn {
+    width: 28px;
+    height: 28px;
+    padding: 4px;
+    font-size: 14px;
+  }
+  
+  .menu-btn {
+    width: 28px;
+    height: 28px;
+    padding: 4px;
   }
 }
 

@@ -29,6 +29,13 @@ html {
   font-family: 'Noto Sans Bengali', 'Hind Siliguri', 'SolaimanLipi', Arial, sans-serif;
   line-height: 1.15;
   -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 body {
@@ -40,6 +47,9 @@ body {
   background-color: #f8f9fa;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-overflow-scrolling: touch;
+  overflow-x: hidden;
+  position: relative;
 }
 
 code {
@@ -118,6 +128,32 @@ code {
     --color-border: #000000;
     --color-text: #000000;
     --color-text-light: #333333;
+  }
+}
+
+/* iPhone Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+  /* iPhone Safari specific styles */
+  .header {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+  
+  .main-content {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+  
+  .news-container {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Fix for iPhone Safari viewport issues */
+@supports (padding: max(0px)) {
+  .main-content {
+    padding-top: max(20px, env(safe-area-inset-top));
   }
 }
 
