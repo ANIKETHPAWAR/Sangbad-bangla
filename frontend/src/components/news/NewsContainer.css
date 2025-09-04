@@ -285,6 +285,53 @@
   font-style: italic;
 }
 
+/* iPhone specific fixes */
+@media only screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) {
+  .news-container {
+    padding: 0.75rem;
+    gap: 1rem;
+    margin-top: 20px;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+  
+  .section-header {
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 0.75rem 0;
+    position: relative !important;
+    z-index: 100 !important;
+  }
+  
+  .featured-news-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+@media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) {
+  .news-container {
+    padding: 1rem;
+    gap: 1.25rem;
+    margin-top: 25px;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+  
+  .section-header {
+    margin-top: 1.25rem;
+    margin-bottom: 1.75rem;
+    padding: 1rem 0;
+    position: relative !important;
+    z-index: 100 !important;
+  }
+  
+  .featured-news-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+}
+
 /* Responsive Design */
 /* Tablet breakpoint - handle screens between 768px and 1200px */
 @media (min-width: 769px) and (max-width: 1200px) {

@@ -410,14 +410,7 @@ app.use('*', (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`=== Bengali News API Server ===`);
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📰 Using: personalize.hindustantimes.com/popular-story`);
-  console.log(`🔐 Admin Panel: http://localhost:${PORT}/api/admin`);
-  console.log(`📊 Combined News: http://localhost:${PORT}/api/combined-news`);
-  console.log(` Health check: http://localhost:${PORT}/health`);
-  console.log(`🧪 Test endpoint: http://localhost:${PORT}/test`);
-  console.log(`===============================`);
+ console.log('server running')
 });
 
 module.exports = app;
