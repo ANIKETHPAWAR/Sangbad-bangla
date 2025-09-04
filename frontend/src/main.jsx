@@ -78,30 +78,58 @@ if (isIphoneSafari()) {
   document.addEventListener('touchmove', function() {}, { passive: true });
 }
 
-try {
-  createRoot(document.getElementById('root')).render(
-    <StrictMode>
-      <ErrorBoundary>
-        <Auth0Provider
-          domain={import.meta.env.VITE_AUTH0_DOMAIN}
-          clientId={import.meta.env.VITE_AUTH0_CLIENT_ID}
-          authorizationParams={{
-            redirect_uri: window.location.origin
-          }}
-        >
+// Check if environment variables are available
+const auth0Domain = import.meta.env.VITE_AUTH0_DOMAIN;
+const auth0ClientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
+
+// If Auth0 is not configured, render app without Auth0
+if (!auth0Domain || !auth0ClientId) {
+  console.warn('Auth0 not configured, running without authentication');
+  try {
+    createRoot(document.getElementById('root')).render(
+      <StrictMode>
+        <ErrorBoundary>
           <App />
-        </Auth0Provider>
-      </ErrorBoundary>
-    </StrictMode>,
-  )
-} catch (error) {
-  console.error('Failed to render app:', error);
-  // Fallback rendering
-  document.getElementById('root').innerHTML = `
-    <div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;">
-      <h1>Loading Error</h1>
-      <p>Please refresh the page or try again later.</p>
-      <button onclick="window.location.reload()">Refresh</button>
-    </div>
-  `;
+        </ErrorBoundary>
+      </StrictMode>,
+    )
+  } catch (error) {
+    console.error('Failed to render app:', error);
+    // Fallback rendering
+    document.getElementById('root').innerHTML = `
+      <div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;">
+        <h1>Loading Error</h1>
+        <p>Please refresh the page or try again later.</p>
+        <button onclick="window.location.reload()">Refresh</button>
+      </div>
+    `;
+  }
+} else {
+  try {
+    createRoot(document.getElementById('root')).render(
+      <StrictMode>
+        <ErrorBoundary>
+          <Auth0Provider
+            domain={auth0Domain}
+            clientId={auth0ClientId}
+            authorizationParams={{
+              redirect_uri: window.location.origin
+            }}
+          >
+            <App />
+          </Auth0Provider>
+        </ErrorBoundary>
+      </StrictMode>,
+    )
+  } catch (error) {
+    console.error('Failed to render app:', error);
+    // Fallback rendering
+    document.getElementById('root').innerHTML = `
+      <div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;">
+        <h1>Loading Error</h1>
+        <p>Please refresh the page or try again later.</p>
+        <button onclick="window.location.reload()">Refresh</button>
+      </div>
+    `;
+  }
 }
