@@ -4,7 +4,7 @@ import { getToken, onMessage } from 'firebase/messaging';
 
 const useNotifications = () => {
   const [token, setToken] = useState(null);
-  const [permission, setPermission] = useState(Notification.permission);
+  const [permission, setPermission] = useState('default');
   const [isSupported, setIsSupported] = useState(false);
   const [error, setError] = useState(null);
 
@@ -13,8 +13,10 @@ const useNotifications = () => {
     const checkSupport = () => {
       if ('Notification' in window && 'serviceWorker' in navigator && messaging) {
         setIsSupported(true);
+        setPermission(Notification.permission);
       } else {
         setIsSupported(false);
+        setPermission('denied');
         setError('Notifications not supported in this browser');
       }
     };
@@ -30,14 +32,19 @@ const useNotifications = () => {
     }
 
     try {
-      const permission = await Notification.requestPermission();
-      setPermission(permission);
-      
-      if (permission === 'granted') {
-        await getFCMToken();
-        return true;
+      if ('Notification' in window) {
+        const permission = await Notification.requestPermission();
+        setPermission(permission);
+        
+        if (permission === 'granted') {
+          await getFCMToken();
+          return true;
+        } else {
+          setError('Notification permission denied');
+          return false;
+        }
       } else {
-        setError('Notification permission denied');
+        setError('Notification API not available');
         return false;
       }
     } catch (err) {
@@ -122,7 +129,7 @@ const useNotifications = () => {
 
     const unsubscribe = onMessage(messaging, (payload) => {
       // Show notification manually for foreground messages
-      if (Notification.permission === 'granted') {
+      if ('Notification' in window && Notification.permission === 'granted') {
         const notification = new Notification(payload.notification?.title || 'নতুন খবর', {
           body: payload.notification?.body || 'ক্লিক করে পড়ুন',
           icon: payload.notification?.icon || '/vite.svg',
