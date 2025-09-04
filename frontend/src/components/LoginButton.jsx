@@ -3,28 +3,24 @@ import React from "react";
 import "./LoginButton.css";
 
 const LoginButton = () => {
+  // Safe Auth0 hook usage with fallback
+  let loginWithRedirect = () => console.log('Auth0 not configured');
+  
   try {
-    const { loginWithRedirect } = useAuth0();
-
-    return (
-      <button 
-        className="login-button"
-        onClick={() => loginWithRedirect()}
-      >
-        Sign In
-      </button>
-    );
+    const auth0 = useAuth0();
+    loginWithRedirect = auth0.loginWithRedirect;
   } catch (error) {
-    // Fallback when Auth0 is not available
-    return (
-      <button 
-        className="login-button"
-        onClick={() => console.log('Auth0 not configured')}
-      >
-        Sign In
-      </button>
-    );
+    console.warn('Auth0 not available in LoginButton:', error);
   }
+
+  return (
+    <button 
+      className="login-button"
+      onClick={() => loginWithRedirect()}
+    >
+      Sign In
+    </button>
+  );
 };
 
 export default LoginButton;
