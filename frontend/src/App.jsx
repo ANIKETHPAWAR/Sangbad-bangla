@@ -64,6 +64,37 @@ function ScrollToTop() {
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  // iPhone Safari loading fix
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 100);
+
+    // iPhone Safari specific fixes
+    if (/iPhone/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent)) {
+      // Force reflow to fix rendering issues
+      document.body.offsetHeight;
+      
+      // Fix for iPhone Safari viewport
+      const setVH = () => {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+      };
+      
+      setVH();
+      window.addEventListener('resize', setVH);
+      window.addEventListener('orientationchange', setVH);
+      
+      return () => {
+        window.removeEventListener('resize', setVH);
+        window.removeEventListener('orientationchange', setVH);
+      };
+    }
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -72,6 +103,33 @@ function App() {
   const closeSidebar = () => {
     setIsSidebarOpen(false);
   };
+
+  // Show loading screen for iPhone Safari
+  if (isLoading) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        backgroundColor: '#f8f9fa',
+        fontFamily: 'Arial, sans-serif'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            border: '4px solid #f3f3f3',
+            borderTop: '4px solid #007bff',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 20px'
+          }}></div>
+          <p style={{ color: '#666' }}>Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Router>

@@ -157,6 +157,33 @@ code {
   }
 }
 
+/* iPhone Safari viewport height fix */
+:root {
+  --vh: 1vh;
+}
+
+.App {
+  min-height: 100vh;
+  min-height: calc(var(--vh, 1vh) * 100);
+}
+
+/* iPhone Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+  .App {
+    min-height: -webkit-fill-available;
+  }
+  
+  html, body {
+    height: -webkit-fill-available;
+  }
+}
+
+/* Loading animation for iPhone Safari */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 /* Ensure proper rendering of Bengali characters */
 @font-face {
   font-family: 'Noto Sans Bengali';
