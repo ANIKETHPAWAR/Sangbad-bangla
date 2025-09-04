@@ -9,7 +9,7 @@ import { Auth0Provider } from '@auth0/auth0-react';
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { hasError: false, error: null, errorInfo: null };
   }
 
   static getDerivedStateFromError(error) {
@@ -17,7 +17,9 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('App Error:', error, errorInfo);
+    console.error('App Error:', error);
+    console.error('Error Info:', errorInfo);
+    this.setState({ errorInfo });
   }
 
   render() {
@@ -36,6 +38,9 @@ class ErrorBoundary extends React.Component {
         }}>
           <h1 style={{ color: '#dc3545', marginBottom: '20px' }}>Something went wrong</h1>
           <p style={{ color: '#666', marginBottom: '20px' }}>
+            Error: {this.state.error?.message || 'Unknown error'}
+          </p>
+          <p style={{ color: '#666', marginBottom: '20px', fontSize: '12px' }}>
             Please refresh the page or try again later.
           </p>
           <button 
@@ -82,54 +87,34 @@ if (isIphoneSafari()) {
 const auth0Domain = import.meta.env.VITE_AUTH0_DOMAIN;
 const auth0ClientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
 
-// If Auth0 is not configured, render app without Auth0
-if (!auth0Domain || !auth0ClientId) {
-  console.warn('Auth0 not configured, running without authentication');
-  try {
-    createRoot(document.getElementById('root')).render(
-      <StrictMode>
-        <ErrorBoundary>
+// Always render with Auth0Provider, but with fallback values if not configured
+const domain = auth0Domain || 'dummy.auth0.com';
+const clientId = auth0ClientId || 'dummy-client-id';
+
+try {
+  createRoot(document.getElementById('root')).render(
+    <StrictMode>
+      <ErrorBoundary>
+        <Auth0Provider
+          domain={domain}
+          clientId={clientId}
+          authorizationParams={{
+            redirect_uri: window.location.origin
+          }}
+        >
           <App />
-        </ErrorBoundary>
-      </StrictMode>,
-    )
-  } catch (error) {
-    console.error('Failed to render app:', error);
-    // Fallback rendering
-    document.getElementById('root').innerHTML = `
-      <div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;">
-        <h1>Loading Error</h1>
-        <p>Please refresh the page or try again later.</p>
-        <button onclick="window.location.reload()">Refresh</button>
-      </div>
-    `;
-  }
-} else {
-  try {
-    createRoot(document.getElementById('root')).render(
-      <StrictMode>
-        <ErrorBoundary>
-          <Auth0Provider
-            domain={auth0Domain}
-            clientId={auth0ClientId}
-            authorizationParams={{
-              redirect_uri: window.location.origin
-            }}
-          >
-            <App />
-          </Auth0Provider>
-        </ErrorBoundary>
-      </StrictMode>,
-    )
-  } catch (error) {
-    console.error('Failed to render app:', error);
-    // Fallback rendering
-    document.getElementById('root').innerHTML = `
-      <div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;">
-        <h1>Loading Error</h1>
-        <p>Please refresh the page or try again later.</p>
-        <button onclick="window.location.reload()">Refresh</button>
-      </div>
-    `;
-  }
+        </Auth0Provider>
+      </ErrorBoundary>
+    </StrictMode>,
+  )
+} catch (error) {
+  console.error('Failed to render app:', error);
+  // Fallback rendering
+  document.getElementById('root').innerHTML = `
+    <div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;">
+      <h1>Loading Error</h1>
+      <p>Please refresh the page or try again later.</p>
+      <button onclick="window.location.reload()">Refresh</button>
+    </div>
+  `;
 }

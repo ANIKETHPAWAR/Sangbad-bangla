@@ -3,26 +3,22 @@ import { Link } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import { FiChevronRight, FiUser, FiLogOut } from 'react-icons/fi';
 import LoginButton from '../LoginButton';
-import AuthWrapper from '../AuthWrapper';
 import './Sidebar.css';
 
 const Sidebar = ({ isOpen, onClose }) => {
-  return (
-    <AuthWrapper>
-      {({ user, isAuthenticated, logout }) => (
-        <SidebarContent 
-          user={user} 
-          isAuthenticated={isAuthenticated} 
-          logout={logout}
-          isOpen={isOpen} 
-          onClose={onClose} 
-        />
-      )}
-    </AuthWrapper>
-  );
-};
-
-const SidebarContent = ({ user, isAuthenticated, logout, isOpen, onClose }) => {
+  // Safe Auth0 hook usage with fallback
+  let user = null;
+  let isAuthenticated = false;
+  let logout = () => console.log('Auth0 not configured');
+  
+  try {
+    const auth0 = useAuth0();
+    user = auth0.user;
+    isAuthenticated = auth0.isAuthenticated;
+    logout = auth0.logout;
+  } catch (error) {
+    console.warn('Auth0 not available in Sidebar:', error);
+  }
 
   const handleLogout = () => {
     logout({ logoutParams: { returnTo: window.location.origin } });

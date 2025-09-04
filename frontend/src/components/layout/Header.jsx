@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FiFacebook, FiMenu, FiChevronDown, FiUserX,FiInstagram  } from 'react-icons/fi';
-import AuthWrapper from '../AuthWrapper';
+import { useAuth0 } from '@auth0/auth0-react';
 import LoginButton from '../LoginButton';
 import LogoutButton from '../LogoutButton';
 import logo from '../../assets/logo-3.jpg';
@@ -10,20 +10,17 @@ import X from '../../assets/X-icon.svg';
 import YT from '../../assets/icons8-youtube.svg';
 
 const Header = ({ onMenuClick }) => {
-  return (
-    <AuthWrapper>
-      {({ user, isAuthenticated }) => (
-        <HeaderContent 
-          user={user} 
-          isAuthenticated={isAuthenticated} 
-          onMenuClick={onMenuClick} 
-        />
-      )}
-    </AuthWrapper>
-  );
-};
-
-const HeaderContent = ({ user, isAuthenticated, onMenuClick }) => {
+  // Safe Auth0 hook usage with fallback
+  let user = null;
+  let isAuthenticated = false;
+  
+  try {
+    const auth0 = useAuth0();
+    user = auth0.user;
+    isAuthenticated = auth0.isAuthenticated;
+  } catch (error) {
+    console.warn('Auth0 not available in Header:', error);
+  }
   const [currentDate, setCurrentDate] = useState('');
 
   // Update current date

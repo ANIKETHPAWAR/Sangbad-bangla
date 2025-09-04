@@ -68,12 +68,16 @@ function App() {
 
   // iPhone Safari loading fix
   React.useEffect(() => {
+    console.log('App useEffect running');
+    
     const timer = setTimeout(() => {
+      console.log('Setting loading to false');
       setIsLoading(false);
     }, 100);
 
     // iPhone Safari specific fixes
     if (/iPhone/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent)) {
+      console.log('iPhone Safari detected, applying fixes');
       // Force reflow to fix rendering issues
       document.body.offsetHeight;
       
@@ -103,6 +107,8 @@ function App() {
   const closeSidebar = () => {
     setIsSidebarOpen(false);
   };
+
+  console.log('App rendering, isLoading:', isLoading);
 
   // Show loading screen for iPhone Safari
   if (isLoading) {
