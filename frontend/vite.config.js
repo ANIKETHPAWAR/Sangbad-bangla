@@ -5,8 +5,8 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   build: {
-    // Production optimizations
-    target: 'es2015',
+    // Production optimizations - iPhone Safari compatibility
+    target: ['es2015', 'safari11'],
     minify: 'esbuild', // Changed from 'terser' to 'esbuild' for better reliability
     cssMinify: true,
     rollupOptions: {
