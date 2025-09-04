@@ -384,14 +384,14 @@ export const useNewsNotifications = () => {
 
   // Check permission status
   useEffect(() => {
-    if (isSupported) {
+    if (isSupported && 'Notification' in window) {
       setPermission(Notification.permission);
     }
   }, [isSupported]);
 
   // Request permission
   const requestPermission = useCallback(async () => {
-    if (!isSupported) {
+    if (!isSupported || !('Notification' in window)) {
       throw new Error('Notifications not supported');
     }
 
@@ -408,7 +408,7 @@ export const useNewsNotifications = () => {
 
   // Show notification
   const showNotification = useCallback((title, options = {}) => {
-    if (!isSupported || permission !== 'granted') {
+    if (!isSupported || permission !== 'granted' || !('Notification' in window)) {
       return null;
     }
 
