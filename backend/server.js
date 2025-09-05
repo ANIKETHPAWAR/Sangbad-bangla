@@ -96,9 +96,12 @@ function validateAndFormatDate(dateString) {
 // Middleware
 const corsOptions = {
   origin: [
-    'https://sangbadbangla.vercel.app', // Your Vercel frontend
+    'https://sangbadbangla.news', // Your custom domain
+    'https://www.sangbadbangla.news', // Your custom domain with www
+    'https://sangbadbangla.vercel.app', // Your Vercel frontend (keep as fallback)
     'http://localhost:3000', // Local development
     'http://localhost:5173'  // Vite dev server
+    
   ],
   credentials: true,
   optionsSuccessStatus: 200

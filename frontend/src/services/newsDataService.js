@@ -494,7 +494,7 @@ class NewsDataService {
           .map(item => this.transformNewsItem(item));
         
         // Return all stories in API order
-        console.log(`Fresh Trending News Set ${setIndex} (API Order):`, allTransformedStories);
+        
         
         const filteredNews = allTransformedStories
           .filter(item => item.publishDate); // Ensure we have valid dates
@@ -517,8 +517,7 @@ class NewsDataService {
         return cachedData;
       }
       
-      // No mock data fallback - return empty array
-      console.log('❌ No cached data available for trending news set:', setIndex);
+      
       return [];
     }
   }
