@@ -29,20 +29,20 @@ import TempLogin from './components/admin/TempLogin';
 import Advertise from './pages/Advertise';
 import StaticPage from './pages/StaticPage';
 import { staticPages } from './pages/static/content';
+import CricketMatchesWidget from './components/cricket/CricketMatchesWidget';
 
 
 // Simple Cricket News Page Component
 const CricketNewsPage = () => {
   return (
     <div className="cricket-news-page">
-      <div className="page-header">
-        <h1>ক্রিকেট আপডেট</h1>
-        <p>সর্বশেষ ক্রিকেট খবর এবং স্কোর</p>
-      </div>
+        <div style={{ backgroundColor: '#000', color: '#fff', borderRadius: '8px', padding: '12px 16px', marginBottom: '4px', textAlign: 'center' }}>
+            <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700 }}>ক্রিকেটের সবকিছু এক জায়গায়</h2>
+          </div>
       <div className="page-content">
-        <div className="main-content">
-          <div className="cricket-info">
-            <p>ক্রিকেট বিভাগটি আপডেট হচ্ছে। শীঘ্রই নতুন ফিচার আসছে!</p>
+        <div className="cricket-main" style={{ paddingTop: 15 }}>
+          <div style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
+            <CricketMatchesWidget />
           </div>
         </div>
         <TrendingNewsSidebar />
