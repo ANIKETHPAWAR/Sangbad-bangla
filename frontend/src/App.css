@@ -59,8 +59,9 @@
 
 @media (max-width: 480px) {
   .main-content {
-    margin-top: 0; /* Reset margin for mobile */
-    padding-top: 0; /* Reset padding for mobile */
+    /* Ensure content doesn't slide under the fixed header on narrow screens */
+    margin-top: 90px;
+    padding-top: 0;
   }
   
   /* Ensure section headers are visible on mobile by pushing content down */
@@ -122,6 +123,15 @@
   background: white;
   border-radius: 12px;
   padding: 2rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+}
+
+/* Variant for cricket page to collapse space at the top */
+.cricket-main {
+  background: white;
+  border-radius: 12px;
+  padding: 5px; /* remove inner padding so title and widget sit closer */
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   border: 1px solid #e9ecef;
 }
