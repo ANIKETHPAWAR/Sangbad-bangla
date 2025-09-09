@@ -18,7 +18,7 @@ import SignIn from './pages/SignIn';
 import NewsContainer from './components/news/NewsContainer';
 import ArticlePage from './components/news/ArticlePage';
 import ArticleDetailPage from './components/news/ArticleDetailPage';
-import TrendingNewsSidebar from './components/news/TrendingNewsSidebar';
+// Removed direct TrendingNewsSidebar import; CategoryNewsPage includes it
 import CategoryNewsPage from './components/news/CategoryNewsPage';
 
 // Admin Components
@@ -34,19 +34,29 @@ import CricketMatchesWidget from './components/cricket/CricketMatchesWidget';
 
 // Simple Cricket News Page Component
 const CricketNewsPage = () => {
+  const [mountWidget, setMountWidget] = React.useState(false);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    // Defer widget mount slightly to avoid Brave quirks during initial render
+    const timer = setTimeout(() => {
+      if (!cancelled) setMountWidget(true);
+    }, 250);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, []);
+
   return (
     <div className="cricket-news-page">
-        <div style={{ backgroundColor: '#000', color: '#fff', borderRadius: '8px', padding: '12px 16px', marginBottom: '4px', textAlign: 'center' }}>
-            <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700 }}>ক্রিকেটের সবকিছু এক জায়গায়</h2>
-          </div>
-      <div className="page-content">
-        <div className="cricket-main" style={{ paddingTop: 15 }}>
-          <div style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
-            <CricketMatchesWidget />
-          </div>
-        </div>
-        <TrendingNewsSidebar />
+      <div style={{ backgroundColor: '#000', color: '#fff', borderRadius: '8px', padding: '12px 16px', marginBottom: '4px', textAlign: 'center' }}>
+        <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700 }}>ক্রিকেটের সবকিছু এক জায়গায়</h2>
       </div>
+      <div className="cricket-main" style={{ paddingTop: 15 }}>
+        <div style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
+          {mountWidget && <CricketMatchesWidget />}
+        </div>
+      </div>
+      {/* Category layout with combined news (internal + external) and trending sidebar */}
+      <CategoryNewsPage sectionKey="cricket" title="ক্রিকেট" subtitle="ক্রিকেটের সর্বশেষ খবর" />
     </div>
   );
 };

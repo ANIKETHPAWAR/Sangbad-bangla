@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { FiArrowRight } from 'react-icons/fi';
 import './NewsCard.css';
 
@@ -55,6 +55,7 @@ const NewsCard = ({
   source // Added source prop
 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Build image candidates preferring wallpaperLarge from API
   const imageCandidates = useMemo(() => {
@@ -144,9 +145,21 @@ const NewsCard = ({
       return;
     }
     
-    // For external news (Hindustan Times), use section navigation
+    // Special case: On cricket page, open external website URL directly
+    if (location && location.pathname === '/cricket') {
+      const targetUrl = websiteUrl ;
+      if (targetUrl) {
+        try {
+          window.open(targetUrl, '_blank', 'noopener,noreferrer');
+        } catch (_) {
+          window.location.assign(targetUrl);
+        }
+        return;
+      }
+    }
+
+    // Default behavior for external news on other pages: navigate to section list
     const sectionToUse = sectionName && sectionName.trim() !== '' ? sectionName : category;
-    
     if (sectionToUse && sectionToUse.trim() !== '') {
       navigate(`/section/${sectionToUse}/10`);
     } else {

@@ -86,6 +86,20 @@ export default defineConfig({
         }
       }
       // Removed catch-all proxy since we're using production backend
-    }
+    },
+    // Dev stability settings (Brave/WS/HMR)
+    hmr: {
+      overlay: false,
+      protocol: 'ws',
+      host: 'localhost',
+      clientPort: 5173,
+      port: 5173
+    },
+    watch: {
+      usePolling: true,
+      interval: 100
+    },
+    host: true,
+    strictPort: true
   }
 })

@@ -10,17 +10,8 @@ import X from '../../assets/X-icon.svg';
 import YT from '../../assets/icons8-youtube.svg';
 
 const Header = ({ onMenuClick }) => {
-  // Safe Auth0 hook usage with fallback
-  let user = null;
-  let isAuthenticated = false;
-  
-  try {
-    const auth0 = useAuth0();
-    user = auth0.user;
-    isAuthenticated = auth0.isAuthenticated;
-  } catch (error) {
-    console.warn('Auth0 not available in Header:', error);
-  }
+  // IMPORTANT: Hooks must be called unconditionally at top-level
+  const { user, isAuthenticated } = useAuth0();
   const [currentDate, setCurrentDate] = useState('');
 
   // Update current date
