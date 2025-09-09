@@ -604,10 +604,15 @@ class NewsDataService {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
       
-      // Always use backend proxy in dev/staging to normalize responses
-      let response = await fetch(`${this.baseUrl}/api/section-feed/${encodeURIComponent(sectionKey)}/${limit}`, {
-        signal: controller.signal
-      });
+      // Use explicit override when provided, otherwise use backend proxy
+      let response;
+      if (overrideUrl) {
+        response = await fetch(overrideUrl, { signal: controller.signal });
+      } else {
+        response = await fetch(`${this.baseUrl}/api/section-feed/${encodeURIComponent(sectionKey)}/${limit}`, {
+          signal: controller.signal
+        });
+      }
 
       clearTimeout(timeoutId);
 

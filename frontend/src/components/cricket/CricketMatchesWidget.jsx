@@ -47,7 +47,8 @@ const CricketMatchesWidget = () => {
             height: "100%",
             border: 0,
           }}
-          sandbox="allow-scripts allow-same-origin allow-popups"
+          // Tightened sandbox: remove allow-same-origin to isolate iframe context from parent
+          sandbox="allow-scripts allow-popups allow-top-navigation-by-user-activation"
           referrerPolicy="no-referrer"
         />
       </div>
