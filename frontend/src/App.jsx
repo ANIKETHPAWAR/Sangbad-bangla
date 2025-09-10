@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import './App.css';
 
 // Layout Components
@@ -29,21 +29,24 @@ import TempLogin from './components/admin/TempLogin';
 import Advertise from './pages/Advertise';
 import StaticPage from './pages/StaticPage';
 import { staticPages } from './pages/static/content';
-import CricketMatchesWidget from './components/cricket/CricketMatchesWidget';
+import MatchCarousel from './components/cricket/MatchCarousel';
+import ScorecardModal from './components/cricket/ScorecardModal';
+import ScorecardPage from './pages/ScorecardPage';
 
 
 // Simple Cricket News Page Component
 const CricketNewsPage = () => {
-  const [mountWidget, setMountWidget] = React.useState(false);
+  const [scoreOpen, setScoreOpen] = React.useState(false);
+  const [activeMatchCode, setActiveMatchCode] = React.useState('');
+  const [activeMatchMeta, setActiveMatchMeta] = React.useState(null);
+  const navigate = useNavigate();
 
-  React.useEffect(() => {
-    let cancelled = false;
-    // Defer widget mount slightly to avoid Brave quirks during initial render
-    const timer = setTimeout(() => {
-      if (!cancelled) setMountWidget(true);
-    }, 250);
-    return () => { cancelled = true; clearTimeout(timer); };
-  }, []);
+  const handleViewScorecard = ({ code, meta }) => {
+    if (!code) return;
+    setActiveMatchCode(code);
+    setActiveMatchMeta(meta || null);
+    navigate(`/scorecard/${code}`, { state: { meta } });
+  };
 
   return (
     <div className="cricket-news-page">
@@ -52,9 +55,10 @@ const CricketNewsPage = () => {
       </div>
       <div className="cricket-main" style={{ paddingTop: 15 }}>
         <div style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
-          {mountWidget && <CricketMatchesWidget />}
+          <MatchCarousel onViewScorecard={handleViewScorecard} />
         </div>
       </div>
+      <ScorecardModal open={scoreOpen} onClose={() => setScoreOpen(false)} matchCode={activeMatchCode} matchMeta={activeMatchMeta} />
       {/* Category layout with combined news (internal + external) and trending sidebar */}
       <CategoryNewsPage sectionKey="cricket" title="ক্রিকেট" subtitle="ক্রিকেটের সর্বশেষ খবর" />
     </div>
@@ -168,6 +172,7 @@ function App() {
             <Route path="/section/:sectionName/:numberOfStories" element={<ArticleDetailPage />} />
             <Route path="/popular" element={<NewsContainer />} />
             <Route path="/cricket" element={<CricketNewsPage />} />
+            <Route path="/scorecard/:code" element={<ScorecardPage />} />
             <Route path="/bengal-face" element={<CategoryNewsPage sectionKey="bengal" title="বাংলার মুখ" />} />
             <Route path="/astrology" element={<CategoryNewsPage sectionKey="astrology" title="ভাগ্যলিপি" />} />
             <Route path="/football" element={<CategoryNewsPage sectionKey="football" title="ফুটবলের মহারণ" />} />
