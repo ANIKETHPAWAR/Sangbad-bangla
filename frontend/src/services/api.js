@@ -15,10 +15,16 @@ export async function fetchFixtures(signal) {
 
 export async function fetchScorecard(matchCode, signal) {
 	if (!matchCode) throw new Error('matchCode is required');
-	const url = `${BASE_URL}/${matchCode}_scoresoverbyover_2.json`;
+	// Prefer the consolidated match JSON (e.g., https://www.hindustantimes.com/static-content/10s/<code>.json)
+	const primaryUrl = `${BASE_URL}/${matchCode}.json`;
+	const fallbackUrl = `${BASE_URL}/${matchCode}_scoresoverbyover_2.json`;
 	try {
-		const response = await fetch(url, { signal, cache: 'no-store' });
-		if (response.status === 404) return null; // not ready yet
+		let response = await fetch(primaryUrl, { signal, cache: 'no-store' });
+		if (response.status === 404) {
+			// Some older matches may still publish only the over-by-over JSON
+			response = await fetch(fallbackUrl, { signal, cache: 'no-store' });
+			if (response.status === 404) return null; // not ready yet
+		}
 		if (!response.ok) throw new Error('Failed to fetch scorecard');
 		return response.json();
 	} catch (err) {
@@ -32,8 +38,10 @@ export function deriveStatus(match) {
 	const rawStatus = match?.matchdetail?.status || match?.matchstatus || match?.status || '';
 	const isLive = /live|progress/i.test(rawStatus) || match?.type === 'live';
 	const isDelayed = /delay|stump|break/i.test(rawStatus);
+	const isResult = /result|won|beat|dls|tie|draw|abandon|no\s*result/i.test(rawStatus) || match?.type === 'result';
 	if (isLive) return 'LIVE';
 	if (isDelayed) return 'DELAYED';
+	if (isResult) return 'RESULTS';
 	return 'UPCOMING';
 }
 
@@ -114,4 +122,86 @@ export function teamLogoUrl(shortCode) {
 	return `https://www.hindustantimes.com/static-content/1y/cricket-logos/teams/logo/${encodeURIComponent(code)}.png?v4`;
 }
 
+
+// ---- Local persistence for recently completed matches ----
+const COMPLETED_KEY = 'bp_completed_matches_v1';
+
+function readStorageSafely(key) {
+	try {
+		const raw = localStorage.getItem(key);
+		return raw ? JSON.parse(raw) : [];
+	} catch (_) {
+		return [];
+	}
+}
+
+function writeStorageSafely(key, value) {
+	try {
+		localStorage.setItem(key, JSON.stringify(value));
+	} catch (_) {
+		// ignore quota or privacy mode errors
+	}
+}
+
+function nowTs() {
+	return Date.now ? Date.now() : new Date().getTime();
+}
+
+function buildSavableResult(match) {
+	const code = getMatchCode(match);
+	return {
+		// Minimal fields needed by carousel helpers
+		matchstatus: match?.matchstatus || match?.matchdetail?.status || '',
+		matchdetail: {
+			match: { code, number: match?.matchnumber || match?.matchdetail?.match?.number },
+			status: match?.matchdetail?.status || match?.matchstatus || '',
+			equation: match?.matchdetail?.equation || '',
+		},
+		venue: match?.matchdetail?.venue?.name || match?.venue || '',
+		matchdate_ist: match?.matchdate_ist,
+		matchtime_ist: match?.matchtime_ist,
+		teama_short: match?.teama_short,
+		teamb_short: match?.teamb_short,
+		teamlist: match?.teamlist,
+		type: 'result',
+		__savedAt: nowTs(),
+		__code: code,
+	};
+}
+
+export function persistCompletedResults(resultsArray) {
+	if (!Array.isArray(resultsArray) || resultsArray.length === 0) return;
+	const existing = readStorageSafely(COMPLETED_KEY);
+	const byCode = new Map(existing.map((m) => [m.__code, m]));
+	resultsArray.forEach((m) => {
+		const code = getMatchCode(m);
+		if (!code) return;
+		byCode.set(code, buildSavableResult(m));
+	});
+	// Keep only last 30 days and limit to 50 items
+	const thirtyDays = 30 * 24 * 60 * 60 * 1000;
+	const cutoff = nowTs() - thirtyDays;
+	const merged = Array.from(byCode.values())
+		.filter((m) => (m.__savedAt || 0) >= cutoff)
+		.sort((a, b) => (b.__savedAt || 0) - (a.__savedAt || 0))
+		.slice(0, 50);
+	writeStorageSafely(COMPLETED_KEY, merged);
+}
+
+export function getSavedCompletedResults() {
+	const items = readStorageSafely(COMPLETED_KEY);
+	// Basic validation: must have code and type
+	return Array.isArray(items) ? items.filter((m) => m && m.__code) : [];
+}
+
+export function upsertCompletedResult(match) {
+	// For use when a live scorecard page detects completion
+	if (!match) return;
+	const existing = readStorageSafely(COMPLETED_KEY);
+	const byCode = new Map(existing.map((m) => [m.__code, m]));
+	const obj = buildSavableResult(match);
+	if (obj.__code) byCode.set(obj.__code, obj);
+	const merged = Array.from(byCode.values()).sort((a, b) => (b.__savedAt || 0) - (a.__savedAt || 0)).slice(0, 50);
+	writeStorageSafely(COMPLETED_KEY, merged);
+}
 

@@ -54,9 +54,7 @@ const CricketNewsPage = () => {
         <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700 }}>ক্রিকেটের সবকিছু এক জায়গায়</h2>
       </div>
       <div className="cricket-main" style={{ paddingTop: 15 }}>
-        <div style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
-          <MatchCarousel onViewScorecard={handleViewScorecard} />
-        </div>
+        <MatchCarousel onViewScorecard={handleViewScorecard} />
       </div>
       <ScorecardModal open={scoreOpen} onClose={() => setScoreOpen(false)} matchCode={activeMatchCode} matchMeta={activeMatchMeta} />
       {/* Category layout with combined news (internal + external) and trending sidebar */}
