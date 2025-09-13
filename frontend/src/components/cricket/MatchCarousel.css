@@ -1,0 +1,8 @@
+/* Hide pagination dots to prevent overlap with footer CTA, especially on mobile */
+.cricket-swiper .swiper-pagination,
+.cricket-swiper .swiper-pagination-bullets,
+.cricket-swiper .swiper-pagination-horizontal {
+  display: none !important;
+}
+
+

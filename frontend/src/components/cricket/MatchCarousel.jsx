@@ -4,6 +4,7 @@ import { Navigation, Pagination, A11y, Keyboard } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import './MatchCarousel.css';
 import {
 	fetchFixtures,
 	deriveStatus,
@@ -152,9 +153,10 @@ export default function MatchCarousel({ onViewScorecard }) {
 				spaceBetween={0}
 				centeredSlides
 				navigation
-				pagination={{ clickable: true }}
+				pagination={false}
 				keyboard
 				key={swiperKey}
+				className="cricket-swiper"
 			>
 				{filtered.map((m, idx) => {
 					const status = deriveStatus(m);

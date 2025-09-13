@@ -1,6 +1,7 @@
 import React from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
 import { fetchScorecard, teamLogoUrl } from '../services/api';
+import './ScorecardPage.css';
 
 function Ball({ value }) {
   const text = String(value || '').toUpperCase();
@@ -258,6 +259,7 @@ export default function ScorecardPage() {
       {/* Match banner with teams and scores */}
       <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
         <div
+          className="score-banner"
           style={{
             width: '100%',
             maxWidth: 980,
@@ -268,38 +270,44 @@ export default function ScorecardPage() {
             boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
           }}
         >
-          <div style={{ padding: '8px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div className="score-banner-header" style={{ padding: '8px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ fontSize: 14, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{meta?.title || 'Scorecard'}</div>
             <span style={{ fontSize: 12, background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 6, padding: '2px 8px' }}>
               {isLive ? 'LIVE' : (/(result|won|beat|tie|draw|abandon|no\s*result)/i.test(meta?.status || '') ? 'Results' : 'Match')}
             </span>
           </div>
           <div style={{ padding: '16px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 60px 1fr', alignItems: 'center', gap: 12 }}>
+            <div className="score-banner-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 60px 1fr', alignItems: 'center', gap: 12 }}>
               {/* Left: team and score */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  {leftShort && <img src={teamLogoUrl(leftShort)} alt={leftShort} style={{ width: 28, height: 28, borderRadius: 4 }} />}
-                  <div style={{ fontSize: 16, fontWeight: 600 }}>{teamsMap[leftKey]?.Name_Full || leftShort}</div>
+              <div className="team-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                <div className="team-name-wrap" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  {leftShort && <img className="team-logo" src={teamLogoUrl(leftShort)} alt={leftShort} style={{ width: 28, height: 28, borderRadius: 4 }} />}
+                  <div className="team-name" style={{ fontSize: 16, fontWeight: 600 }}>
+                    <span className="only-desktop">{teamsMap[leftKey]?.Name_Full || leftShort}</span>
+                    <span className="only-mobile">{leftShort || teamsMap[leftKey]?.Name_Short || ''}</span>
+                  </div>
                 </div>
-                <div style={{ fontSize: 24, fontWeight: 800 }}>{formatScore(leftScore) || '—'}</div>
+                <div className="team-score" style={{ fontSize: 24, fontWeight: 800 }}>{formatScore(leftScore) || '—'}</div>
               </div>
               {/* Center divider */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div className="divider" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={{ width: 32, height: 32, borderRadius: 16, background: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>—</div>
               </div>
               {/* Right: score then team */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-                <div style={{ fontSize: 24, fontWeight: 800 }}>{formatScore(rightScore) || '—'}</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <div style={{ fontSize: 16, fontWeight: 600, textAlign: 'right' }}>{teamsMap[rightKey]?.Name_Full || rightShort}</div>
-                  {rightShort && <img src={teamLogoUrl(rightShort)} alt={rightShort} style={{ width: 28, height: 28, borderRadius: 4 }} />}
+              <div className="team-row right" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                <div className="team-score" style={{ fontSize: 24, fontWeight: 800 }}>{formatScore(rightScore) || '—'}</div>
+                <div className="team-name-wrap" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div className="team-name text-right" style={{ fontSize: 16, fontWeight: 600, textAlign: 'right' }}>
+                    <span className="only-desktop">{teamsMap[rightKey]?.Name_Full || rightShort}</span>
+                    <span className="only-mobile">{rightShort || teamsMap[rightKey]?.Name_Short || ''}</span>
+                  </div>
+                  {rightShort && <img className="team-logo" src={teamLogoUrl(rightShort)} alt={rightShort} style={{ width: 28, height: 28, borderRadius: 4 }} />}
                 </div>
               </div>
             </div>
-            <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13, opacity: 0.95 }}>
-              <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingRight: 8 }}>{resultText}</div>
-              <div style={{ opacity: 0.8 }}>{meta?.venue}</div>
+            <div className="score-meta-row" style={{ marginTop: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13, opacity: 0.95 }}>
+              <div className="result-text" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingRight: 8 }}>{resultText}</div>
+              <div className="venue-text" style={{ opacity: 0.8 }}>{meta?.venue}</div>
             </div>
           </div>
         </div>

@@ -1,0 +1,86 @@
+/* Mobile-only overrides for scorecard page. Desktop remains unchanged. */
+
+@media (max-width: 640px) {
+  .score-banner {
+    border-radius: 6px;
+  }
+
+  .score-banner-header {
+    gap: 8px;
+  }
+
+  .score-banner-grid {
+    grid-template-columns: 1fr !important; /* override inline grid columns */
+    gap: 10px !important;
+  }
+
+  .score-banner-grid .divider {
+    display: none !important;
+  }
+
+  .score-banner-grid .team-row {
+    gap: 10px !important;
+  }
+
+  .score-banner-grid .team-row.right {
+    flex-direction: row-reverse; /* show score below name on mobile */
+    align-items: flex-start;
+  }
+
+  /* Ensure right team shows logo then name, matching left */
+  .score-banner-grid .team-row.right .team-name-wrap {
+    display: flex;
+    flex-direction: row-reverse; /* put logo before text */
+    align-items: center;
+    gap: 8px;
+  }
+  .score-banner-grid .team-row.right .team-name {
+    text-align: left !important;
+  }
+
+  .score-banner-grid .team-name-wrap {
+    min-width: 0;
+  }
+
+  .score-banner-grid .team-name {
+    font-size: 15px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  /* Toggle full vs short names */
+  .only-desktop { display: none !important; }
+  .only-mobile { display: inline !important; }
+
+  .score-banner-grid .team-logo {
+    width: 24px !important;
+    height: 24px !important;
+  }
+
+  .score-banner-grid .team-score {
+    font-size: 20px !important;
+    font-weight: 800;
+  }
+
+  .score-meta-row {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 6px;
+  }
+
+  .score-meta-row .result-text {
+    width: 100%;
+  }
+
+  .score-meta-row .venue-text {
+    opacity: 0.9 !important;
+  }
+}
+
+/* Default (>=640px): show desktop names */
+.only-desktop { display: inline; }
+.only-mobile { display: none; }
+
+
