@@ -128,8 +128,8 @@ app.get('/test', (req, res) => {
   });
 });
 
-// Advertising enquiry - email submission endpoint
-app.post('/api/advertise', async (req, res) => {
+// Shared handler for marketing/advertise inquiries (avoids ad-blocked paths)
+async function handleMarketingInquiry(req, res) {
   try {
     const { name, company, email, phone, adType, message } = req.body || {};
 
@@ -174,7 +174,7 @@ app.post('/api/advertise', async (req, res) => {
         <li><strong>Ad Type:</strong> ${adType || 'N/A'}</li>
       </ul>
       ${message ? `<p><strong>Message:</strong><br/>${String(message).replace(/\n/g, '<br/>')}</p>` : ''}
-      <p style="color:#666">Submitted: ${new Date().toLocaleString()}</p>
+      <p style=\"color:#666\">Submitted: ${new Date().toLocaleString()}</p>
     `;
 
     const info = await transporter.sendMail({
@@ -192,7 +192,12 @@ app.post('/api/advertise', async (req, res) => {
     console.error('❌ Failed to send advertise enquiry:', error.message);
     res.status(500).json({ success: false, message: 'Failed to send enquiry' });
   }
-});
+}
+
+// Original path (may be blocked by ad blockers on some networks)
+app.post('/api/advertise', handleMarketingInquiry);
+// Neutral alias to avoid client-side blockers
+app.post('/api/marketing-inquiry', handleMarketingInquiry);
 
 // Get combined news (Firestore + external) for frontend
 app.get('/api/combined-news', async (req, res) => {
