@@ -3,11 +3,40 @@ import './ConsentBanner.css';
 
 const CookieConsent = () => {
   const [showBanner, setShowBanner] = useState(false);
+  
+  const updateGtagConsent = (accepted) => {
+    try {
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){window.dataLayer.push(arguments);} // eslint-disable-line no-inner-declarations
+      gtag('consent', 'update', {
+        'ad_storage': accepted ? 'granted' : 'denied',
+        'ad_user_data': accepted ? 'granted' : 'denied',
+        'ad_personalization': accepted ? 'granted' : 'denied',
+        'analytics_storage': accepted ? 'granted' : 'denied'
+      });
+    } catch (e) {
+      console.warn('Consent update failed:', e);
+    }
+  };
 
   useEffect(() => {
     // Check if user has already accepted cookies
-    const hasAccepted = localStorage.getItem('cookieConsent');
-    if (!hasAccepted) {
+    const stored = localStorage.getItem('cookieConsent');
+    if (!stored) {
+      setShowBanner(true);
+      return;
+    }
+    try {
+      const parsed = JSON.parse(stored);
+      if (parsed?.expiry && Date.now() > parsed.expiry) {
+        // Expired -> show and reset defaults (denied)
+        updateGtagConsent(false);
+        setShowBanner(true);
+      } else {
+        // Persist existing choice to Consent Mode on load
+        updateGtagConsent(!!parsed?.accepted);
+      }
+    } catch (e) {
       setShowBanner(true);
     }
   }, []);
@@ -17,11 +46,13 @@ const CookieConsent = () => {
     const expiryDate = new Date();
     expiryDate.setFullYear(expiryDate.getFullYear() + 1);
     
-    localStorage.setItem('cookieConsent', JSON.stringify({
+    const value = {
       accepted: true,
       timestamp: Date.now(),
       expiry: expiryDate.getTime()
-    }));
+    };
+    localStorage.setItem('cookieConsent', JSON.stringify(value));
+    updateGtagConsent(true);
     
     setShowBanner(false);
   };
@@ -31,11 +62,13 @@ const CookieConsent = () => {
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + 30);
     
-    localStorage.setItem('cookieConsent', JSON.stringify({
+    const value = {
       accepted: false,
       timestamp: Date.now(),
       expiry: expiryDate.getTime()
-    }));
+    };
+    localStorage.setItem('cookieConsent', JSON.stringify(value));
+    updateGtagConsent(false);
     
     setShowBanner(false);
   };

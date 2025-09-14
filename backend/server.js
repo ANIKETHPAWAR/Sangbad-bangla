@@ -140,8 +140,10 @@ app.post('/api/advertise', async (req, res) => {
 
     // Ensure SMTP configuration is available
     const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, MAIL_TO, MAIL_FROM, SMTP_SECURE } = process.env;
-    if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS || !MAIL_TO) {
-      console.error('Email configuration missing. Please set SMTP_* and MAIL_TO env vars');
+    const requiredKeys = ['SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'MAIL_TO'];
+    const missingKeys = requiredKeys.filter((k) => !process.env[k]);
+    if (missingKeys.length > 0) {
+      console.error('Email configuration missing keys:', missingKeys.join(', '));
       return res.status(500).json({ success: false, message: 'Email service not configured' });
     }
 

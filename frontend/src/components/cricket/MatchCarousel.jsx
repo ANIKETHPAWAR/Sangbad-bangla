@@ -138,7 +138,7 @@ export default function MatchCarousel({ onViewScorecard }) {
 							border: '1px solid',
 							borderColor: filter === key ? '#111827' : '#D1D5DB',
 							backgroundColor: filter === key ? '#111827' : '#ffffff',
-							color: filter === key ? '#ffffff' : '#1F2937',
+							color: filter === key ? '#FFFF' : '#1F2937',
 							cursor: 'pointer',
 						}}
 						aria-pressed={filter === key}
