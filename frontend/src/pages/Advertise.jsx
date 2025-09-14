@@ -49,7 +49,8 @@ const Advertise = () => {
 
     try {
       setSubmitting(true);
-      const res = await fetch(`${baseUrl}/api/advertise`, {
+      // Use neutral path to avoid ad blockers in production
+      const res = await fetch(`${baseUrl}/api/marketing-inquiry`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
