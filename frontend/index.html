@@ -6,6 +6,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>Sangbad Bangla</title>
     
+    <!-- Google Consent Mode default (gated; will be updated by app) -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);} 
+      gtag('consent', 'default', {
+        'ad_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied',
+        'analytics_storage': 'denied',
+        'wait_for_update': 500
+      });
+    </script>
+    
+    <!-- Google tag (gtag.js) for AdSense/Ads (client id from env at build time) -->
+    <script type="module">
+      // Inject AdSense only if VITE_ADSENSE_CLIENT_ID is defined at build
+      const client = import.meta?.env?.VITE_ADSENSE_CLIENT_ID;
+      if (client) {
+        const s = document.createElement('script');
+        s.async = true;
+        s.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(client)}`;
+        s.crossOrigin = 'anonymous';
+        document.head.appendChild(s);
+      }
+    </script>
+    
     <!-- Google Translate Script -->
     <script type="text/javascript">
       function googleTranslateElementInit() {

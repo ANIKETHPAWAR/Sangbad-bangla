@@ -10,6 +10,7 @@ import Sidebar from './components/layout/Sidebar';
 // New Components
 import ConsentBanner from './components/ConsentBanner';
 import NotificationPermission from './components/NotificationPermission';
+import AdSlot from './components/ads/AdSlot';
 
 // Page Components
 import SignIn from './pages/SignIn';
@@ -157,6 +158,10 @@ function App() {
         <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
         
         <main className="main-content">
+          {/* Global Top Ad */}
+          <div style={{ margin: '12px 0' }}>
+            <AdSlot adSlot={import.meta.env.VITE_ADSENSE_TOP_SLOT || ''} adFormat="auto" fullWidthResponsive={true} />
+          </div>
           {/* Cookie Consent Banner */}
           <ConsentBanner />
           
@@ -220,6 +225,10 @@ function App() {
               </RequireAdmin>
             } />
           </Routes>
+          {/* Global Bottom Ad */}
+          <div style={{ margin: '12px 0' }}>
+            <AdSlot adSlot={import.meta.env.VITE_ADSENSE_BOTTOM_SLOT || ''} adFormat="auto" fullWidthResponsive={true} />
+          </div>
         </main>
         
         <Footer />

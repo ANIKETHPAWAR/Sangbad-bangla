@@ -5,6 +5,7 @@ import SectionTitle from './SectionTitle';
 import newsDataService from '../../services/newsDataService';
 import { NEWS_REFRESH_INTERVAL, TRENDING_NEWS_ROTATION_INTERVAL } from '../../config/constants';
 import './TrendingNewsSidebar.css';
+import AdSlot from '../ads/AdSlot';
 
 const TrendingNewsSidebar = ({ similarStories = null, isArticlePage = false }) => {
   const [trendingNews, setTrendingNews] = useState([]);
@@ -126,6 +127,10 @@ const TrendingNewsSidebar = ({ similarStories = null, isArticlePage = false }) =
           showBorder={true}
           showDecorativeLines={true}
         />
+      </div>
+      {/* AdSense slot: replace data-ad-slot with your slot id from AdSense */}
+      <div style={{ margin: '12px 0' }}>
+        <AdSlot adSlot={import.meta.env.VITE_ADSENSE_TRENDING_SIDEBAR_SLOT || ''} adFormat="auto" fullWidthResponsive={true} />
       </div>
       
       {displayData && displayData.length > 0 ? (
