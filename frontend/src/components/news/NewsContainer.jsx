@@ -22,6 +22,10 @@ const NewsContainer = () => {
 
   // Determine if this is the popular news page
   const isPopularNews = location.pathname === '/popular';
+  // Determine if this is the homepage or all-news page
+  const isHomePage = location.pathname === '/';
+  const isAllNewsPage = location.pathname === '/all-news';
+  const showHomeIcon = isHomePage || isAllNewsPage;
 
   // Load news data from service
   const loadNewsData = useCallback(async () => {
@@ -193,7 +197,7 @@ const NewsContainer = () => {
             <SectionTitle 
               title={isPopularNews ? "জনপ্রিয় খবর" : "সর্বশেষ খবর"} 
               subtitle={isPopularNews ? "সর্বাধিক পঠিত এবং আলোচিত খবর" : "আজকের গুরুত্বপূর্ণ এবং জনপ্রিয় খবর"}
-              icon={<FiHome />}
+              icon={showHomeIcon ? <FiHome /> : null}
               variant="large"
               align="center"
             />
