@@ -75,7 +75,7 @@ const CategoryNewsPage = ({ sectionKey: propSectionKey, title, subtitle }) => {
             <SectionTitle
               title={title || 'সর্বশেষ খবর'}
               subtitle={subtitle || 'আপনার নির্বাচিত বিভাগের খবর'}
-              icon={<FiHome />}
+              icon={null}
               variant="large"
               align="center"
             />
