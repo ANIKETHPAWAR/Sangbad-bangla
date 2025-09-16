@@ -24,26 +24,31 @@ const NewsForm = () => {
 
   const [newTag, setNewTag] = useState('');
 
-  // Updated categories to match Hindustan Times structure
-  const categories = [
-    'national',
-    'international', 
-    'politics',
-    'economy',
-    'sports',
-    'entertainment',
-    'technology',
-    'health',
-    'education',
-    'environment',
-    'astrology',
-    'lifestyle',
-    'bengal',
+  // Approved categories aligned with navbar and routes
+  const allowedCategories = [
     'cricket',
+    'bengal',
+    'astrology',
     'football',
-    'breaking',
-    'special-report'
+    'pictures',
+    'career',
+    'lifestyle',
+    'all-news',
+    'popular'
   ];
+
+  // Human-friendly labels for dropdown (English only)
+  const CATEGORY_LABELS = {
+    cricket: 'Cricket',
+    bengal: 'Bengal',
+    astrology: 'Astrology',
+    football: 'Football',
+    pictures: 'Pictures',
+    career: 'Career',
+    lifestyle: 'Lifestyle',
+    'all-news': 'All news',
+    popular: 'Popular'
+  };
 
   useEffect(() => {
     if (id) {
@@ -236,9 +241,12 @@ const NewsForm = () => {
                 required
               >
                 <option value="">Select a category</option>
-                {categories.map((category) => (
-                  <option key={category} value={category}>
-                    {category.charAt(0).toUpperCase() + category.slice(1)}
+                {formData.category && !allowedCategories.includes(formData.category) && (
+                  <option value={formData.category}>{`Legacy: ${formData.category}`}</option>
+                )}
+                {allowedCategories.map((value) => (
+                  <option key={value} value={value}>
+                    {CATEGORY_LABELS[value] || value}
                   </option>
                 ))}
               </select>
