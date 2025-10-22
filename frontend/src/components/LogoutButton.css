@@ -1,5 +1,5 @@
 .logout-button {
-  background-color: blue;
+  background: none;
   border: none;
   color: var(--color-text-light);
   font-size: 12px;

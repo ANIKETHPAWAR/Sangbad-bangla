@@ -600,21 +600,30 @@ class NewsDataService {
       
       const overrideUrl = SECTION_API_OVERRIDES[sectionKey];
       
-      // Reduced timeout for faster user feedback
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
-      
-      // Use explicit override when provided, otherwise use backend proxy
-      let response;
-      if (overrideUrl) {
-        response = await fetch(overrideUrl, { signal: controller.signal });
-      } else {
-        response = await fetch(`${this.baseUrl}/api/section-feed/${encodeURIComponent(sectionKey)}/${limit}`, {
-          signal: controller.signal
-        });
-      }
+      // Longer timeout with single retry
+      const tryFetch = async (attempt = 1) => {
+        const controller = new AbortController();
+        const TIMEOUT_MS = attempt === 1 ? 12000 : 20000; // 12s then 20s
+        const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
+        try {
+          // Use explicit override when provided, otherwise use backend proxy
+          const resp = await fetch(
+            overrideUrl || `${this.baseUrl}/api/section-feed/${encodeURIComponent(sectionKey)}/${limit}`,
+            { signal: controller.signal, headers: { 'Cache-Control': 'no-cache' } }
+          );
+          clearTimeout(timeoutId);
+          return resp;
+        } catch (e) {
+          clearTimeout(timeoutId);
+          if (attempt < 2) {
+            await new Promise(r => setTimeout(r, 800));
+            return tryFetch(attempt + 1);
+          }
+          throw e;
+        }
+      };
 
-      clearTimeout(timeoutId);
+      const response = await tryFetch();
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -623,18 +632,14 @@ class NewsDataService {
       const data = await response.json();
       if (data.success && Array.isArray(data.stories)) {
         const transformed = data.stories.map(item => this.transformNewsItem(item));
-        let finalData = transformed;
-        
-        if (this.shouldProxyImages) {
-          // Rewrite images through proxy when backend is same origin
-          finalData = transformed.map(n => ({
-            ...n,
-            wallpaperLarge: n.wallpaperLarge ? `${this.baseUrl}/api/image?url=${encodeURIComponent(n.wallpaperLarge)}` : undefined,
-            mediumRes: n.mediumRes ? `${this.baseUrl}/api/image?url=${encodeURIComponent(n.mediumRes)}` : undefined,
-            thumbImage: n.thumbImage ? `${this.baseUrl}/api/image?url=${encodeURIComponent(n.thumbImage)}` : undefined,
-            imageUrl: n.wallpaperLarge ? `${this.baseUrl}/api/image?url=${encodeURIComponent(n.wallpaperLarge)}` : (n.imageUrl ? `${this.baseUrl}/api/image?url=${encodeURIComponent(n.imageUrl)}` : undefined)
-          }));
-        }
+        // Always rewrite images through proxy to avoid CORP/CORS on third-party CDN
+        const finalData = transformed.map(n => ({
+          ...n,
+          wallpaperLarge: n.wallpaperLarge ? `${this.baseUrl}/api/image?url=${encodeURIComponent(n.wallpaperLarge)}` : undefined,
+          mediumRes: n.mediumRes ? `${this.baseUrl}/api/image?url=${encodeURIComponent(n.mediumRes)}` : undefined,
+          thumbImage: n.thumbImage ? `${this.baseUrl}/api/image?url=${encodeURIComponent(n.thumbImage)}` : undefined,
+          imageUrl: n.wallpaperLarge ? `${this.baseUrl}/api/image?url=${encodeURIComponent(n.wallpaperLarge)}` : (n.imageUrl ? `${this.baseUrl}/api/image?url=${encodeURIComponent(n.imageUrl)}` : undefined)
+        }));
         
         // Cache for 2 minutes
         this.setCache(cacheKey, finalData, 120000);
@@ -1012,19 +1017,30 @@ class NewsDataService {
       
       console.log('🌐 Fetching from URL:', url);
       
-      // Reduced timeout for faster user feedback
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
-      
-      const response = await fetch(url, {
-        signal: controller.signal,
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
+      // Add cache-buster on first request and longer timeout with single retry
+      const cacheBustedUrl = `${url}&t=${Date.now()}`;
+      const tryFetch = async (attempt = 1) => {
+        const controller = new AbortController();
+        const TIMEOUT_MS = attempt === 1 ? 15000 : 25000; // 15s then 25s
+        const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
+        try {
+          const resp = await fetch(cacheBustedUrl, {
+            signal: controller.signal,
+            headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+          });
+          clearTimeout(timeoutId);
+          return resp;
+        } catch (e) {
+          clearTimeout(timeoutId);
+          if (attempt < 2) {
+            await new Promise(r => setTimeout(r, 1200));
+            return tryFetch(attempt + 1);
+          }
+          throw e;
         }
-      });
-      
-      clearTimeout(timeoutId);
+      };
+
+      const response = await tryFetch();
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -1049,7 +1065,17 @@ class NewsDataService {
             return this.transformNewsItem(item);
           }
         });
-        
+        // Rewrite image URLs through backend proxy to avoid CORS/CORP blocks
+        transformedNews = transformedNews.map(n => ({
+          ...n,
+          wallpaperLarge: n.wallpaperLarge ? `${this.baseUrl}/api/image?url=${encodeURIComponent(n.wallpaperLarge)}` : n.wallpaperLarge,
+          mediumRes: n.mediumRes ? `${this.baseUrl}/api/image?url=${encodeURIComponent(n.mediumRes)}` : n.mediumRes,
+          thumbImage: n.thumbImage ? `${this.baseUrl}/api/image?url=${encodeURIComponent(n.thumbImage)}` : n.thumbImage,
+          imageUrl: n.wallpaperLarge
+            ? `${this.baseUrl}/api/image?url=${encodeURIComponent(n.wallpaperLarge)}`
+            : (n.imageUrl ? `${this.baseUrl}/api/image?url=${encodeURIComponent(n.imageUrl)}` : n.imageUrl)
+        }));
+
         // Apply rotation offset if specified
         if (rotationOffset > 0 && transformedNews.length > 0) {
           const rotatedNews = [...transformedNews];
