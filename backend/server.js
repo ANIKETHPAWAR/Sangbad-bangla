@@ -5,6 +5,22 @@ const admin = require('firebase-admin');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
+// Simple in-memory cache with TTL
+const apiCache = {
+  combinedNews: new Map(),
+  sectionFeed: new Map()
+};
+
+const setCache = (bucket, key, data, ttlMs = 60000) => {
+  bucket.set(key, { data, expires: Date.now() + ttlMs });
+};
+
+const getCache = (bucket, key) => {
+  const hit = bucket.get(key);
+  if (hit && hit.expires > Date.now()) return hit.data;
+  bucket.delete(key);
+  return null;
+};
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -205,6 +221,13 @@ app.get('/api/combined-news', async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
     const category = req.query.category;
+    const cacheKey = `${page}-${limit}-${category || 'all'}`;
+
+    const cached = getCache(apiCache.combinedNews, cacheKey);
+    if (cached) {
+      res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=120');
+      return res.json(cached);
+    }
     
     // Get Firestore news
     const newsService = require('./services/newsService');
@@ -288,6 +311,22 @@ app.get('/api/combined-news', async (req, res) => {
         total: combinedNews.length
       }
     });
+
+    setCache(apiCache.combinedNews, cacheKey, {
+      success: true,
+      data: paginatedNews,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(combinedNews.length / limit),
+        totalItems: combinedNews.length,
+        itemsPerPage: limit
+      },
+      sources: {
+        firestore: firestoreNews.length,
+        external: externalNews.length,
+        total: combinedNews.length
+      }
+    }, 120000); // cache for 120s
     
   } catch (error) {
     console.error('Error fetching combined news:', error);
@@ -304,6 +343,13 @@ app.get('/api/section-feed/:sectionName/:numStories', async (req, res) => {
   try {
     const { sectionName, numStories } = req.params;
     const limit = parseInt(numStories) || 10;
+    const cacheKey = `${sectionName}-${limit}`;
+
+    const cached = getCache(apiCache.sectionFeed, cacheKey);
+    if (cached) {
+      res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=120');
+      return res.json(cached);
+    }
     
     console.log(`📰 Fetching section feed (HT) for: ${sectionName}, stories: ${limit}`);
 
@@ -322,7 +368,7 @@ app.get('/api/section-feed/:sectionName/:numStories', async (req, res) => {
         'User-Agent': 'Mozilla/5.0',
         'Referer': 'https://bangla.hindustantimes.com/'
       },
-      timeout: 10000
+      timeout: 15000
     });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -336,7 +382,7 @@ app.get('/api/section-feed/:sectionName/:numStories', async (req, res) => {
       const limitedStories = sectionItems.slice(0, limit);
       console.log(`✅ Returning ${limitedStories.length} HT stories for section: ${sectionName}`);
 
-      return res.json({
+      const payload = {
         success: true,
         stories: limitedStories,
         sectionName: data?.content?.sectionName || sectionName,
@@ -344,11 +390,18 @@ app.get('/api/section-feed/:sectionName/:numStories', async (req, res) => {
         requestedStories: limit,
         source: 'ht-sectionFeedPerp',
         upstreamUrl: htUrl
-      });
+      };
+
+      setCache(apiCache.sectionFeed, cacheKey, payload, 120000); // 120s cache
+      res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=120');
+      return res.json(payload);
     }
 
     console.warn(`⚠️ No section items found for ${sectionName}. Data keys:`, Object.keys(data || {}));
-    return res.json({ success: false, stories: [], sectionName, requestedStories: limit, upstreamUrl: htUrl });
+    const emptyPayload = { success: false, stories: [], sectionName, requestedStories: limit, upstreamUrl: htUrl };
+    setCache(apiCache.sectionFeed, cacheKey, emptyPayload, 60000);
+    res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=120');
+    return res.json(emptyPayload);
   } catch (error) {
     console.error(`❌ Error fetching section feed for ${sectionName}:`, error.message);
     res.status(500).json({ 
@@ -379,6 +432,7 @@ app.get('/api/image', async (req, res) => {
     }
     const contentType = upstream.headers.get('content-type') || 'image/jpeg';
     res.setHeader('Content-Type', contentType);
+    res.setHeader('Cache-Control', 'public, max-age=86400'); // cache images 1 day
     const buf = await upstream.buffer();
     res.send(buf);
   } catch (err) {
