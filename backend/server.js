@@ -117,31 +117,9 @@ function validateAndFormatDate(dateString) {
 }
 
 // Middleware
-const allowedOrigins = [
-  'https://sangbadbangla.news',
-  'https://www.sangbadbangla.news',
-  'https://sangbadbangla.vercel.app',
-  'https://sangbadbangla1.onrender.com',
-  'http://localhost:3000',
-  'http://localhost:5173'
-];
-
 const corsOptions = {
-  origin: (origin, cb) => {
-    // Allow same-origin requests (no Origin header) and known hosts
-    if (!origin) return cb(null, true);
-
-    // Allow exact matches
-    if (allowedOrigins.includes(origin)) return cb(null, true);
-
-    // Allow onrender domains for this service
-    if (/\.onrender\.com$/.test(new URL(origin).host)) return cb(null, true);
-
-    // Allow subdomains of sangbadbangla.news
-    if (new URL(origin).host.endsWith('sangbadbangla.news')) return cb(null, true);
-
-    return cb(new Error('Not allowed by CORS'));
-  },
+  // Allow all origins (reflects request origin). We need this to stop CORS blocks across onrender and custom domains.
+  origin: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
