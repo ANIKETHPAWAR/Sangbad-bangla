@@ -1017,14 +1017,13 @@ class NewsDataService {
       
       console.log('🌐 Fetching from URL:', url);
       
-      // Add cache-buster on first request and longer timeout with single retry
-      const cacheBustedUrl = `${url}&t=${Date.now()}`;
+      // Longer timeout with single retry (no cache-buster to allow backend cache)
       const tryFetch = async (attempt = 1) => {
         const controller = new AbortController();
         const TIMEOUT_MS = attempt === 1 ? 15000 : 25000; // 15s then 25s
         const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
         try {
-          const resp = await fetch(cacheBustedUrl, {
+          const resp = await fetch(url, {
             signal: controller.signal,
             headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
           });
