@@ -4,7 +4,7 @@ import "./LogoutButton.css";
 
 const LogoutButton = () => {
   // Safe Auth0 hook usage with fallback
-  let logout = () => console.log('Auth0 not configured');
+  let logout = () => {};
   
   try {
     const auth0 = useAuth0();

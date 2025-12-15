@@ -9,7 +9,7 @@ const Sidebar = ({ isOpen, onClose }) => {
   // Safe Auth0 hook usage with fallback
   let user = null;
   let isAuthenticated = false;
-  let logout = () => console.log('Auth0 not configured');
+  let logout = () => {};
   
   try {
     const auth0 = useAuth0();

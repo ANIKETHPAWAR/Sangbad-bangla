@@ -3,6 +3,12 @@ import { Link } from 'react-router-dom';
 import authService from '../../services/authService';
 import './AdminDashboard.css';
 
+const debug = (...args) => {
+  if (import.meta.env?.MODE === 'development') {
+    console.log(...args);
+  }
+};
+
 const AdminDashboard = () => {
   const [news, setNews] = useState([]);
   const [stats, setStats] = useState({
@@ -24,7 +30,7 @@ const AdminDashboard = () => {
 
   // Debug useEffect to monitor stats changes
   useEffect(() => {
-    console.log('AdminDashboard - stats state changed:', stats);
+    debug('AdminDashboard - stats state changed:', stats);
   }, [stats]);
 
   const fetchNews = async (page = 1, search = '') => {
@@ -61,19 +67,19 @@ const AdminDashboard = () => {
 
   const fetchStats = async () => {
     try {
-      console.log('Fetching admin stats...');
+      debug('Fetching admin stats...');
       const headers = await authService.getAuthHeaders();
       const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://sangbadbangla1.onrender.com';
       const response = await fetch(`${baseUrl}/api/admin/stats`, { headers: headers });
       
-      console.log('Stats response status:', response.status);
+      debug('Stats response status:', response.status);
       
       if (response.ok) {
         const data = await response.json();
-        console.log('Stats response data:', data);
+        debug('Stats response data:', data);
         
         if (data.success && data.data) {
-          console.log('Setting stats:', data.data);
+          debug('Setting stats:', data.data);
           setStats(data.data);
         } else {
           console.error('Stats response not successful:', data);

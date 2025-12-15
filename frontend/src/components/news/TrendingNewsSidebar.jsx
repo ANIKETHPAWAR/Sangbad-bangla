@@ -7,6 +7,12 @@ import { NEWS_REFRESH_INTERVAL, TRENDING_NEWS_ROTATION_INTERVAL } from '../../co
 import './TrendingNewsSidebar.css';
 import AdSlot from '../ads/AdSlot';
 
+const debug = (...args) => {
+  if (import.meta.env?.MODE === 'development') {
+    console.log(...args);
+  }
+};
+
 const TrendingNewsSidebar = ({ similarStories = null, isArticlePage = false }) => {
   const [trendingNews, setTrendingNews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -58,7 +64,7 @@ const TrendingNewsSidebar = ({ similarStories = null, isArticlePage = false }) =
 
   const handleNewsClick = (newsId) => {
     // Handle news click - navigate to detail page or open modal
-    console.log('News clicked:', newsId);
+    debug('News clicked:', newsId);
   };
 
   // Determine which data to display
@@ -67,7 +73,7 @@ const TrendingNewsSidebar = ({ similarStories = null, isArticlePage = false }) =
   const displayTitle = 'ট্রেন্ডিং খবর'; // Always show trending news title
 
   // Debug logging
-  console.log('TrendingNewsSidebar Debug:', {
+  debug('TrendingNewsSidebar Debug:', {
     isArticlePage,
     similarStoriesLength: similarStories?.length,
     trendingNewsLength: trendingNews?.length,

@@ -6,6 +6,12 @@ import TrendingNewsSidebar from './TrendingNewsSidebar';
 import newsDataService from '../../services/newsDataService';
 import './ArticlePage.css';
 
+const debug = (...args) => {
+  if (import.meta.env?.MODE === 'development') {
+    console.log(...args);
+  }
+};
+
 const ArticlePage = () => {
   const { articleId } = useParams();
   const navigate = useNavigate();
@@ -23,7 +29,7 @@ const ArticlePage = () => {
 
   // Debug useEffect to monitor similarStories changes
   useEffect(() => {
-    console.log('ArticlePage - similarStories state changed:', {
+    debug('ArticlePage - similarStories state changed:', {
       similarStories,
       length: similarStories?.length,
       isArray: Array.isArray(similarStories)
@@ -81,13 +87,13 @@ const ArticlePage = () => {
       if (foundArticle.category || foundArticle.sectionName) {
         const categoryToUse = foundArticle.category || foundArticle.sectionName;
         try {
-          console.log('Loading similar stories from category:', categoryToUse);
+          debug('Loading similar stories from category:', categoryToUse);
           const sectionStories = await newsDataService.getSectionFeed(categoryToUse, 10);
           if (sectionStories && sectionStories.length > 0) {
             similarStoriesData = sectionStories
               .filter(story => story.id !== articleId)
               .slice(0, 8);
-            console.log('Found similar stories from category:', similarStoriesData.length);
+            debug('Found similar stories from category:', similarStoriesData.length);
           }
         } catch (error) {
           console.error('Error fetching section stories:', error);
@@ -97,13 +103,13 @@ const ArticlePage = () => {
       // If no category stories, try to get from combined news
       if (similarStoriesData.length === 0) {
         try {
-          console.log('Loading similar stories from combined news');
+          debug('Loading similar stories from combined news');
           const moreNewsData = await newsDataService.getCombinedNews(1, 20);
           if (moreNewsData && moreNewsData.news) {
             similarStoriesData = moreNewsData.news
               .filter(story => story.id !== articleId)
               .slice(0, 8);
-            console.log('Found similar stories from combined news:', similarStoriesData.length);
+            debug('Found similar stories from combined news:', similarStoriesData.length);
           }
         } catch (error) {
           console.error('Error fetching combined news:', error);
@@ -115,7 +121,7 @@ const ArticlePage = () => {
         similarStoriesData = allNews
           .filter(story => story.id !== articleId)
           .slice(0, 8);
-        console.log('Using fallback similar stories:', similarStoriesData.length);
+        debug('Using fallback similar stories:', similarStoriesData.length);
       }
       
       // If absolutely no stories, create some sample trending news
@@ -143,13 +149,13 @@ const ArticlePage = () => {
             publishDate: new Date().toISOString()
           }
         ];
-        console.log('Using sample trending news');
+        debug('Using sample trending news');
       }
       
       setSimilarStories(similarStoriesData);
       
       // Debug logging
-      console.log('ArticlePage Debug - Similar Stories:', {
+      debug('ArticlePage Debug - Similar Stories:', {
         similarStoriesData,
         length: similarStoriesData.length,
         firstStory: similarStoriesData[0]
@@ -429,13 +435,13 @@ const ArticlePage = () => {
   };
 
   const handleTestAPI = async () => {
-    console.log('Testing API endpoint...');
-    console.log('Current article ID from URL:', articleId);
-    console.log('Current article data:', article);
+    debug('Testing API endpoint...');
+    debug('Current article ID from URL:', articleId);
+    debug('Current article data:', article);
     
     try {
       if (!article.detailUrl) {
-        console.log('No detailUrl available for testing');
+        debug('No detailUrl available for testing');
         return;
       }
       
@@ -452,16 +458,16 @@ const ArticlePage = () => {
         proxyPath = `/api/app/detailfeed/v1/${article.detailUrl}`;
       }
       
-      console.log('Testing proxy path:', proxyPath);
+      debug('Testing proxy path:', proxyPath);
       const testResponse = await fetch(proxyPath);
-      console.log('Test response status:', testResponse.status);
-      console.log('Test response headers:', testResponse.headers);
+      debug('Test response status:', testResponse.status);
+      debug('Test response headers:', testResponse.headers);
       
       if (testResponse.ok) {
         const testData = await testResponse.json();
-        console.log('Test API data:', testData);
+        debug('Test API data:', testData);
       } else {
-        console.log('Test API failed with status:', testResponse.status);
+        debug('Test API failed with status:', testResponse.status);
       }
     } catch (error) {
       console.error('Test API error:', error);
@@ -469,13 +475,13 @@ const ArticlePage = () => {
     
     // Also test the working sectionfeed endpoint to see if proxy is working
     try {
-      console.log('Testing working sectionfeed endpoint...');
+      debug('Testing working sectionfeed endpoint...');
       const sectionResponse = await fetch('/api/sectionfeedperp/v1/nation%20and%20world/10');
-      console.log('Sectionfeed response status:', sectionResponse.status);
+      debug('Sectionfeed response status:', sectionResponse.status);
       if (sectionResponse.ok) {
-        console.log('Sectionfeed endpoint is working');
+        debug('Sectionfeed endpoint is working');
       } else {
-        console.log('Sectionfeed endpoint failed');
+        debug('Sectionfeed endpoint failed');
       }
     } catch (sectionError) {
       console.error('Sectionfeed test error:', sectionError);
