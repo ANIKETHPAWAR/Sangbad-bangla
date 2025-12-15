@@ -9,6 +9,12 @@ import { NEWS_REFRESH_INTERVAL, UI_CONSTANTS } from '../../config/constants';
 import newsDataService from '../../services/newsDataService';
 import './NewsContainer.css';
 
+const debug = (...args) => {
+  if (import.meta.env?.MODE === 'development') {
+    console.log(...args);
+  }
+};
+
 const NewsContainer = () => {
   const location = useLocation();
   const [featuredNews, setFeaturedNews] = useState([]);
@@ -38,11 +44,11 @@ const NewsContainer = () => {
       if (isPopularNews) {
         // Use popular news with rotation for different content
         combinedData = await newsDataService.getPopularNews(1, 20);
-        console.log('🔥 Loaded popular news with rotation');
+        debug('🔥 Loaded popular news with rotation');
       } else {
         // Use regular combined news for all other routes
         combinedData = await newsDataService.getCombinedNews(1, 20);
-        console.log('📰 Loaded regular combined news');
+        debug('📰 Loaded regular combined news');
       }
       
       // Check for new content only if we have news
@@ -98,10 +104,10 @@ const NewsContainer = () => {
       let moreNews;
       if (isPopularNews) {
         moreNews = await newsDataService.getPopularNews(1, newCount);
-        console.log('🔥 Loaded more popular news with rotation');
+        debug('🔥 Loaded more popular news with rotation');
       } else {
         moreNews = await newsDataService.getCombinedNews(1, newCount);
-        console.log('📰 Loaded more regular combined news');
+        debug('📰 Loaded more regular combined news');
       }
       
       setFeaturedNews(moreNews.news);

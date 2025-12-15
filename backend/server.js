@@ -117,20 +117,29 @@ function validateAndFormatDate(dateString) {
 }
 
 // Middleware
+const allowedOrigins = [
+  'https://sangbadbangla.news',
+  'https://www.sangbadbangla.news',
+  'https://sangbadbangla.vercel.app',
+  'https://sangbadbangla1.onrender.com',
+  'http://localhost:3000',
+  'http://localhost:5173'
+];
+
 const corsOptions = {
-  origin: [
-    'https://sangbadbangla.news', // Your custom domain
-    'https://www.sangbadbangla.news', // Your custom domain with www
-    'https://sangbadbangla.vercel.app', // Your Vercel frontend (keep as fallback)
-    'http://localhost:3000', // Local development
-    'http://localhost:5173'  // Vite dev server
-    
-  ],
+  origin: (origin, cb) => {
+    if (!origin) return cb(null, true);
+    if (allowedOrigins.includes(origin)) return cb(null, true);
+    return cb(new Error('Not allowed by CORS'));
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
   optionsSuccessStatus: 200
 };
 
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json());
 
 // Health check endpoint

@@ -4,7 +4,7 @@ import "./LoginButton.css";
 
 const LoginButton = () => {
   // Safe Auth0 hook usage with fallback
-  let loginWithRedirect = () => console.log('Auth0 not configured');
+  let loginWithRedirect = () => {};
   
   try {
     const auth0 = useAuth0();
