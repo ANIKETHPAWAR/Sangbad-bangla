@@ -128,8 +128,18 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: (origin, cb) => {
+    // Allow same-origin requests (no Origin header) and known hosts
     if (!origin) return cb(null, true);
+
+    // Allow exact matches
     if (allowedOrigins.includes(origin)) return cb(null, true);
+
+    // Allow onrender domains for this service
+    if (/\.onrender\.com$/.test(new URL(origin).host)) return cb(null, true);
+
+    // Allow subdomains of sangbadbangla.news
+    if (new URL(origin).host.endsWith('sangbadbangla.news')) return cb(null, true);
+
     return cb(new Error('Not allowed by CORS'));
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
