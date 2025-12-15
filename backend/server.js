@@ -5,6 +5,13 @@ const admin = require('firebase-admin');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
+// Lightweight debug logger; no-ops in production
+const debug = (...args) => {
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(...args);
+  }
+};
+
 // Simple in-memory cache with TTL
 const apiCache = {
   combinedNews: new Map(),
@@ -45,7 +52,7 @@ try {
       credential: admin.credential.cert(serviceAccount),
       storageBucket: process.env.FIREBASE_STORAGE_BUCKET
     });
-    console.log('✅ Firebase Admin SDK initialized successfully with environment variables');
+    debug('✅ Firebase Admin SDK initialized successfully with environment variables');
   } else {
     // Fallback to JSON file (local development)
     const serviceAccount = require('./firebase-service-account.json');
@@ -53,12 +60,12 @@ try {
       credential: admin.credential.cert(serviceAccount),
       storageBucket: process.env.FIREBASE_STORAGE_BUCKET
     });
-    console.log('✅ Firebase Admin SDK initialized successfully with JSON file');
+    debug('✅ Firebase Admin SDK initialized successfully with JSON file');
   }
 } catch (error) {
   console.error('❌ Firebase initialization error:', error.message);
   // Don't exit the process, let it continue without Firebase for now
-  console.log('⚠️ Continuing without Firebase Admin SDK...');
+  debug('⚠️ Continuing without Firebase Admin SDK...');
 }
 
 // Helper function to validate and format dates
@@ -202,7 +209,7 @@ async function handleMarketingInquiry(req, res) {
       html
     });
 
-    console.log('📧 Advertise enquiry email sent:', info.messageId);
+    debug('📧 Advertise enquiry email sent:', info.messageId);
     res.json({ success: true, message: 'Enquiry submitted successfully' });
   } catch (error) {
     console.error('❌ Failed to send advertise enquiry:', error.message);
@@ -242,7 +249,7 @@ app.get('/api/combined-news', async (req, res) => {
         firestoreNews = firestoreResult.data || [];
       }
     } catch (error) {
-      console.log('⚠️ Firestore news fetch failed, continuing with external news only:', error.message);
+      debug('⚠️ Firestore news fetch failed, continuing with external news only:', error.message);
     }
     
     // Get external news from popular stories API (best-effort; never block internal)
@@ -279,7 +286,7 @@ app.get('/api/combined-news', async (req, res) => {
           }
         }
       } catch (error) {
-        console.log('⚠️ External news fetch failed, returning internal news only:', error.message);
+        debug('⚠️ External news fetch failed, returning internal news only:', error.message);
       }
     }
     
@@ -351,7 +358,7 @@ app.get('/api/section-feed/:sectionName/:numStories', async (req, res) => {
       return res.json(cached);
     }
     
-    console.log(`📰 Fetching section feed (HT) for: ${sectionName}, stories: ${limit}`);
+    debug(`📰 Fetching section feed (HT) for: ${sectionName}, stories: ${limit}`);
 
     // Build the Hindustan Times Bangla sectionFeedPerp URL
     // Map route aliases to HT section names
@@ -380,7 +387,7 @@ app.get('/api/section-feed/:sectionName/:numStories', async (req, res) => {
 
     if (Array.isArray(sectionItems) && sectionItems.length > 0) {
       const limitedStories = sectionItems.slice(0, limit);
-      console.log(`✅ Returning ${limitedStories.length} HT stories for section: ${sectionName}`);
+      debug(`✅ Returning ${limitedStories.length} HT stories for section: ${sectionName}`);
 
       const payload = {
         success: true,
@@ -474,7 +481,7 @@ app.use('*', (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
- console.log('server running')
+debug('server running')
 });
 
 module.exports = app;

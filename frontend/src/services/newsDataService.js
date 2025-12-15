@@ -1,5 +1,12 @@
 // News Data Service - Integrated with Hindustan Times Bangla API
 import { mockNewsData } from '../data/mockNewsData.js';
+
+// Lightweight debug logger; no-ops in production
+const debug = (...args) => {
+  if (import.meta.env?.MODE === 'development') {
+    console.log(...args);
+  }
+};
 import { SECTION_API_OVERRIDES } from '../config/sectionAPIs.js';
 
 class NewsDataService {
@@ -7,7 +14,7 @@ class NewsDataService {
     // Use environment variable for production, fallback to localhost for development
     this.baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://sangbadbangla1.onrender.com';
     
-    console.log('NewsDataService initialized with baseUrl:', this.baseUrl);
+    debug('NewsDataService initialized with baseUrl:', this.baseUrl);
     // Decide if we should route images via backend proxy (only if same host)
     try {
       const baseHost = new URL(this.baseUrl).host;
@@ -47,15 +54,15 @@ class NewsDataService {
   // Get popular news with rotation to show different content than all news
   async getPopularNews(page = 1, limit = 20) {
     try {
-      console.log('🔥 Fetching popular news with rotation...');
+      debug('🔥 Fetching popular news with rotation...');
       
       // Generate rotation offset based on current time to ensure different content
       // This creates a rotation that changes every 5 minutes
       const rotationInterval = 5 * 60 * 1000; // 5 minutes in milliseconds
       const rotationOffset = Math.floor(Date.now() / rotationInterval) % 10; // Rotate through 10 different offsets
       
-      console.log(`🔄 Popular News Rotation: Using offset ${rotationOffset} (changes every 5 minutes)`);
-      console.log(`🔄 This ensures popular news shows different content than all news`);
+      debug(`🔄 Popular News Rotation: Using offset ${rotationOffset} (changes every 5 minutes)`);
+      debug(`🔄 This ensures popular news shows different content than all news`);
       
       // Use the same API as all news but with rotation
       const result = await this.getCombinedNews(page, limit, null, rotationOffset);
@@ -71,7 +78,7 @@ class NewsDataService {
 
   // Transform API response to match our frontend structure
   transformNewsItem(apiItem) {
-    console.log('Transforming API item:', apiItem);
+    debug('Transforming API item:', apiItem);
     // Broad image extraction to handle different API shapes
     const bigImage = apiItem.imageObject?.bigImage || apiItem.bigImage || apiItem.leadImage || apiItem.image;
     const mediumImage = apiItem.imageObject?.mediumImage || apiItem.mediumImage;
@@ -98,7 +105,7 @@ class NewsDataService {
       authorName: apiItem.authorName || apiItem.author || apiItem.byline || '',
       keywords: apiItem.keywords || apiItem.tags || []
     };
-    console.log('Transformed item:', transformed);
+    debug('Transformed item:', transformed);
     return transformed;
   }
 
@@ -213,21 +220,21 @@ class NewsDataService {
   // Get featured news from new popular stories API
   async getFeaturedNews() {
     try {
-      console.log('🔍 Fetching featured news from:', `${this.baseUrl}/api/popular-stories`);
+      debug('🔍 Fetching featured news from:', `${this.baseUrl}/api/popular-stories`);
       
       // Check cache first
       const cacheKey = 'featured-news';
       const cachedData = this.getFromCache(cacheKey);
       if (cachedData) {
-        console.log('⚡ Loading featured news from cache');
+        debug('⚡ Loading featured news from cache');
         return cachedData;
       }
       
       // Use the proxy URL format
       const fullUrl = `${this.baseUrl}/api/popular-stories`;
       
-      console.log('📡 Full API URL:', fullUrl);
-      console.log('🌐 Base URL being used:', this.baseUrl);
+      debug('📡 Full API URL:', fullUrl);
+      debug('🌐 Base URL being used:', this.baseUrl);
       
       // Reduced timeout for faster user feedback
       const controller = new AbortController();
@@ -244,21 +251,21 @@ class NewsDataService {
       
       clearTimeout(timeoutId);
       
-      console.log('📥 Response status:', response.status);
+      debug('📥 Response status:', response.status);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
       const data = await response.json();
-      console.log('✅ Fresh Popular Stories API Response:', data);
+      debug('✅ Fresh Popular Stories API Response:', data);
       
       if (data.success && data.stories) {
         // Transform and return all stories in API order
         const transformedNews = data.stories
           .map(item => this.transformNewsItem(item));
         
-        console.log('✅ Fresh Transformed Featured News (API Order):', transformedNews);
+        debug('✅ Fresh Transformed Featured News (API Order):', transformedNews);
         
         // Cache for 2 minutes
         this.setCache(cacheKey, transformedNews, 120000);
@@ -273,12 +280,12 @@ class NewsDataService {
       const cacheKey = 'featured-news';
       const cachedData = this.getFromCache(cacheKey);
       if (cachedData) {
-        console.log('🔄 Using cached featured news as fallback');
+        debug('🔄 Using cached featured news as fallback');
         return cachedData;
       }
       
       // No mock data fallback - return empty array
-      console.log('❌ No cached data available, returning empty state');
+      debug('❌ No cached data available, returning empty state');
       return [];
     }
   }
@@ -286,13 +293,13 @@ class NewsDataService {
   // Get trending news from trending stories API
   async getTrendingNews() {
     try {
-      console.log('🔍 Fetching trending news from:', `${this.baseUrl}/api/trending-stories`);
+      debug('🔍 Fetching trending news from:', `${this.baseUrl}/api/trending-stories`);
       
       // Check cache first
       const cacheKey = 'trending-news';
       const cachedData = this.getFromCache(cacheKey);
       if (cachedData) {
-        console.log('⚡ Loading trending news from cache');
+        debug('⚡ Loading trending news from cache');
         return cachedData;
       }
       
@@ -312,12 +319,12 @@ class NewsDataService {
       
       clearTimeout(timeoutId);
       
-      console.log('📥 Trending stories response status:', response.status);
+      debug('📥 Trending stories response status:', response.status);
       
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.stories) {
-          console.log('✅ Fresh Trending Stories API Response:', data);
+          debug('✅ Fresh Trending Stories API Response:', data);
           // Return all stories in API order
           const transformedNews = data.stories
             .map(item => this.transformNewsItem(item));
@@ -329,12 +336,12 @@ class NewsDataService {
         }
       }
       
-      console.log('🔄 Falling back to popular stories for trending news...');
+      debug('🔄 Falling back to popular stories for trending news...');
       
       // Fallback: Get trending data from popular stories
       const fallbackUrl = `${this.baseUrl}/api/popular-stories`;
       
-      console.log('📡 Fallback API URL:', fallbackUrl);
+      debug('📡 Fallback API URL:', fallbackUrl);
       
       const fallbackController = new AbortController();
       const fallbackTimeoutId = setTimeout(() => fallbackController.abort(), 3000);
@@ -350,7 +357,7 @@ class NewsDataService {
       
       clearTimeout(fallbackTimeoutId);
       
-      console.log('📥 Fallback response status:', response.status);
+      debug('📥 Fallback response status:', response.status);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -365,7 +372,7 @@ class NewsDataService {
           .sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate));
         
         // Return all stories in API order
-        console.log('✅ Fresh Trending News (API Order):', allTransformedStories);
+        debug('✅ Fresh Trending News (API Order):', allTransformedStories);
         
         const filteredNews = allTransformedStories
           .filter(item => item.publishDate); // Ensure we have valid dates
@@ -384,12 +391,12 @@ class NewsDataService {
       const cacheKey = 'trending-news';
       const cachedData = this.getFromCache(cacheKey);
       if (cachedData) {
-        console.log('🔄 Using cached trending news as fallback');
+        debug('🔄 Using cached trending news as fallback');
         return cachedData;
       }
       
       // No mock data fallback - return empty array
-      console.log('❌ No cached data available, returning empty state');
+      debug('❌ No cached data available, returning empty state');
       return [];
     }
   }
@@ -401,7 +408,7 @@ class NewsDataService {
       const cacheKey = 'fresh-trending-news';
       const cachedData = this.getFromCache(cacheKey);
       if (cachedData) {
-        console.log('⚡ Loading fresh trending news from cache');
+        debug('⚡ Loading fresh trending news from cache');
         return cachedData;
       }
       
@@ -427,7 +434,7 @@ class NewsDataService {
           .map(item => this.transformNewsItem(item));
         
         // Return all stories in API order
-        console.log('Enhanced Fresh Trending News (API Order):', allTransformedStories);
+        debug('Enhanced Fresh Trending News (API Order):', allTransformedStories);
         
         const filteredNews = allTransformedStories
           .filter(item => item.publishDate); // Ensure we have valid dates
@@ -446,12 +453,12 @@ class NewsDataService {
       const cacheKey = 'fresh-trending-news';
       const cachedData = this.getFromCache(cacheKey);
       if (cachedData) {
-        console.log('🔄 Using cached fresh trending news as fallback');
+        debug('🔄 Using cached fresh trending news as fallback');
         return cachedData;
       }
       
       // No mock data fallback - return empty array
-      console.log('❌ No cached data available for fresh trending news');
+      debug('❌ No cached data available for fresh trending news');
       return [];
     }
   }
@@ -463,7 +470,7 @@ class NewsDataService {
       const cacheKey = `trending-news-set-${setIndex}`;
       const cachedData = this.getFromCache(cacheKey);
       if (cachedData) {
-        console.log('⚡ Loading trending news set from cache:', setIndex);
+        debug('⚡ Loading trending news set from cache:', setIndex);
         return cachedData;
       }
       
@@ -513,7 +520,7 @@ class NewsDataService {
       const cacheKey = `trending-news-set-${setIndex}`;
       const cachedData = this.getFromCache(cacheKey);
       if (cachedData) {
-        console.log('🔄 Using cached trending news set as fallback:', setIndex);
+        debug('🔄 Using cached trending news set as fallback:', setIndex);
         return cachedData;
       }
       
@@ -529,7 +536,7 @@ class NewsDataService {
       const cacheKey = `category-news-${category}`;
       const cachedData = this.getFromCache(cacheKey);
       if (cachedData) {
-        console.log('⚡ Loading category news from cache:', category);
+        debug('⚡ Loading category news from cache:', category);
         return cachedData;
       }
       
@@ -577,12 +584,12 @@ class NewsDataService {
       const cacheKey = `category-news-${category}`;
       const cachedData = this.getFromCache(cacheKey);
       if (cachedData) {
-        console.log('🔄 Using cached category news as fallback:', category);
+        debug('🔄 Using cached category news as fallback:', category);
         return cachedData;
       }
       
       // No mock data fallback - return empty array
-      console.log('❌ No cached data available for category:', category);
+      debug('❌ No cached data available for category:', category);
       return [];
     }
   }
@@ -594,7 +601,7 @@ class NewsDataService {
       const cacheKey = `section-news-${sectionKey}-${limit}`;
       const cachedData = this.getFromCache(cacheKey);
       if (cachedData) {
-        console.log('⚡ Loading section news from cache:', sectionKey);
+        debug('⚡ Loading section news from cache:', sectionKey);
         return cachedData;
       }
       
@@ -654,12 +661,12 @@ class NewsDataService {
       const cacheKey = `section-news-${sectionKey}-${limit}`;
       const cachedData = this.getFromCache(cacheKey);
       if (cachedData) {
-        console.log('🔄 Using cached section news as fallback:', sectionKey);
+        debug('🔄 Using cached section news as fallback:', sectionKey);
         return cachedData;
       }
       
       // No mock data fallback - return empty array
-      console.log('❌ No cached data available for section:', sectionKey);
+      debug('❌ No cached data available for section:', sectionKey);
       return [];
     }
   }
@@ -671,7 +678,7 @@ class NewsDataService {
       const cacheKey = `category-combined-${sectionKey}-${limit}`;
       const cachedData = this.getFromCache(cacheKey);
       if (cachedData) {
-        console.log('⚡ Loading combined category news from cache:', sectionKey);
+        debug('⚡ Loading combined category news from cache:', sectionKey);
         return cachedData;
       }
       
@@ -719,12 +726,12 @@ class NewsDataService {
       const cacheKey = `category-combined-${sectionKey}-${limit}`;
       const cachedData = this.getFromCache(cacheKey);
       if (cachedData) {
-        console.log('🔄 Using cached combined category news as fallback:', sectionKey);
+        debug('🔄 Using cached combined category news as fallback:', sectionKey);
         return cachedData;
       }
       
       // No mock data fallback - return empty array
-      console.log('❌ No cached data available for combined category:', sectionKey);
+      debug('❌ No cached data available for combined category:', sectionKey);
       return [];
     }
   }
@@ -736,7 +743,7 @@ class NewsDataService {
       const cacheKey = `search-${query.toLowerCase()}`;
       const cachedData = this.getFromCache(cacheKey);
       if (cachedData) {
-        console.log('⚡ Loading search results from cache:', query);
+        debug('⚡ Loading search results from cache:', query);
         return cachedData;
       }
       
@@ -784,12 +791,12 @@ class NewsDataService {
       const cacheKey = `search-${query.toLowerCase()}`;
       const cachedData = this.getFromCache(cacheKey);
       if (cachedData) {
-        console.log('🔄 Using cached search results as fallback:', query);
+        debug('🔄 Using cached search results as fallback:', query);
         return cachedData;
       }
       
       // No mock data fallback - return empty array
-      console.log('❌ No cached data available for search:', query);
+      debug('❌ No cached data available for search:', query);
       return [];
     }
   }
@@ -797,7 +804,7 @@ class NewsDataService {
   // Get section feed for detailed article view
   async getSectionFeed(sectionName, numStories = 15) {
     try {
-      console.log('🔍 Fetching section feed for:', sectionName, 'with', numStories, 'stories');
+      debug('🔍 Fetching section feed for:', sectionName, 'with', numStories, 'stories');
       
       const response = await fetch(`${this.baseUrl}/api/section-feed/${encodeURIComponent(sectionName)}/${numStories}`);
       
@@ -806,7 +813,7 @@ class NewsDataService {
       }
       
       const data = await response.json();
-      console.log('✅ Section feed API response:', data);
+      debug('✅ Section feed API response:', data);
       
       if (data.success && data.stories) {
         return data.stories.map(item => this.transformNewsItem(item));
@@ -821,13 +828,13 @@ class NewsDataService {
 
   async getDetailedArticle(sectionName, numberOfStories = 15) {
     try {
-      console.log('🔍 Fetching detailed articles for section:', sectionName);
+      debug('🔍 Fetching detailed articles for section:', sectionName);
       
       // Check cache first
       const cacheKey = `detailed-article-${sectionName}-${numberOfStories}`;
       const cachedData = this.getFromCache(cacheKey);
       if (cachedData) {
-        console.log('⚡ Loading detailed articles from cache:', sectionName);
+        debug('⚡ Loading detailed articles from cache:', sectionName);
         return cachedData;
       }
       
@@ -847,14 +854,14 @@ class NewsDataService {
       }
       
       const data = await response.json();
-      console.log('✅ Detailed Article API Response:', data);
+      debug('✅ Detailed Article API Response:', data);
       
       if (data.success && data.stories && Array.isArray(data.stories)) {
         // Transform and sort by publish date - latest first
         const transformedStories = this.transformDetailedStories(data.stories);
         const sortedStories = transformedStories.sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate));
         
-        console.log('✅ Transformed and sorted detailed articles:', sortedStories);
+        debug('✅ Transformed and sorted detailed articles:', sortedStories);
         
         // Cache for 2 minutes
         this.setCache(cacheKey, sortedStories, 120000);
@@ -872,12 +879,12 @@ class NewsDataService {
       const cacheKey = `detailed-article-${sectionName}-${numberOfStories}`;
       const cachedData = this.getFromCache(cacheKey);
       if (cachedData) {
-        console.log('🔄 Using cached detailed articles as fallback:', sectionName);
+        debug('🔄 Using cached detailed articles as fallback:', sectionName);
         return cachedData;
       }
       
       // No mock data fallback - return empty array
-      console.log('❌ No cached data available for detailed articles:', sectionName);
+      debug('❌ No cached data available for detailed articles:', sectionName);
       return [];
     }
   }
@@ -888,7 +895,7 @@ class NewsDataService {
       return [];
     }
     
-    console.log('🔄 Transforming detailed stories:', stories);
+    debug('🔄 Transforming detailed stories:', stories);
     
     const transformed = stories.map((item, index) => {
       try {
@@ -911,7 +918,7 @@ class NewsDataService {
           sectionName: item.sectionName || item.section || ''
         };
         
-        console.log(`✅ Transformed story ${index + 1}:`, transformedItem);
+        debug(`✅ Transformed story ${index + 1}:`, transformedItem);
         return transformedItem;
       } catch (error) {
         console.error(`❌ Error transforming story ${index + 1}:`, error, item);
@@ -919,41 +926,41 @@ class NewsDataService {
       }
     }).filter(Boolean); // Remove any null items
     
-    console.log(`✅ Successfully transformed ${transformed.length} stories`);
+    debug(`✅ Successfully transformed ${transformed.length} stories`);
     return transformed;
   }
 
   // Mock data methods removed - returning empty arrays for better performance
   getMockFeaturedNews() {
-    console.log('❌ Mock data disabled - returning empty array');
+    debug('❌ Mock data disabled - returning empty array');
     return [];
   }
 
   getMockTrendingNews() {
-    console.log('❌ Mock data disabled - returning empty array');
+    debug('❌ Mock data disabled - returning empty array');
     return [];
   }
 
   getMockNewsByCategory(category) {
-    console.log('❌ Mock data disabled for category:', category);
+    debug('❌ Mock data disabled for category:', category);
     return [];
   }
 
   getMockSearchNews(query) {
-    console.log('❌ Mock data disabled for search:', query);
+    debug('❌ Mock data disabled for search:', query);
     return [];
   }
 
   // Force refresh all news data with aggressive cache busting
   async forceRefreshAllNews() {
     try {
-      console.log('🔄 Force refreshing all news data...');
+      debug('🔄 Force refreshing all news data...');
       
       // Clear any potential browser cache
       if ('caches' in window) {
         const cacheNames = await caches.keys();
         await Promise.all(cacheNames.map(name => caches.delete(name)));
-        console.log('🧹 Browser cache cleared');
+        debug('🧹 Browser cache cleared');
       }
       
       // Force fresh featured news
@@ -962,7 +969,7 @@ class NewsDataService {
       // Force fresh trending news
       const trendingNews = await this.getTrendingNews();
       
-      console.log('✅ All news data force refreshed successfully');
+      debug('✅ All news data force refreshed successfully');
       
       return {
         featured: featuredNews,
