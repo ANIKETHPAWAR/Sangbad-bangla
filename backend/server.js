@@ -28,6 +28,27 @@ const getCache = (bucket, key) => {
   bucket.delete(key);
   return null;
 };
+
+// Helper for fetch with proper timeout using AbortController
+const fetchWithTimeout = async (url, options = {}, timeoutMs = 10000) => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    return response;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new Error(`Request timeout after ${timeoutMs}ms`);
+    }
+    throw error;
+  }
+};
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -263,14 +284,13 @@ app.get('/api/combined-news', async (req, res) => {
     let externalNews = [];
     if (!category) {
       try {
-        const response = await fetch('https://personalize.hindustantimes.com/popular-story?propertyId=bg&platformId=web&articleType=story&numStories=20', {
+        const response = await fetchWithTimeout('https://personalize.hindustantimes.com/popular-story?propertyId=bg&platformId=web&articleType=story&numStories=20', {
           headers: {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
             'Accept': 'application/json, text/plain, */*',
             'Accept-Language': 'bn-IN,bn;q=0.9,en;q=0.8'
-          },
-          timeout: 8000
-        });
+          }
+        }, 8000);
         if (response.ok) {
           const data = await response.json();
           if (data && data.status === 'success' && Array.isArray(data.items)) {
@@ -371,19 +391,30 @@ app.get('/api/section-feed/:sectionName/:numStories', async (req, res) => {
     // Map route aliases to HT section names
     const map = {
       football: 'sports',
-      careers: 'career'
+      careers: 'career',
+      news: 'national',
+      national: 'national',
+      entertainment: 'entertainment',
+      cricket: 'cricket',
+      sports: 'sports',
+      lifestyle: 'lifestyle',
+      technology: 'technology',
+      business: 'business',
+      world: 'world',
+      india: 'india',
+      bengal: 'bengal',
+      kolkata: 'kolkata'
     };
-    const htSection = map[sectionName] || sectionName;
+    const htSection = map[sectionName.toLowerCase()] || sectionName;
     const htUrl = `https://bangla.hindustantimes.com/api/app/sectionFeedPerp/v1/${encodeURIComponent(htSection)}/${Math.min(limit, 50)}`;
 
-    const response = await fetch(htUrl, {
+    const response = await fetchWithTimeout(htUrl, {
       headers: {
         'Accept': 'application/json, text/plain, */*',
         'User-Agent': 'Mozilla/5.0',
         'Referer': 'https://bangla.hindustantimes.com/'
-      },
-      timeout: 15000
-    });
+      }
+    }, 12000);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -433,14 +464,13 @@ app.get('/api/image', async (req, res) => {
     if (!targetUrl) {
       return res.status(400).send('Missing url');
     }
-    const upstream = await fetch(targetUrl, {
+    const upstream = await fetchWithTimeout(targetUrl, {
       headers: {
         'Accept': 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
         'User-Agent': 'Mozilla/5.0',
         'Referer': 'https://bangla.hindustantimes.com/'
-      },
-      timeout: 10000
-    });
+      }
+    }, 8000);
     if (!upstream.ok) {
       return res.status(upstream.status).send('Failed to load image');
     }
@@ -467,9 +497,14 @@ app.use('/api/notifications', notificationRoutes);
 const configRoutes = require('./routes/config');
 app.use('/api/config', configRoutes);
 
-// Error handling middleware
+// Error handling middleware - ensure CORS headers on errors too
 app.use((error, req, res, next) => {
   console.error('Unhandled error:', error);
+  // Ensure CORS headers are set even on errors
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,Cache-Control,Pragma,X-Requested-With,Accept,Accept-Language');
+  res.header('Access-Control-Allow-Credentials', 'true');
   res.status(500).json({
     success: false,
     error: 'Internal server error',
@@ -477,8 +512,12 @@ app.use((error, req, res, next) => {
   });
 });
 
-// 404 handler
+// 404 handler - ensure CORS headers on 404 too
 app.use('*', (req, res) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,Cache-Control,Pragma,X-Requested-With,Accept,Accept-Language');
+  res.header('Access-Control-Allow-Credentials', 'true');
   res.status(404).json({
     success: false,
     error: 'Route not found',

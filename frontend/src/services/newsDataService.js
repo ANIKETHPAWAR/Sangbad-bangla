@@ -790,7 +790,15 @@ class NewsDataService {
     try {
       debug('🔍 Fetching section feed for:', sectionName, 'with', numStories, 'stories');
       
-      const response = await fetch(`${this.baseUrl}/api/section-feed/${encodeURIComponent(sectionName)}/${numStories}`);
+      // Add timeout to prevent hanging requests
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
+      const response = await fetch(`${this.baseUrl}/api/section-feed/${encodeURIComponent(sectionName)}/${numStories}`, {
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -822,9 +830,9 @@ class NewsDataService {
         return cachedData;
       }
       
-      // Reduced timeout for faster user feedback
+      // Timeout for detailed article fetching
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
       
       // Use the backend section feed endpoint
       const response = await fetch(`${this.baseUrl}/api/section-feed/${encodeURIComponent(sectionName)}/${numberOfStories}`, {
@@ -968,7 +976,15 @@ class NewsDataService {
   // Fetch cricket data from the backend proxy
   async getCricketData() {
     try {
-      const response = await fetch(`${this.baseUrl}/api/cricket-data`);
+      // Add timeout to prevent hanging requests
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
+      const response = await fetch(`${this.baseUrl}/api/cricket-data`, {
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
