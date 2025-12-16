@@ -4,8 +4,31 @@ const notificationService = require('./notificationService');
 
 class NewsService {
   constructor() {
-    this.db = admin.firestore();
     this.newsCollection = 'news';
+    this.db = null;
+    this._initializeDb();
+  }
+
+  _initializeDb() {
+    try {
+      // Check if Firebase is initialized before getting Firestore
+      if (admin.apps.length > 0) {
+        this.db = admin.firestore();
+      } else {
+        console.warn('⚠️ Firebase not initialized, NewsService will return empty results');
+      }
+    } catch (error) {
+      console.error('❌ Error initializing Firestore in NewsService:', error.message);
+      this.db = null;
+    }
+  }
+
+  // Ensure db is available, return null if not
+  _getDb() {
+    if (!this.db) {
+      this._initializeDb();
+    }
+    return this.db;
   }
 
   /**
@@ -13,6 +36,11 @@ class NewsService {
    */
   async createNews(newsData) {
     try {
+      const db = this._getDb();
+      if (!db) {
+        throw new Error('Firestore not available');
+      }
+      
       const newsId = uuidv4();
       const timestamp = admin.firestore.FieldValue.serverTimestamp();
       
@@ -33,7 +61,7 @@ class NewsService {
         source: 'internal'
       };
 
-      await this.db.collection(this.newsCollection).doc(newsId).set(news);
+      await db.collection(this.newsCollection).doc(newsId).set(news);
       
       // Send push notification for new article
       try {
@@ -59,6 +87,11 @@ class NewsService {
    */
   async updateNews(newsId, updateData) {
     try {
+      const db = this._getDb();
+      if (!db) {
+        throw new Error('Firestore not available');
+      }
+      
       const timestamp = admin.firestore.FieldValue.serverTimestamp();
       
       // Prepare update data with new fields
@@ -82,7 +115,7 @@ class NewsService {
         updateFields.readTime = parseInt(updateData.readTime) || 3;
       }
 
-      await this.db.collection(this.newsCollection).doc(newsId).update(updateFields);
+      await db.collection(this.newsCollection).doc(newsId).update(updateFields);
       
       return {
         success: true,
@@ -99,7 +132,12 @@ class NewsService {
    */
   async deleteNews(newsId) {
     try {
-      await this.db.collection(this.newsCollection).doc(newsId).update({
+      const db = this._getDb();
+      if (!db) {
+        throw new Error('Firestore not available');
+      }
+      
+      await db.collection(this.newsCollection).doc(newsId).update({
         published: false,
         deletedAt: admin.firestore.FieldValue.serverTimestamp()
       });
@@ -119,7 +157,12 @@ class NewsService {
    */
   async getNewsById(newsId) {
     try {
-      const doc = await this.db.collection(this.newsCollection).doc(newsId).get();
+      const db = this._getDb();
+      if (!db) {
+        throw new Error('Firestore not available');
+      }
+      
+      const doc = await db.collection(this.newsCollection).doc(newsId).get();
       
       if (!doc.exists) {
         throw new Error('News not found');
@@ -150,8 +193,14 @@ class NewsService {
    */
   async getAllNews(page = 1, limit = 20) {
     try {
+      const db = this._getDb();
+      if (!db) {
+        console.warn('⚠️ Firestore not available, returning empty news list');
+        return { success: true, data: [], pagination: { page, limit, total: 0, pages: 0 } };
+      }
+      
       // Simplified query that doesn't require complex indexes
-      let query = this.db.collection(this.newsCollection)
+      let query = db.collection(this.newsCollection)
         .where('published', '==', true);
       
       const snapshot = await query.get();
@@ -203,11 +252,17 @@ class NewsService {
    */
   async getNewsByCategory(category, limit = 20) {
     try {
+      const db = this._getDb();
+      if (!db) {
+        console.warn('⚠️ Firestore not available, returning empty category news');
+        return { success: true, data: [], category, count: 0 };
+      }
+      
       // Use equality filters only to avoid composite index requirements,
       // then sort in memory by createdAt desc and apply the limit.
       // Query only by category to avoid composite index requirements,
       // we'll filter by published in memory.
-      const snapshot = await this.db.collection(this.newsCollection)
+      const snapshot = await db.collection(this.newsCollection)
         .where('category', '==', category)
         .get();
       
@@ -249,8 +304,13 @@ class NewsService {
    */
   async searchNews(query, limit = 20) {
     try {
+      const db = this._getDb();
+      if (!db) {
+        return { success: true, data: [], query };
+      }
+      
       // Simple search implementation
-      const snapshot = await this.db.collection(this.newsCollection)
+      const snapshot = await db.collection(this.newsCollection)
         .where('published', '==', true)
         .orderBy('createdAt', 'desc')
         .limit(limit)
@@ -284,16 +344,21 @@ class NewsService {
    */
   async getNewsStats() {
     try {
+      const db = this._getDb();
+      if (!db) {
+        return { success: true, data: { totalNews: 0, published: 0, deleted: 0, categories: 0, lastUpdated: new Date().toISOString() } };
+      }
+      
       // Get all news (both published and unpublished)
-      const allNewsSnapshot = await this.db.collection(this.newsCollection).get();
+      const allNewsSnapshot = await db.collection(this.newsCollection).get();
       
       // Get published news
-      const publishedSnapshot = await this.db.collection(this.newsCollection)
+      const publishedSnapshot = await db.collection(this.newsCollection)
         .where('published', '==', true)
         .get();
       
       // Get unpublished/deleted news
-      const unpublishedSnapshot = await this.db.collection(this.newsCollection)
+      const unpublishedSnapshot = await db.collection(this.newsCollection)
         .where('published', '==', false)
         .get();
       
