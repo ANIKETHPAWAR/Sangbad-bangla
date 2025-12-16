@@ -2,8 +2,29 @@ const admin = require('firebase-admin');
 
 class NotificationService {
   constructor() {
-    this.messaging = admin.messaging();
+    this.messaging = null;
     this.fcmTokens = new Map(); // In production, use a database
+    this._initializeMessaging();
+  }
+
+  _initializeMessaging() {
+    try {
+      if (admin.apps.length > 0) {
+        this.messaging = admin.messaging();
+      } else {
+        console.warn('⚠️ Firebase not initialized, NotificationService will be disabled');
+      }
+    } catch (error) {
+      console.error('❌ Error initializing Firebase Messaging:', error.message);
+      this.messaging = null;
+    }
+  }
+
+  _getMessaging() {
+    if (!this.messaging) {
+      this._initializeMessaging();
+    }
+    return this.messaging;
   }
 
   /**
@@ -25,6 +46,11 @@ class NotificationService {
    */
   async sendNewArticleNotification(article) {
     try {
+      const messaging = this._getMessaging();
+      if (!messaging) {
+        return { success: false, message: 'Firebase Messaging not available' };
+      }
+      
       if (this.fcmTokens.size === 0) {
         // No FCM tokens registered
         return { success: false, message: 'No tokens registered' };
@@ -63,7 +89,7 @@ class NotificationService {
         }
       };
 
-      const result = await this.messaging.sendMulticast({
+      const result = await messaging.sendMulticast({
         tokens,
         ...message
       });
@@ -107,6 +133,11 @@ class NotificationService {
    */
   async sendCustomNotification(title, body, data = {}) {
     try {
+      const messaging = this._getMessaging();
+      if (!messaging) {
+        return { success: false, message: 'Firebase Messaging not available' };
+      }
+      
       if (this.fcmTokens.size === 0) {
         // No FCM tokens registered
         return { success: false, message: 'No tokens registered' };
@@ -144,7 +175,7 @@ class NotificationService {
         }
       };
 
-      const result = await this.messaging.sendMulticast({
+      const result = await messaging.sendMulticast({
         tokens,
         ...message
       });
