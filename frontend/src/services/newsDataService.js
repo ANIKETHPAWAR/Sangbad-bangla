@@ -242,11 +242,7 @@ class NewsDataService {
       
       const response = await fetch(fullUrl, {
         method: 'GET',
-        signal: controller.signal,
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
-        }
+        signal: controller.signal
       });
       
       clearTimeout(timeoutId);
@@ -310,11 +306,7 @@ class NewsDataService {
       // First try to get trending stories from a dedicated trending endpoint
       let response = await fetch(`${this.baseUrl}/api/trending-stories`, {
         method: 'GET',
-        signal: controller.signal,
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
-        }
+        signal: controller.signal
       });
       
       clearTimeout(timeoutId);
@@ -348,11 +340,7 @@ class NewsDataService {
       
       response = await fetch(fallbackUrl, {
         method: 'GET',
-        signal: fallbackController.signal,
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
-        }
+        signal: fallbackController.signal
       });
       
       clearTimeout(fallbackTimeoutId);
@@ -480,11 +468,7 @@ class NewsDataService {
       
       const response = await fetch(`${this.baseUrl}/api/popular-stories`, {
         method: 'GET',
-        signal: controller.signal,
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
-        }
+        signal: controller.signal
       });
       
       clearTimeout(timeoutId);
@@ -616,7 +600,7 @@ class NewsDataService {
           // Use explicit override when provided, otherwise use backend proxy
           const resp = await fetch(
             overrideUrl || `${this.baseUrl}/api/section-feed/${encodeURIComponent(sectionKey)}/${limit}`,
-            { signal: controller.signal, headers: { 'Cache-Control': 'no-cache' } }
+            { signal: controller.signal }
           );
           clearTimeout(timeoutId);
           return resp;
@@ -1006,13 +990,13 @@ class NewsDataService {
   // Get combined news (Firestore + external) from backend
   async getCombinedNews(page = 1, limit = 20, category = null, rotationOffset = 0) {
     try {
-      console.log('📡 Fetching combined news from backend...');
+      debug('📡 Fetching combined news from backend...');
       
       // Check cache first for immediate loading
       const cacheKey = `combined-news-${page}-${limit}-${category || 'all'}-${rotationOffset}`;
       const cachedData = this.getFromCache(cacheKey);
       if (cachedData) {
-        console.log('⚡ Loading from cache:', cacheKey);
+        debug('⚡ Loading from cache:', cacheKey);
         return cachedData;
       }
       
@@ -1022,7 +1006,7 @@ class NewsDataService {
         url += `&category=${encodeURIComponent(category)}`;
       }
       
-      console.log('🌐 Fetching from URL:', url);
+      debug('🌐 Fetching from URL:', url);
       
       // Longer timeout with single retry (no cache-buster to allow backend cache)
       const tryFetch = async (attempt = 1) => {
@@ -1031,8 +1015,7 @@ class NewsDataService {
         const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
         try {
           const resp = await fetch(url, {
-            signal: controller.signal,
-            headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+            signal: controller.signal
           });
           clearTimeout(timeoutId);
           return resp;
@@ -1053,7 +1036,7 @@ class NewsDataService {
       }
       
       const result = await response.json();
-      console.log('✅ Combined news response:', result);
+      debug('✅ Combined news response:', result);
       
       if (result.success && result.data) {
         // Transform the combined news to match our frontend format
@@ -1090,10 +1073,10 @@ class NewsDataService {
             ...rotatedNews.slice(offset),
             ...rotatedNews.slice(0, offset)
           ];
-          console.log(`🔄 Applied rotation offset ${offset} to ${transformedNews.length} articles`);
+          debug(`🔄 Applied rotation offset ${offset} to ${transformedNews.length} articles`);
         }
         
-        console.log('🔄 Transformed news:', transformedNews.length, 'articles');
+        debug('🔄 Transformed news:', transformedNews.length, 'articles');
         
         const responseData = {
           news: transformedNews,
@@ -1119,12 +1102,12 @@ class NewsDataService {
       const cacheKey = `combined-news-${page}-${limit}-${category || 'all'}-${rotationOffset}`;
       const cachedData = this.getFromCache(cacheKey);
       if (cachedData) {
-        console.log('🔄 Using cached data as fallback');
+        debug('🔄 Using cached data as fallback');
         return cachedData;
       }
       
       // No mock data fallback - return empty state
-      console.log('❌ No cached data available, returning empty state');
+      debug('❌ No cached data available, returning empty state');
       return {
         news: [],
         pagination: { currentPage: 1, totalPages: 1, totalItems: 0 },
