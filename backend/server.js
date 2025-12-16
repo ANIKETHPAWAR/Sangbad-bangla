@@ -372,7 +372,7 @@ app.get('/api/combined-news', async (req, res) => {
   }
 });
 
-// Section feed endpoint for detailed article view (proxying HT sectionFeedPerp)
+// Section feed endpoint - uses popular-story API (sectionFeedPerp is deprecated)
 app.get('/api/section-feed/:sectionName/:numStories', async (req, res) => {
   try {
     const { sectionName, numStories } = req.params;
@@ -385,56 +385,70 @@ app.get('/api/section-feed/:sectionName/:numStories', async (req, res) => {
       return res.json(cached);
     }
     
-    debug(`📰 Fetching section feed (HT) for: ${sectionName}, stories: ${limit}`);
+    debug(`📰 Fetching section feed for: ${sectionName}, stories: ${limit}`);
 
-    // Build the Hindustan Times Bangla sectionFeedPerp URL
-    // Map route aliases to HT section names
-    const map = {
-      football: 'sports',
-      careers: 'career',
-      news: 'national',
-      national: 'national',
-      entertainment: 'entertainment',
-      cricket: 'cricket',
-      sports: 'sports',
-      lifestyle: 'lifestyle',
-      technology: 'technology',
-      business: 'business',
-      world: 'world',
-      india: 'india',
-      bengal: 'bengal',
-      kolkata: 'kolkata'
-    };
-    const htSection = map[sectionName.toLowerCase()] || sectionName;
-    const htUrl = `https://bangla.hindustantimes.com/api/app/sectionFeedPerp/v1/${encodeURIComponent(htSection)}/${Math.min(limit, 50)}`;
+    // Use the working popular-story API instead of deprecated sectionFeedPerp
+    const popularStoryUrl = `https://personalize.hindustantimes.com/popular-story?propertyId=bg&platformId=web&articleType=story&numStories=${Math.min(limit * 2, 50)}`;
 
-    const response = await fetchWithTimeout(htUrl, {
+    const response = await fetchWithTimeout(popularStoryUrl, {
       headers: {
         'Accept': 'application/json, text/plain, */*',
-        'User-Agent': 'Mozilla/5.0',
-        'Referer': 'https://bangla.hindustantimes.com/'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept-Language': 'bn-IN,bn;q=0.9,en;q=0.8'
       }
     }, 12000);
+    
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
-    // Expected: { content: { sectionItems: [...], sectionName, sectionUrl } }
-    const sectionItems = data?.content?.sectionItems || [];
+    
+    // Check if response is JSON (not HTML)
+    if (data && data.status === 'success' && Array.isArray(data.items)) {
+      // Filter by section if possible, otherwise return all
+      let stories = data.items;
+      
+      // Try to filter by section name if it matches
+      const sectionLower = sectionName.toLowerCase();
+      if (sectionLower !== 'news' && sectionLower !== 'all') {
+        const filtered = stories.filter(item => 
+          item.sectionName?.toLowerCase().includes(sectionLower) ||
+          item.section?.toLowerCase().includes(sectionLower)
+        );
+        // Only use filtered if we got enough results
+        if (filtered.length >= Math.min(3, limit)) {
+          stories = filtered;
+        }
+      }
+      
+      const limitedStories = stories.slice(0, limit).map(item => ({
+        id: item.storyId || `ht_${Date.now()}_${Math.random()}`,
+        title: item.headline || item.title || 'News Story',
+        headLine: item.headline,
+        shortDescription: item.shortDescription || '',
+        imageObject: item.imageObject,
+        wallpaperLarge: item.imageObject?.bigImage || item.imageObject?.mediumImage,
+        mediumRes: item.imageObject?.mediumImage,
+        thumbImage: item.imageObject?.thumbnailImage,
+        publishDate: item.publishDate || new Date().toISOString(),
+        timeToRead: item.timeToRead || 3,
+        storyURL: item.storyURL || '',
+        detailFeedURL: item.detailFeedURL || '',
+        sectionName: item.sectionName || sectionName,
+        authorName: item.authorName || '',
+        contentType: item.contentType || 'story'
+      }));
 
-    if (Array.isArray(sectionItems) && sectionItems.length > 0) {
-      const limitedStories = sectionItems.slice(0, limit);
-      debug(`✅ Returning ${limitedStories.length} HT stories for section: ${sectionName}`);
+      debug(`✅ Returning ${limitedStories.length} stories for section: ${sectionName}`);
 
       const payload = {
         success: true,
         stories: limitedStories,
-        sectionName: data?.content?.sectionName || sectionName,
+        sectionName: sectionName,
         totalStories: limitedStories.length,
         requestedStories: limit,
-        source: 'ht-sectionFeedPerp',
-        upstreamUrl: htUrl
+        source: 'ht-popular-story'
       };
 
       setCache(apiCache.sectionFeed, cacheKey, payload, 120000); // 120s cache
@@ -442,13 +456,14 @@ app.get('/api/section-feed/:sectionName/:numStories', async (req, res) => {
       return res.json(payload);
     }
 
-    console.warn(`⚠️ No section items found for ${sectionName}. Data keys:`, Object.keys(data || {}));
-    const emptyPayload = { success: false, stories: [], sectionName, requestedStories: limit, upstreamUrl: htUrl };
+    // If API didn't return expected format
+    console.warn(`⚠️ Unexpected API response for ${sectionName}`);
+    const emptyPayload = { success: false, stories: [], sectionName, requestedStories: limit };
     setCache(apiCache.sectionFeed, cacheKey, emptyPayload, 60000);
     res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=120');
     return res.json(emptyPayload);
   } catch (error) {
-    console.error(`❌ Error fetching section feed for ${sectionName}:`, error.message);
+    console.error(`❌ Error fetching section feed for ${req.params.sectionName}:`, error.message);
     res.status(500).json({ 
       success: false,
       error: 'Failed to fetch section feed',
