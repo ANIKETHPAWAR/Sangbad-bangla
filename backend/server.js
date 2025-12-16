@@ -120,7 +120,7 @@ function validateAndFormatDate(dateString) {
 const corsOptions = {
   origin: true, // reflect request origin
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control', 'Pragma', 'X-Requested-With', 'Accept', 'Accept-Language'],
   credentials: true,
   optionsSuccessStatus: 200
 };
@@ -131,7 +131,7 @@ app.use(cors(corsOptions));
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+  res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,Cache-Control,Pragma,X-Requested-With,Accept,Accept-Language');
   res.header('Access-Control-Allow-Credentials', 'true');
   if (req.method === 'OPTIONS') {
     return res.sendStatus(204);
