@@ -2,10 +2,14 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import './App.css';
 
+// Maintenance Mode - Set to true to show maintenance page
+const MAINTENANCE_MODE = true;
+
 // Layout Components
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import Sidebar from './components/layout/Sidebar';
+import MaintenancePage from './components/MaintenancePage';
 
 // New Components
 import ConsentBanner from './components/ConsentBanner';
@@ -122,6 +126,11 @@ function App() {
   };
 
   console.log('App rendering, isLoading:', isLoading);
+
+  // Show maintenance page if enabled
+  if (MAINTENANCE_MODE) {
+    return <MaintenancePage />;
+  }
 
   // Show loading screen for iPhone Safari
   if (isLoading) {
